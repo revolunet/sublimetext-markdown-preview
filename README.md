@@ -1,4 +1,3 @@
-
 Sublime Text 2 MarkDown preview
 =====
 
@@ -8,8 +7,8 @@ Just preview the current md file in your web browser.
 
 **Installation :**
 
- - `cmd+shift+P` then `install packages`
- - select `MarkdownPreview`
+ - you should use [sublime package manager][3]
+ - then `cmd+shift+P` then `Packages: add repository` then enter `https://github.com/revolunet/sublimetext-markdown-preview`
 
 **Usage :**
 
@@ -27,3 +26,4 @@ The code is available at github [https://github.com/revolunet/sublimetext-markdo
  [0]: https://github.com/waylan/Python-Markdown
  [1]: https://github.com/clownfart/Markdown-CSS
  [2]: https://github.com/revolunet/sublimetext-markdown-preview
+ [3]: http://wbond.net/sublime_packages/package_control
