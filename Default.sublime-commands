@@ -1,0 +1,7 @@
+[
+    {
+        "caption": "Markdown Preview: Preview Current File",
+        "command": "markdown_preview",
+        "args": {}
+    }
+]
