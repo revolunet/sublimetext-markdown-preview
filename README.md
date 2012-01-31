@@ -13,9 +13,8 @@ Just preview the current md file in your web browser.
 
 **Usage :**
 
- - once installed :
-     - use `cmd+shift+P` then `MarkdownPreview` to launch a preview
-     - or bind some key in your user key binding
+ - use `cmd+shift+P` then `MarkdownPreview` to launch a preview
+ - or bind some key in your user key binding
 
 **Uses :**
 

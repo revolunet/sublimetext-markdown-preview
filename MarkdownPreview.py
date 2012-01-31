@@ -2,6 +2,7 @@ import sublime, sublime_plugin
 import webbrowser
 import tempfile
 import markdown
+import os
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
@@ -15,7 +16,9 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         if encoding == 'Undefined':
             encoding = 'UTF-8'
         tmp_html.write('<meta charset="%s">' % self.view.encoding())
-        tmp_html.write('<link href="https://raw.github.com/revolunet/Markdown-CSS/master/markdown.css" rel="stylesheet"></link>')
+        base_dir = os.path.split(__file__)[0]
+        styles = open(os.path.join(base_dir, 'markdown.css'), 'r').read()
+        tmp_html.write('<style>%s</style>' % styles)
         tmp_html.write(html.encode(encoding))
         tmp_html.close()
         webbrowser.open_new_tab(tmp_html.name)
