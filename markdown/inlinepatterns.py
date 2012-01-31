@@ -241,13 +241,14 @@ class SubstituteTagPattern(SimpleTagPattern):
 
 
 class BacktickPattern(Pattern):
-    """ Return a `<code>` element containing the matching text. """
+    """ Return a `<span class='backtick'>` element containing the matching text. """
     def __init__ (self, pattern):
         Pattern.__init__(self, pattern)
-        self.tag = "code"
+        self.tag = "span"
 
     def handleMatch(self, m):
         el = util.etree.Element(self.tag)
+        el.set("class", "backtick")
         el.text = util.AtomicString(m.group(3).strip())
         return el
 

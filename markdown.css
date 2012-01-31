@@ -6,8 +6,6 @@ body{
   font-size:12px;
   line-height:1.5em;
   padding:1em;
-  margin:auto;
-  max-width:60em;
   background:#fefefe;
 }
 
@@ -17,6 +15,13 @@ a:hover{ color: #06e; }
 a:active{ color:#faa700; }
 a:focus{ outline: thin dotted; }
 a:hover, a:active{ outline: 0; }
+
+span.backtick {
+  border:1px solid #EAEAEA;
+  border-radius:3px;
+  background:#F8F8F8;
+  padding:0px 3px 0px 3px;
+}
 
 ::-moz-selection{background:rgba(255,255,0,0.3);color:#000}
 ::selection{background:rgba(255,255,0,0.3);color:#000}
@@ -52,8 +57,19 @@ padding-left: 3em;
 border-left: 0.5em #EEE solid;
 }
 hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa;border-bottom: 1px solid #eee; margin: 1em 0; padding: 0; }
-pre, code, kbd, samp { color: #000; font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 0.98em; }
-pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
+
+
+pre , code, kbd, samp { 
+  color: #000; 
+  font-family: monospace; 
+  font-size: 0.8em; 
+  border-radius:3px;
+  background-color: #F8F8F8;
+  border: 1px solid #CCC; 
+}
+pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; padding: 5px;}
+pre code { border: 0px !important; }
+
 
 b, strong { font-weight: bold; }
 
