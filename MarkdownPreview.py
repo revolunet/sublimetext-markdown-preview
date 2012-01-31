@@ -12,6 +12,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         tmp_html = tempfile.NamedTemporaryFile(delete=False, suffix='.html')
         html = markdown.markdown(contents)
         encoding = self.view.encoding()
+        if encoding == 'Undefined':
+            encoding = 'UTF-8'
         tmp_html.write('<meta charset="%s">' % self.view.encoding())
         tmp_html.write('<link href="https://raw.github.com/revolunet/Markdown-CSS/master/markdown.css" rel="stylesheet"></link>')
         tmp_html.write(html.encode(encoding))
