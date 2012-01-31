@@ -62,7 +62,7 @@ hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa;border-b
 pre , code, kbd, samp { 
   color: #000; 
   font-family: monospace; 
-  font-size: 0.8em; 
+  font-size: 0.98em; 
   border-radius:3px;
   background-color: #F8F8F8;
   border: 1px solid #CCC; 

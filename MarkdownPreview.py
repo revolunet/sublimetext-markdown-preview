@@ -16,7 +16,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         tmp_html = tempfile.NamedTemporaryFile(delete=False, suffix='.html')
         html = markdown.markdown(contents)
         tmp_html.write('<meta charset="%s">' % self.view.encoding())
-        styles = open(os.path.join(sublime.packages_path(), 'MarkdownPreview', 'markdown.css'), 'r').read()
+        styles = open(os.path.join(sublime.packages_path(), 'Markdown Preview', 'markdown.css'), 'r').read()
         tmp_html.write('<style>%s</style>' % styles)
         tmp_html.write(html.encode(encoding))
         tmp_html.close()
