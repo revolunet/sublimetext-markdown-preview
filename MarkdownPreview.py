@@ -3,6 +3,7 @@ import webbrowser
 import tempfile
 import markdown
 import os
+import sys
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
@@ -20,4 +21,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         tmp_html.write('<style>%s</style>' % styles)
         tmp_html.write(html.encode(encoding))
         tmp_html.close()
-        webbrowser.open_new_tab(tmp_html.name)
+        if sys.platform == "win32":
+            # fix for win32
+            webbrowser.get('windows-default').open_new_tab(tmp_html.name)
+        else:
+            webbrowser.open_new_tab(tmp_html.name)
