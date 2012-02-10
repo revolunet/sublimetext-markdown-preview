@@ -22,8 +22,10 @@ Just preview the current md file in your web browser.
 
 The code is available at github [https://github.com/revolunet/sublimetext-markdown-preview][2]
 
+Licence MIT : [http://revolunet.mit-license.org][4]
 
  [0]: https://github.com/waylan/Python-Markdown
  [1]: https://github.com/clownfart/Markdown-CSS
  [2]: https://github.com/revolunet/sublimetext-markdown-preview
  [3]: http://wbond.net/sublime_packages/package_control
+ [4]: http://revolunet.mit-license.org
