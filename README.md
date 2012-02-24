@@ -9,6 +9,8 @@ Just preview the current md file in your web browser.
 
  - you should use [sublime package manager][3]
  - then `cmd+shift+P` then `Packages: add repository` then enter `https://github.com/revolunet/sublimetext-markdown-preview`
+ - use `cmd+shift+P` then `Package Control: Install Package`
+ - look for `MarkdownPreview` and install it.
 
 **Usage :**
 
