@@ -1,5 +1,5 @@
 import sublime, sublime_plugin
-import webbrowser
+import desktop
 import tempfile
 import markdown
 import os
@@ -44,7 +44,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             tmp_html = tempfile.NamedTemporaryFile(delete=False, suffix='.html')
             tmp_html.write(html_contents.encode(encoding))
             tmp_html.close()
-            webbrowser.open_new_tab(tmp_html.name)
+            desktop.open(tmp_html.name)
         elif target == 'sublime':
             new_view = self.view.window().new_file()
             new_edit = new_view.begin_edit()
