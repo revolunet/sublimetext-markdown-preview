@@ -2,7 +2,9 @@ html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-
 
 body{
   color:#444;
-  font-family:Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+  font-family:Georgia, Palatino, 'Palatino Linotype', Times,
+              'Times New Roman', serif,
+              "Hiragino Sans GB", "STXihei", "微软雅黑";
   font-size:12px;
   line-height:1.5em;
   background:#fefefe;
@@ -65,7 +67,7 @@ hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa;border-b
 pre , code, kbd, samp { 
   color: #000; 
   font-family: monospace; 
-  font-size: 0.98em; 
+  font-size: 0.88em; 
   border-radius:3px;
   background-color: #F8F8F8;
   border: 1px solid #CCC; 

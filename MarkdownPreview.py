@@ -3,6 +3,7 @@ import webbrowser
 import tempfile
 import markdown
 import os
+import sys
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
@@ -21,7 +22,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         return open(css_path, 'r').read()
 
     def run(self, edit, target='browser'):
-        print edit, target
+        reload(sys)
+        sys.setdefaultencoding('UTF-8')
         region = sublime.Region(0, self.view.size())
         encoding = self.view.encoding()
         if encoding == 'Undefined':
