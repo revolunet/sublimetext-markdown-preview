@@ -19,15 +19,13 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             if not os.path.isfile(css_path):
                 raise Exception("markdown.css file not found!")
 
-        return open(css_path, 'r').read()
+        return open(css_path, 'r').read().decode('utf-8')
 
     def run(self, edit, target='browser'):
-        reload(sys)
-        sys.setdefaultencoding('UTF-8')
         region = sublime.Region(0, self.view.size())
         encoding = self.view.encoding()
         if encoding == 'Undefined':
-            encoding = 'UTF-8'
+            encoding = 'utf-8'
         elif encoding == 'Western (Windows 1252)':
             encoding = 'windows-1252'
         contents = self.view.substr(region)
@@ -36,7 +34,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         markdown_html = markdown.markdown(contents)
 
         # build the html
-        html_contents = u'<meta charset="%s">' % self.view.encoding()
+        html_contents = u'<meta charset="%s">' % encoding
         styles = self.getCSS()
         html_contents += '<style>%s</style>' % styles
         html_contents += markdown_html
