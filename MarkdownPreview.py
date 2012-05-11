@@ -3,7 +3,13 @@ import desktop
 import tempfile
 import markdown
 import os
-import sys
+
+
+def getTempMarkdownPreviewPath(view):
+    # return a permanent full path of the temp markdown preview file
+    tmp_filename = '%s.html' % view.id()
+    tmp_fullpath = os.path.join(tempfile.gettempdir(), tmp_filename)
+    return tmp_fullpath
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
@@ -41,14 +47,18 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         html_contents += markdown_html
         html_contents += '</body>'
 
-        # output
-        if target == 'browser':
-            tmp_html = tempfile.NamedTemporaryFile(delete=False, suffix='.html')
+        if target in ['disk', 'browser']:
+            # update output html file
+            tmp_fullpath = getTempMarkdownPreviewPath(self.view)
+            tmp_html = open(tmp_fullpath, 'w')
             tmp_html.write(html_contents.encode(encoding))
             tmp_html.close()
-            desktop.open(tmp_html.name)
+            # todo : livereload ?
+            if target == 'browser':
+                desktop.open(tmp_fullpath)
         elif target == 'sublime':
             new_view = self.view.window().new_file()
             new_edit = new_view.begin_edit()
             new_view.insert(new_edit, 0, html_contents)
             new_view.end_edit(new_edit)
+        print 'markdown converted'
