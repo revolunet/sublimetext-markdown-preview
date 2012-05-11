@@ -6,10 +6,21 @@ import os
 
 
 def getTempMarkdownPreviewPath(view):
-    # return a permanent full path of the temp markdown preview file
+    " return a permanent full path of the temp markdown preview file "
     tmp_filename = '%s.html' % view.id()
     tmp_fullpath = os.path.join(tempfile.gettempdir(), tmp_filename)
     return tmp_fullpath
+
+
+class MarkdownPreviewListener(sublime_plugin.EventListener):
+    """ update the output html when markdown file has already been converted once """
+
+    def on_post_save(self, view):
+        if view.file_name().endswith(('.md', '.markdown', '.mdown')):
+            temp_file = getTempMarkdownPreviewPath(view)
+            if os.path.isfile(temp_file):
+                # reexec markdown conversion
+                view.run_command('markdown_preview', {'target': 'browser'})
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
