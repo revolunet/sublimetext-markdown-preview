@@ -50,14 +50,17 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             \)                      # source end
             )
         """
-        abs_path = '%s/' % os.path.dirname(self.view.file_name())
-        for md, alt, src, title in re.findall(RE_IMG, contents, re.VERBOSE):
-            if src.startswith(('http', '/')):
-                # skip abdolute paths
-                continue
-            else:
-                md_fixed = "![%s](%s%s '%s')" % (alt, abs_path, src.strip(), title)
-                contents = contents.replace(md, md_fixed)
+        filename = self.view.file_name()
+        if filename:
+            # skip if file not saved
+            abs_path = '%s/' % os.path.dirname(filename)
+            for md, alt, src, title in re.findall(RE_IMG, contents, re.VERBOSE):
+                if src.startswith(('http', '/')):
+                    # skip abdolute paths
+                    continue
+                else:
+                    md_fixed = "![%s](%s%s '%s')" % (alt, abs_path, src.strip(), title)
+                    contents = contents.replace(md, md_fixed)
         return contents
 
     def run(self, edit, target='browser'):
@@ -76,7 +79,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         markdown_html = markdown.markdown(contents)
 
         # build the html
-        html_contents = u'<html><head><meta charset="%s">' % encoding
+        html_contents = u'<!DOCTYPE html>'
+        html_contents += '<html><head><meta charset="%s">' % encoding
         styles = self.getCSS()
         html_contents += '<style>%s</style>' % styles
         html_contents += '</head><body>'
