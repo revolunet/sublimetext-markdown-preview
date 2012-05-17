@@ -67,12 +67,16 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         # postprocess the html
         markdown_html = self.postprocessor(markdown_html)
+        # check if LiveReload ST2 extension installed
+        livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
 
         # build the html
         html_contents = u'<!DOCTYPE html>'
         html_contents += '<html><head><meta charset="%s">' % encoding
         styles = self.getCSS()
         html_contents += '<style>%s</style>' % styles
+        if livereload_installed:
+            html_contents += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':35729/livereload.js?snipver=1"></\' + \'script>\')</script>'
         html_contents += '</head><body>'
         html_contents += markdown_html
         html_contents += '</body>'
