@@ -45,8 +45,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             (
             !\[([^\]]+)\]           # alternative text
             [\(\[]                  # source start
-                ([^)'\]]+)          # image path
-                (?:\s'([^']+)')?    # optional title
+                ([^)'"\]]+)          # image path
+                (?:\s["']([^'"]+)["'])?    # optional title
             [\)\]]                  # source end
             )
         """
