@@ -39,29 +39,19 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         return open(css_path, 'r').read().decode('utf-8')
 
-    def preprocess(self, contents):
-        # detect inline images and prefix relative paths with the absolute one
-        RE_INLINE_IMG = """
-            (
-            !\[([^\]]+)\]                    # alternative text
-            [\(]                             # source start
-                ([^)'"]+)                    # image path
-                (?:\s["']([^'"]+)["'])?      # optional title
-            [\)]                             # source end
-            )
-        """
-        filename = self.view.file_name()
-        if filename:
-            # skip if file not saved
-            abs_path = u'file://%s/' % os.path.dirname(filename)
-            for md, alt, src, title in re.findall(RE_INLINE_IMG, contents, re.VERBOSE):
-                if src.startswith(('http', '/')):
-                    # skip absolute paths
-                    continue
-                else:
-                    md_fixed = "![%s](%s%s '%s')" % (alt, abs_path, src.strip(), title)
-                    contents = contents.replace(md, md_fixed)
-        return contents
+    def postprocessor(self, html):
+        # fix relative images paths
+        def img_fix(match):
+            img, src = match.groups()
+            filename = self.view.file_name()
+            if filename:
+                if not src.startswith(('file://', 'http://', '/')):
+                    abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
+                    img = img.replace(src, abs_path)
+            return img
+        RE_IMGS = re.compile("""(?P<img><img[^>]+src=["'](?P<src>[^"']+)[^>]*>)""")
+        html = RE_IMGS.sub(img_fix, html)
+        return html
 
     def run(self, edit, target='browser'):
         region = sublime.Region(0, self.view.size())
@@ -72,11 +62,11 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             encoding = 'windows-1252'
         contents = self.view.substr(region)
 
-        # preprocess the markdown
-        contents = self.preprocess(contents)
-
         # convert the markdown
         markdown_html = markdown.markdown(contents)
+
+        # postprocess the html
+        markdown_html = self.postprocessor(markdown_html)
 
         # build the html
         html_contents = u'<!DOCTYPE html>'
