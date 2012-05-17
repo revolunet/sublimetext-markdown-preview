@@ -40,23 +40,23 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         return open(css_path, 'r').read().decode('utf-8')
 
     def preprocess(self, contents):
-        # detect images and prefix relative paths with the absolute one
-        RE_IMG = """
+        # detect inline images and prefix relative paths with the absolute one
+        RE_INLINE_IMG = """
             (
-            !\[([^\]]+)\]           # alternative text
-            [\(\[]                  # source start
-                ([^)'"\]]+)          # image path
-                (?:\s["']([^'"]+)["'])?    # optional title
-            [\)\]]                  # source end
+            !\[([^\]]+)\]                    # alternative text
+            [\(]                             # source start
+                ([^)'"]+)                    # image path
+                (?:\s["']([^'"]+)["'])?      # optional title
+            [\)]                             # source end
             )
         """
         filename = self.view.file_name()
         if filename:
             # skip if file not saved
             abs_path = u'file://%s/' % os.path.dirname(filename)
-            for md, alt, src, title in re.findall(RE_IMG, contents, re.VERBOSE):
+            for md, alt, src, title in re.findall(RE_INLINE_IMG, contents, re.VERBOSE):
                 if src.startswith(('http', '/')):
-                    # skip abdolute paths
+                    # skip absolute paths
                     continue
                 else:
                     md_fixed = "![%s](%s%s '%s')" % (alt, abs_path, src.strip(), title)
