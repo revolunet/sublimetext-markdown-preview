@@ -44,16 +44,16 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         RE_IMG = """
             (
             !\[([^\]]+)\]           # alternative text
-            \(                      # source start
-                ([^)']+)            # image path
+            [\(\[]                  # source start
+                ([^)'\]]+)          # image path
                 (?:\s'([^']+)')?    # optional title
-            \)                      # source end
+            [\)\]]                  # source end
             )
         """
         filename = self.view.file_name()
         if filename:
             # skip if file not saved
-            abs_path = '%s/' % os.path.dirname(filename)
+            abs_path = u'file://%s/' % os.path.dirname(filename)
             for md, alt, src, title in re.findall(RE_IMG, contents, re.VERBOSE):
                 if src.startswith(('http', '/')):
                     # skip abdolute paths
