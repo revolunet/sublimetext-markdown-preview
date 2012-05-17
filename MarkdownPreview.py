@@ -3,6 +3,7 @@ import desktop
 import tempfile
 import markdown
 import os
+import re
 
 
 def getTempMarkdownPreviewPath(view):
@@ -38,6 +39,27 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         return open(css_path, 'r').read().decode('utf-8')
 
+    def preprocess(self, contents):
+        # detect images and prefix relative paths with the absolute one
+        RE_IMG = """
+            (
+            !\[([^\]]+)\]           # alternative text
+            \(                      # source start
+                ([^)']+)            # image path
+                (?:\s'([^']+)')?    # optional title
+            \)                      # source end
+            )
+        """
+        abs_path = '%s/' % os.path.dirname(self.view.file_name())
+        for md, alt, src, title in re.findall(RE_IMG, contents, re.VERBOSE):
+            if src.startswith(('http', '/')):
+                # skip abdolute paths
+                continue
+            else:
+                md_fixed = "![%s](%s%s '%s')" % (alt, abs_path, src.strip(), title)
+                contents = contents.replace(md, md_fixed)
+        return contents
+
     def run(self, edit, target='browser'):
         region = sublime.Region(0, self.view.size())
         encoding = self.view.encoding()
@@ -46,6 +68,9 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         elif encoding == 'Western (Windows 1252)':
             encoding = 'windows-1252'
         contents = self.view.substr(region)
+
+        # preprocess the markdown
+        contents = self.preprocess(contents)
 
         # convert the markdown
         markdown_html = markdown.markdown(contents)
