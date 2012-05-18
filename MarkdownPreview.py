@@ -21,7 +21,7 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
             temp_file = getTempMarkdownPreviewPath(view)
             if os.path.isfile(temp_file):
                 # reexec markdown conversion
-                view.run_command('markdown_preview', {'target': 'browser'})
+                view.run_command('markdown_preview', {'target': 'disk'})
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
