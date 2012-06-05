@@ -45,7 +45,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             img, src = match.groups()
             filename = self.view.file_name()
             if filename:
-                if not src.startswith(('file://', 'http://', '/')):
+                if not src.startswith(('file://', 'https://', 'http://', '/')):
                     abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
                     img = img.replace(src, abs_path)
             return img
