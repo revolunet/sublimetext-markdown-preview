@@ -257,13 +257,13 @@ def open(url, desktop=None, wait=0):
         return os.startfile(url)
 
     elif desktop_in_use == "KDE":
-        cmd = ["kfmclient", "exec", url]
+        cmd = ["xdg-open", url]
 
     elif desktop_in_use == "GNOME":
-        cmd = ["gnome-open", url]
+        cmd = ["xdg-open", url]
 
     elif desktop_in_use == "XFCE":
-        cmd = ["exo-open", url]
+        cmd = ["xdg-open", url]
 
     elif desktop_in_use == "Mac OS X":
         cmd = ["open", url]
