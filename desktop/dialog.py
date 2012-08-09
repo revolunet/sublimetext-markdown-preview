@@ -35,6 +35,7 @@ function as follows:
 
 question.open("KDE") # Insists on KDE
 question.open("GNOME") # Insists on GNOME
+question.open("MATE") # Insists on MATE
 
 The dialogue box options are documented in each class's docstring.
 
@@ -241,6 +242,7 @@ class Dialogue:
     commands = {
         "KDE" : "kdialog",
         "GNOME" : "zenity",
+        "MATE" : "zenity",
         "XFCE" : "zenity", # NOTE: Based on observations with Xubuntu.
         "X11" : "Xdialog"
         }
@@ -256,7 +258,7 @@ class Dialogue:
         instead of guessing or detecting which environment is being used.
 
         Suggested values for 'desktop' are "standard", "KDE", "GNOME",
-        "Mac OS X", "Windows".
+        "MATE", "Mac OS X", "Windows".
 
         The result of the dialogue interaction may be a string indicating user
         input (for Input, Password, Menu, Pulldown), a list of strings

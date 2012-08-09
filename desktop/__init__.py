@@ -42,6 +42,7 @@ function as follows:
 
 desktop.open("http://www.python.org", "KDE") # Insists on KDE
 desktop.open("http://www.python.org", "GNOME") # Insists on GNOME
+desktop.open("http://www.python.org", "MATE") # Insists on MATE
 
 Without overriding using the desktop parameter, the open function will attempt
 to use the "standard" desktop opening mechanism which is controlled by the
@@ -160,6 +161,9 @@ def get_desktop():
     elif os.environ.has_key("GNOME_DESKTOP_SESSION_ID") or \
         os.environ.has_key("GNOME_KEYRING_SOCKET"):
         return "GNOME"
+    elif os.environ.has_key("MATE_DESKTOP_SESSION_ID") or \
+        os.environ.has_key("MATE_KEYRING_SOCKET"):
+        return "MATE"
     elif sys.platform == "darwin":
         return "Mac OS X"
     elif hasattr(os, "startfile"):
@@ -167,7 +171,7 @@ def get_desktop():
     elif _is_xfce():
         return "XFCE"
 
-    # KDE, GNOME and XFCE run on X11, so we have to test for X11 last.
+    # KDE, GNOME, MATE and XFCE run on X11, so we have to test for X11 last.
 
     if _is_x11():
         return "X11"
@@ -200,6 +204,8 @@ def use_desktop(desktop):
         return "KDE"
     elif (desktop or detected) == "GNOME":
         return "GNOME"
+    elif (desktop or detected) == "MATE":
+        return "MATE"
     elif (desktop or detected) == "XFCE":
         return "XFCE"
     elif (desktop or detected) == "Mac OS X":
@@ -228,11 +234,11 @@ def open(url, desktop=None, wait=0):
     particular desktop environment's mechanisms to open the 'url' instead of
     guessing or detecting which environment is being used.
 
-    Suggested values for 'desktop' are "standard", "KDE", "GNOME", "XFCE",
-    "Mac OS X", "Windows" where "standard" employs a DESKTOP_LAUNCH environment
-    variable to open the specified 'url'. DESKTOP_LAUNCH should be a command,
-    possibly followed by arguments, and must have any special characters
-    shell-escaped.
+    Suggested values for 'desktop' are "standard", "KDE", "GNOME", "GNOME",
+    "XFCE", "Mac OS X", "Windows" where "standard" employs a DESKTOP_LAUNCH
+    environment variable to open the specified 'url'. DESKTOP_LAUNCH should
+    be a command, possibly followed by arguments, and must have any special
+    characters shell-escaped.
 
     The process identifier of the "opener" (ie. viewer, editor, browser or
     program) associated with the 'url' is returned by this function. If the
@@ -257,13 +263,16 @@ def open(url, desktop=None, wait=0):
         return os.startfile(url)
 
     elif desktop_in_use == "KDE":
-        cmd = ["kfmclient", "exec", url]
+        cmd = ["xdg-open", url]
 
     elif desktop_in_use == "GNOME":
-        cmd = ["gnome-open", url]
+        cmd = ["xdg-open", url]
+
+    elif desktop_in_use == "MATE":
+        cmd = ["xdg-open", url]
 
     elif desktop_in_use == "XFCE":
-        cmd = ["exo-open", url]
+        cmd = ["xdg-open", url]
 
     elif desktop_in_use == "Mac OS X":
         cmd = ["open", url]
