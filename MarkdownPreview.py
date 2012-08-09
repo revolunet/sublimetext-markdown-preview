@@ -40,17 +40,17 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         return open(css_path, 'r').read().decode('utf-8')
 
     def postprocessor(self, html):
-        # fix relative images paths
-        def img_fix(match):
-            img, src = match.groups()
+        # fix relative paths in images/scripts
+        def tag_fix(match):
+            tag, src = match.groups()
             filename = self.view.file_name()
             if filename:
                 if not src.startswith(('file://', 'https://', 'http://', '/')):
                     abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
-                    img = img.replace(src, abs_path)
-            return img
-        RE_IMGS = re.compile("""(?P<img><img[^>]+src=["'](?P<src>[^"']+)[^>]*>)""")
-        html = RE_IMGS.sub(img_fix, html)
+                    tag = tag.replace(src, abs_path)
+            return tag
+        RE_SOURCES = re.compile("""(?P<tag><(?:img|script)[^>]+src=["'](?P<src>[^"']+)[^>]*>)""")
+        html = RE_SOURCES.sub(tag_fix, html)
         return html
 
     def run(self, edit, target='browser'):
@@ -67,6 +67,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         # postprocess the html
         markdown_html = self.postprocessor(markdown_html)
+
         # check if LiveReload ST2 extension installed
         livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
 
