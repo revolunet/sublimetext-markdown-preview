@@ -25,7 +25,7 @@ span.backtick {
   border:1px solid #EAEAEA;
   border-radius:3px;
   background:#F8F8F8;
-  padding:0px 3px 0px 3px;
+  padding:0 3px 0 3px;
 }
 
 ::-moz-selection{background:rgba(255,255,0,0.3);color:#000}
@@ -49,7 +49,7 @@ line-height:1em;
 }
 h4,h5,h6{ font-weight: bold; }
 h1{ font-size:2.5em; }
-h2{ font-size:2em; }
+h2{ font-size:2em; border-bottom:1px solid silver; padding-bottom: 5px; }
 h3{ font-size:1.5em; }
 h4{ font-size:1.2em; }
 h5{ font-size:1em; }
@@ -74,7 +74,7 @@ pre , code, kbd, samp {
 }
 pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; padding: 5px;}
 pre code { border: 0px !important; }
-
+code { padding: 0 3px 0 3px; }
 
 b, strong { font-weight: bold; }
 

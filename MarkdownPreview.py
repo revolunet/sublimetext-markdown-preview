@@ -1,7 +1,7 @@
 import sublime, sublime_plugin
 import desktop
 import tempfile
-import markdown
+import markdown2
 import os
 import re
 
@@ -63,7 +63,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         contents = self.view.substr(region)
 
         # convert the markdown
-        markdown_html = markdown.markdown(contents)
+        markdown_html = markdown2.markdown(contents, extras=['footnotes', 'toc'])
 
         # postprocess the html
         markdown_html = self.postprocessor(markdown_html)
