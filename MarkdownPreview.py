@@ -28,6 +28,14 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
                 sublime.status_message('Markdown preview file updated')
 
 
+class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
+    """ open our markdown cheat sheet in ST2"""
+    def run(self, edit):
+        cheatsheet = os.path.join(sublime.packages_path(), 'Markdown Preview', 'sample.md')
+        self.view.window().open_file(cheatsheet)
+        sublime.status_message('Markdown cheat sheet opened')
+
+
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     """ preview file contents with python-markdown and your web browser"""
 
