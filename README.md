@@ -5,6 +5,8 @@ A simple ST2 plugin to help you preview your markdown files.
 
 Preview the current md file in your web browser.
 
+If you have the ST2 LivReload plugin, your browser will autorefresh the display once you save your file :)
+
 **Installation :**
 
  - you should use [sublime package manager][3]
@@ -16,7 +18,7 @@ Preview the current md file in your web browser.
  - use `cmd+shift+P` then `MarkdownPreview` to launch a preview
  - or bind some key in your user key binding, using a line like this one:
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser"} },`
- - once converted a first time, the output HTML will be updated on each file save
+ - once converted a first time, the output HTML will be updated on each file save (with LiveReload plugin)
 
 **Uses :**
 
