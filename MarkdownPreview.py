@@ -3,7 +3,10 @@ import desktop
 import tempfile
 import markdown2
 import os
+import sys
 import re
+
+settings = sublime.load_settings('MarkdownPreview.sublime-settings')
 
 
 def getTempMarkdownPreviewPath(view):
@@ -22,6 +25,7 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
             if os.path.isfile(temp_file):
                 # reexec markdown conversion
                 view.run_command('markdown_preview', {'target': 'disk'})
+                sublime.status_message('Markdown preview file updated')
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
@@ -90,10 +94,23 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             tmp_html.close()
             # todo : livereload ?
             if target == 'browser':
-                desktop.open(tmp_fullpath)
+                config_browser = settings.get('browser')
+                if config_browser != 'default':
+                    cmd = '"%s" %s' % (config_browser, tmp_fullpath)
+                    if sys.platform == 'darwin':
+                        cmd = "open -a %s" % cmd
+                    print "Markdown Preview: executing", cmd
+                    result = os.system(cmd)
+                    if result != 0:
+                        sublime.error_message('cannot execute "%s" Please check your Markdown Preview settings' % config_browser)
+                    else:
+                        sublime.status_message('Markdown preview launched in %s' % config_browser)
+                else:
+                    desktop.open(tmp_fullpath)
+                    sublime.status_message('Markdown preview launched in default html viewer')
         elif target == 'sublime':
             new_view = self.view.window().new_file()
             new_edit = new_view.begin_edit()
             new_view.insert(new_edit, 0, html_contents)
             new_view.end_edit(new_edit)
-        print 'markdown converted'
+            sublime.status_message('Markdown preview launched in sublime')
