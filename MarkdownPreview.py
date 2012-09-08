@@ -103,7 +103,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # todo : livereload ?
             if target == 'browser':
                 config_browser = settings.get('browser')
-                if config_browser != 'default':
+                if config_browser and config_browser != 'default':
                     cmd = '"%s" %s' % (config_browser, tmp_fullpath)
                     if sys.platform == 'darwin':
                         cmd = "open -a %s" % cmd
