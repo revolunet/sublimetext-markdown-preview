@@ -75,7 +75,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         contents = self.view.substr(region)
 
         # convert the markdown
-        markdown_html = markdown2.markdown(contents, extras=['footnotes', 'toc'])
+        markdown_html = markdown2.markdown(contents, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly'])
 
         # postprocess the html
         markdown_html = self.postprocessor(markdown_html)
