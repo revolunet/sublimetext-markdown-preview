@@ -5,6 +5,8 @@ import markdown2
 import os
 import sys
 import re
+import json
+import urllib2
 
 settings = sublime.load_settings('MarkdownPreview.sublime-settings')
 
@@ -40,16 +42,25 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     """ preview file contents with python-markdown and your web browser"""
 
     def getCSS(self):
-        css_filename = 'markdown.css'
-        # path via package manager
-        css_path = os.path.join(sublime.packages_path(), 'Markdown Preview', css_filename)
-        if not os.path.isfile(css_path):
-            # path via git repo
-            css_path = os.path.join(sublime.packages_path(), 'sublimetext-markdown-preview', css_filename)
-            if not os.path.isfile(css_path):
-                raise Exception("markdown.css file not found!")
+        config_parser = settings.get('parser')
+        config_css = settings.get('css')
 
-        return open(css_path, 'r').read().decode('utf-8')
+        if config_css and config_css != 'default':
+            return "<link href='%s' rel='stylesheet' type='text/css'>" % config_css
+        else:
+            css_filename = 'markdown.css'
+            if config_parser and config_parser == 'github':
+                css_filename = 'github.css'
+            # path via package manager
+            css_path = os.path.join(sublime.packages_path(), 'Markdown Preview', css_filename)
+            if not os.path.isfile(css_path):
+                # path via git repo
+                css_path = os.path.join(sublime.packages_path(), 'sublimetext-markdown-preview', css_filename)
+                if not os.path.isfile(css_path):
+                    sublime.error_message('markdown.css file not found!')
+                    raise Exception("markdown.css file not found!")
+            styles = u"<style>%s</style>" % open(css_path, 'r').read().decode('utf-8')
+        return styles
 
     def postprocessor(self, html):
         # fix relative paths in images/scripts
@@ -74,11 +85,24 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             encoding = 'windows-1252'
         contents = self.view.substr(region)
 
-        # convert the markdown
-        markdown_html = markdown2.markdown(contents, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly'])
+        config_parser = settings.get('parser')
 
-        # postprocess the html
-        markdown_html = self.postprocessor(markdown_html)
+        if config_parser and config_parser == 'github':
+            sublime.status_message('converting markdown with github API...')
+            try:
+                data = json.dumps({"text":contents, "mode":"gfm"})
+                url = "https://api.github.com/markdown"
+                markdown_html = urllib2.urlopen(url, data).read()
+                print "from github"
+            except:
+                sublime.error_message('cannot use github API to convert markdown. Please check your settings.')
+            else:
+                sublime.status_message('converted markdown with github API successfully')
+        else:
+            # convert the markdown
+            markdown_html = markdown2.markdown(contents, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly'])
+            # postprocess the html
+            markdown_html = self.postprocessor(markdown_html)
 
         # check if LiveReload ST2 extension installed
         livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
@@ -86,8 +110,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         # build the html
         html_contents = u'<!DOCTYPE html>'
         html_contents += '<html><head><meta charset="%s">' % encoding
-        styles = self.getCSS()
-        html_contents += '<style>%s</style>' % styles
+        html_contents = self.getCSS()
         if livereload_installed:
             html_contents += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':35729/livereload.js?snipver=1"></\' + \'script>\')</script>'
         html_contents += '</head><body>'

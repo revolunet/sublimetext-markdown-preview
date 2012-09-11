@@ -1,5 +1,5 @@
 Sample Markdown Cheat Sheet
-=======
+=========================== 
 
 This is a sample markdown file to help you write Markdown quickly :)
 
@@ -67,6 +67,15 @@ Also, any indented block is considered a code block.
         document.location = 'http://lmgtfy.com/?q=markdown+cheat+sheet';
     </script>
 
+## GitHub Flavored Markdown
+
+If you use the Github parser, you can use some of [Github Flavored Markdown][gfm] syntax :
+
+ * User/Project@SHA: revolunet/sublimetext-markdown-preview@7da61badeda468b5019869d11000307e07e07401
+ * User/Project#Issue: revolunet/sublimetext-markdown-preview#1
+ * User : @revolunet
+
+
 ## About
 
 This plugin and this sample file is proudly brought to you by the [revolunet team][revolunet]
@@ -78,6 +87,6 @@ This plugin and this sample file is proudly brought to you by the [revolunet tea
  [ST2]: http://sublimetext.com
  [revolunet]: http://revolunet.com
  [revolunet-logo]: http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg "revolunet logo"
-
+ [gfm]: http://github.github.com/github-flavored-markdown/
 
 
