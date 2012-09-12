@@ -87,14 +87,15 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         config_parser = settings.get('parser')
 
-        markdown_html = 'cannot convert markdown'
+        markdown_html = u'cannot convert markdown'
         if config_parser and config_parser == 'github':
             sublime.status_message('converting markdown with github API...')
             try:
                 data = json.dumps({"text":contents, "mode":"gfm"})
                 url = "https://api.github.com/markdown"
-                markdown_html = urllib2.urlopen(url, data).read()
-                print "from github"
+                markdown_html = urllib2.urlopen(url, data).read().decode('utf-8')
+            except urllib2.URLError:
+                sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation')
             except:
                 sublime.error_message('cannot use github API to convert markdown. Please check your settings.')
             else:
