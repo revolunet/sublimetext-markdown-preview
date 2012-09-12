@@ -112,7 +112,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         # build the html
         html_contents = u'<!DOCTYPE html>'
         html_contents += '<html><head><meta charset="%s">' % encoding
-        html_contents = self.getCSS()
+        html_contents += self.getCSS()
         if livereload_installed:
             html_contents += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':35729/livereload.js?snipver=1"></\' + \'script>\')</script>'
         html_contents += '</head><body>'
