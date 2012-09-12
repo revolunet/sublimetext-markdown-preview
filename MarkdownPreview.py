@@ -87,6 +87,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         config_parser = settings.get('parser')
 
+        markdown_html = 'cannot convert markdown'
         if config_parser and config_parser == 'github':
             sublime.status_message('converting markdown with github API...')
             try:
