@@ -7,7 +7,7 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
 
 If you have the ST2 LiveReload plugin, your browser will autorefresh the display when you save your file :)
 
-NOTE: If you choose the GitHub API for conversion, your code will be sent through https to github for live conversion. You'll have Github flavored markdown and syntax highlighting for free.
+**NOTE:** If you choose the GitHub API for conversion (set parser: github in your settings), your code will be sent through https to github for live conversion. You'll have [Github flavored markdown][5], syntax highlighting and EMOJI support for free :heart: :octocat: :gift:
 
 ## Installation :
 
