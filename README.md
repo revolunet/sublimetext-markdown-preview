@@ -7,7 +7,7 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
 
 If you have the ST2 LiveReload plugin, your browser will autorefresh the display when you save your file :)
 
-**NOTE:** If you choose the GitHub API for conversion (set parser: github in your settings), your code will be sent through https to github for live conversion. You'll have [Github flavored markdown][5], syntax highlighting and EMOJI support for free :heart: :octocat: :gift:
+**NOTE:** If you choose the GitHub API for conversion (set parser: github in your settings), your code will be sent through https to github for live conversion. You'll have [Github flavored markdown][6], syntax highlighting and EMOJI support for free :heart: :octocat: :gift:
 
 ## Installation :
 
@@ -36,3 +36,4 @@ The code is available at github [https://github.com/revolunet/sublimetext-markdo
  [3]: http://wbond.net/sublime_packages/package_control
  [4]: http://revolunet.mit-license.org
  [5]: http://developer.github.com/v3/markdown
+ [6]: http://github.github.com/github-flavored-markdown/
