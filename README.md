@@ -13,11 +13,11 @@ If you have the ST2 LiveReload plugin, your browser will autorefresh the display
 
  - you should use [sublime package manager][3]
  - use `cmd+shift+P` then `Package Control: Install Package`
- - look for `MarkdownPreview` and install it.
+ - look for `Markdown Preview` and install it.
 
 ## Usage :
 
- - use `cmd+shift+P` then `MarkdownPreview` to launch a preview
+ - use `cmd+shift+P` then `Markdown Preview` to launch a preview
  - or bind some key in your user key binding, using a line like this one:
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser"} },`
  - once converted a first time, the output HTML will be updated on each file save (with LiveReload plugin)
