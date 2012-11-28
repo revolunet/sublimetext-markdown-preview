@@ -8,7 +8,7 @@ If you use the fabulous [Sublime Text 2 editor][ST2] along with the [Markdown Pr
 ## Text basics
 this is *italic* and this is **bold** .  another _italic_ and another __bold__
 
-this is `important` text.
+this is `important` text. and percentage signs : % and `%`
 
 ## Indentation
 > Here is some indented text
