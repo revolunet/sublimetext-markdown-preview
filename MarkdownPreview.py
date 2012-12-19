@@ -33,6 +33,7 @@ if sublime.platform() == 'linux' and settings.get('linux_enable_ssl'):
             m = imp.load_module('ssl', *m_info)
         except (ImportError) as (e):
             print 'Markdown Preview: ssl module import error - ' + str(e)
+    reload(urllib2)
 
 
 def getTempMarkdownPreviewPath(view):
