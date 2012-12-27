@@ -12,7 +12,7 @@ this is `important` text. and percentage signs : % and `%`
 
 ## Indentation
 > Here is some indented text
->> event more indented
+>> even more indented
 
 ## Titles
 # Big title (h1)
@@ -57,7 +57,7 @@ As links, images can also use references instead of inline links :
 
 ## Code
 
-Its quite easy to show code in markdown files.
+It's quite easy to show code in markdown files.
 
 Backticks can be used to `highlight` some words.
 
