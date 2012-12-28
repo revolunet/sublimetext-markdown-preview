@@ -174,6 +174,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # build the html
             html_contents = markdown_html
             new_view = self.view.window().new_file()
+						new_view.set_scratch(True)
             new_edit = new_view.begin_edit()
             new_view.insert(new_edit, 0, html_contents)
             new_view.end_edit(new_edit)
