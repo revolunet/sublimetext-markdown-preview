@@ -47,7 +47,7 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
     """ update the output html when markdown file has already been converted once """
 
     def on_post_save(self, view):
-        if view.file_name().endswith(('.md', '.markdown', '.mdown')):
+        if view.file_name().endswith(tuple(settings.get('markdown_filetypes'))):
             temp_file = getTempMarkdownPreviewPath(view)
             if os.path.isfile(temp_file):
                 # reexec markdown conversion
