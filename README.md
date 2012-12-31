@@ -9,6 +9,8 @@ If you have the ST2 LiveReload plugin, your browser will autorefresh the display
 
 **NOTE:** If you choose the GitHub API for conversion (set parser: github in your settings), your code will be sent through https to github for live conversion. You'll have [Github flavored markdown][6], syntax highlighting and EMOJI support for free :heart: :octocat: :gift:
 
+**LINUX users:** If you want to use GitHub API for conversion, you'll need to have a custom Python install that includes python-ssl as its not built in the Sublime Text 2 Linux package. see @dusteye comment : https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098.
+
 ## Installation :
 
  - you should use [sublime package manager][3]
