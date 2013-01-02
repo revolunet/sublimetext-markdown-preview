@@ -10,6 +10,10 @@ this is *italic* and this is **bold** .  another _italic_ and another __bold__
 
 this is `important` text. and percentage signs : % and `%`
 
+This is a paragraph with a footnote (builtin parser only). [^note-id] 
+
+Insert `[ toc ]` without spaces to generate a table of contents (builtin parser only).
+
 ## Indentation
 > Here is some indented text
 >> even more indented
@@ -106,6 +110,9 @@ async_call('/path/to/api', function(json) {
     });
 })
 ```
+
+
+[^note-id]: This is the text of the note. 
 
 ## About
 

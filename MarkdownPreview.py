@@ -108,6 +108,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         else:
             # convert the markdown
             markdown_html = markdown2.markdown(contents, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists'])
+            toc_html = markdown_html.toc_html
+            if toc_html:
+                toc_markers = ['[toc]', '[TOC]', '<!--TOC-->']
+                for marker in toc_markers:
+                    markdown_html = markdown_html.replace(marker, toc_html)
+
             # postprocess the html
             markdown_html = self.postprocessor(markdown_html)
 
