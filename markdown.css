@@ -2,9 +2,8 @@ html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-
 
 body{
   color:#444;
-  font-family:Georgia, Palatino, 'Palatino Linotype', Times,
-              'Times New Roman', serif,
-              "Hiragino Sans GB", "STXihei", "微软雅黑";
+  font-family:Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman',
+              "Hiragino Sans GB", "STXihei", "微软雅黑", serif;
   font-size:12px;
   line-height:1.5em;
   background:#fefefe;
