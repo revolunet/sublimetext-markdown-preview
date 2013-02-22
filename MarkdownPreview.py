@@ -67,11 +67,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             filename = self.view.file_name()
             filetypes = settings.get('markdown_filetypes')
 
-            for filetype in filetypes:
-                if filename.endswith(filetype):
-                    css_filename = filename.rpartition(filetype)[0] + '.css'
-                if (os.path.isfile(css_filename)):
-                    styles += u"<style>%s</style>" % open(css_filename, 'r').read().decode('utf-8')
+            if filename and filetypes:
+                for filetype in filetypes:
+                    if filename.endswith(filetype):
+                        css_filename = filename.rpartition(filetype)[0] + '.css'
+                    if (os.path.isfile(css_filename)):
+                        styles += u"<style>%s</style>" % open(css_filename, 'r').read().decode('utf-8')
 
         return styles
 
