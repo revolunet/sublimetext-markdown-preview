@@ -43,7 +43,7 @@
     /*
         Strips the YAML front matter header and converts title to a heading
     */
-    "strip_yaml_front_matter": true
+    "strip_yaml_front_matter": false
 }
 
 
