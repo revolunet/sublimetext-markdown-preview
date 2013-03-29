@@ -20,6 +20,11 @@
     "parser": "default",
 
     /*
+        Uses an OAuth token to when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
+    */
+    // "github_oauth_token": "secret"
+
+    /*
         Sets the default css file to embed in the HTML
 
         default - Use the builtin CSS or github CSS, depending on parser config (markdown.css or github.css)

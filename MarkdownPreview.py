@@ -116,18 +116,26 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         contents = self.get_contents(region)
 
         config_parser = settings.get('parser')
+        github_oauth_token = settings.get('github_oauth_token')
 
         markdown_html = u'cannot convert markdown'
         if config_parser and config_parser == 'github':
             sublime.status_message('converting markdown with github API...')
             try:
                 #contents = contents.replace('%', '')    # see https://gist.github.com/3742011
-                data = json.dumps({"text": contents, "mode": "gfm"})
+                data = {"text": contents, "mode": "gfm"}
+                json_data = json.dumps(data)
                 url = "https://api.github.com/markdown"
-                request = urllib2.Request(url, data, {'Content-Type': 'application/json'})
+                sublime.status_message(url)
+                request = urllib2.Request(url, json_data, {'Content-Type': 'application/json'})
+                if github_oauth_token:
+                    request.add_header('Authorization', "token %s" % github_oauth_token)
                 markdown_html = urllib2.urlopen(request).read().decode('utf-8')
-            except urllib2.HTTPError:
-                sublime.error_message('github API responded in an unfashion way :/')
+            except urllib2.HTTPError, e:
+                if e.code == 401:
+                    sublime.error_message('github API auth failed. Please check your OAuth token.')
+                else:
+                    sublime.error_message('github API responded in an unfashion way :/')
             except urllib2.URLError:
                 sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation')
             except:
