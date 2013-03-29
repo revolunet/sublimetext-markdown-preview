@@ -122,8 +122,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         if config_parser and config_parser == 'github':
             sublime.status_message('converting markdown with github API...')
             try:
-                #contents = contents.replace('%', '')    # see https://gist.github.com/3742011
-                data = {"text": contents, "mode": "gfm"}
+                github_mode = settings.get('github_mode', 'gfm')
+                data = {"text": contents, "mode": github_mode}
                 json_data = json.dumps(data)
                 url = "https://api.github.com/markdown"
                 sublime.status_message(url)

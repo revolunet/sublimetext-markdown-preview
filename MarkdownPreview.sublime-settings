@@ -20,6 +20,12 @@
     "parser": "default",
 
     /*
+        Default mode for the github Markdon parser : markdown (documents) or gfm (comments)
+        see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
+    */
+    "github_mode": "markdown",
+
+    /*
         Uses an OAuth token to when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
     */
     // "github_oauth_token": "secret"
