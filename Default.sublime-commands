@@ -7,10 +7,17 @@
         }
     },
     {
-        "caption": "Markdown Preview: preview in Sublime Text",
+        "caption": "Markdown Preview: export HTML in Sublime Text",
         "command": "markdown_preview",
         "args": {
             "target": "sublime"
+        }
+    },
+    {
+        "caption": "Markdown Preview: copy to clipboard",
+        "command": "markdown_preview",
+        "args": {
+            "target": "clipboard"
         }
     },
     {

@@ -16,6 +16,9 @@ If you have the ST2 LiveReload plugin, your browser will autorefresh the display
  - Markdown conversion via builtin Markdown Parser ([python-markdown2][0]) or via Github API : just choose in your settings.
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
  - Builtin parser : Support TOC, footnotes markdown extensions
+ - CSS overriding if you need
+ - YAML support thanks to @tommi
+ - Clipboard selection and copy to clipboard thanks to @hexatrope
 
 ## Installation :
 
