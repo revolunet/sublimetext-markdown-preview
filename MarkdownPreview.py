@@ -97,7 +97,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         return contents
 
     def postprocessor(self, html):
-        ''' fix relative paths in images/scripts for the internal parser '''
+        ''' fix relative paths in images, scripts, and links for the internal parser '''
         def tag_fix(match):
             tag, src = match.groups()
             filename = self.view.file_name()
@@ -106,7 +106,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                     abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
                     tag = tag.replace(src, abs_path)
             return tag
-        RE_SOURCES = re.compile("""(?P<tag><(?:img|script)[^>]+src=["'](?P<src>[^"']+)[^>]*>)""")
+        RE_SOURCES = re.compile("""(?P<tag><(?:img|script|a)[^>]+(?:src|href)=["'](?P<src>[^"']+)[^>]*>)""")
         html = RE_SOURCES.sub(tag_fix, html)
         return html
 
