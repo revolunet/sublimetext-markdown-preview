@@ -76,6 +76,19 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         return styles
 
+    def get_contents(self, region):
+        """Get contents from view and optionally strip the YAML front matter"""
+        contents = self.view.substr(region)
+        if settings.get('strip_yaml_front_matter') and contents.startswith('---'):
+            title = ''
+            title_match = re.search('(?:title:)(.+)', contents, flags=re.IGNORECASE)
+            if title_match:
+                stripped_title= title_match.group(1).strip()
+                title = '%s\n%s\n\n' % (stripped_title, '=' * len(stripped_title))
+            contents_without_front_matter = re.sub(r'(?s)^---.*---\n', '', contents)
+            contents = '%s%s' % (title, contents_without_front_matter)
+        return contents
+
     def postprocessor(self, html):
         # fix relative paths in images/scripts
         def tag_fix(match):
@@ -99,7 +112,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             encoding = 'windows-1252'
         elif encoding == 'UTF-8 with BOM':
             encoding = 'utf-8'
-        contents = self.view.substr(region)
+
+        contents = self.get_contents(region)
 
         config_parser = settings.get('parser')
 
