@@ -193,6 +193,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                     cmd = '"%s" %s' % (config_browser, tmp_fullpath)
                     if sys.platform == 'darwin':
                         cmd = "open -a %s" % cmd
+                    elif sys.platform == 'linux2':
+                        cmd += ' &'
                     result = os.system(cmd)
                     if result != 0:
                         sublime.error_message('cannot execute "%s" Please check your Markdown Preview settings' % config_browser)
