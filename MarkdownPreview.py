@@ -102,7 +102,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             tag, src = match.groups()
             filename = self.view.file_name()
             if filename:
-                if not src.startswith(('file://', 'https://', 'http://', '/')):
+                if not src.startswith(('file://', 'https://', 'http://', '/', '#')):
                     abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
                     tag = tag.replace(src, abs_path)
             return tag
@@ -144,12 +144,14 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # convert the markdown
             markdown_html = markdown2.markdown(markdown, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists'])
             toc_html = markdown_html.toc_html
-            # postprocess the html from internal parser (don't apply to toc)
-            markdown_html = self.postprocessor(markdown_html)
             if toc_html:
                 toc_markers = ['[toc]', '[TOC]', '<!--TOC-->']
                 for marker in toc_markers:
                     markdown_html = markdown_html.replace(marker, toc_html)
+
+            # postprocess the html from internal parser
+            markdown_html = self.postprocessor(markdown_html)
+
         return markdown_html
 
     def run(self, edit, target='browser'):
