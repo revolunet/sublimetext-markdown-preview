@@ -55,10 +55,10 @@
         Sets a custom temporary folder for MarkdownPreview-generated html files. Useful if you're
         using LiveReload and don't want to use the OS default. The directory must already exist.
 
-        Examples: //tmp//custom_folder   (Linux/OSX)
-                  C://TEMP               (Windows)
+        Examples: /tmp/custom_folder   (Linux/OSX)
+                  C:/TEMP/MYNOTES      (Windows - note it's forward slash, even on Windows)
     */
-    // "path_tempfile": "//myfolder",
+    // "path_tempfile": "/tmp/my_notes",
 
     /*
         Strips the YAML front matter header and converts title to a heading
