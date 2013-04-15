@@ -277,8 +277,11 @@ def open(url, desktop=None, wait=0):
     elif desktop_in_use == "Mac OS X":
         cmd = ["open", url]
 
-    elif desktop_in_use == "X11" and os.environ.has_key("BROWSER"):
+    elif desktop_in_use == "X11" and "BROWSER" in os.environ:
         cmd = [os.environ["BROWSER"], url]
+
+    elif desktop_in_use == "X11":
+        cmd = ["xdg-open", url]
 
     # Finish with an error where no suitable desktop was identified.
 
