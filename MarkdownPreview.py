@@ -159,20 +159,13 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, target='browser'):
         region = sublime.Region(0, self.view.size())
-        encoding = self.view.encoding()
-        if encoding == 'Undefined':
-            encoding = 'utf-8'
-        elif encoding == 'Western (Windows 1252)':
-            encoding = 'windows-1252'
-        elif encoding == 'UTF-8 with BOM':
-            encoding = 'utf-8'
 
         contents = self.get_contents(region)
 
         markdown_html = self.convert_markdown(contents)
 
         full_html = u'<!DOCTYPE html>'
-        full_html += '<html><head><meta charset="%s">' % encoding
+        full_html += '<html><head><meta charset="utf-8">'
         full_html += self.getCSS()
         full_html += '</head><body>'
         full_html += markdown_html
@@ -187,7 +180,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # update output html file
             tmp_fullpath = getTempMarkdownPreviewPath(self.view)
             tmp_html = open(tmp_fullpath, 'w')
-            tmp_html.write(full_html.encode(encoding))
+            tmp_html.write(full_html.encode('utf-8'))
             tmp_html.close()
             # now opens in browser if needed
             if target == 'browser':
