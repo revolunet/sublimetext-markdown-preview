@@ -20,7 +20,7 @@
     "parser": "default",
 
     /* 
-        Turn on or off mathjax support
+        Turn on or off mathjax support.
     */
     "mathjax": "on",
 
@@ -41,7 +41,7 @@
         default - Use the builtin CSS or github CSS, depending on parser config (markdown.css or github.css)
         other - Set an absolute path or url to any css file
     */
-    "css": "C://Users/Brian/Documents/GDrive/markdown/default2.css",
+    "css": "default",
 
     /*
         Allow CSS overrides
