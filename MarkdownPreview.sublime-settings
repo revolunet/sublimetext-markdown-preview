@@ -20,9 +20,9 @@
     "parser": "default",
 
     /* 
-        Turn on or off mathjax support.
+       Enable or not mathjax support.
     */
-    "mathjax": "on",
+    "enable_mathjax": false,
 
     /*
         Default mode for the github Markdon parser : markdown (documents) or gfm (comments)
