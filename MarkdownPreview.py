@@ -82,6 +82,24 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         return styles
 
+    def getMathJax(self):
+        ''' return the MathJax script '''
+        config_mathjax = settings.get('mathjax')
+
+        math = ''
+        if config_mathjax == 'on':
+            mathjax_path = os.path.join(sublime.packages_path(), 'Markdown Preview', "mathjax.html")
+            
+            if not os.path.isfile(mathjax_path):
+                sublime.error_message('mathjax.html file not found!')
+                raise Exception("mathjax.html file not found!")
+
+            math += '%s' % open(mathjax_path, 'r').read().decode('utf-8')
+        else:
+            pass
+
+        return math
+
     def get_contents(self, region):
         ''' Get contents or selection from view and optionally strip the YAML front matter '''
         contents = self.view.substr(region)
@@ -167,6 +185,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         full_html = u'<!DOCTYPE html>'
         full_html += '<html><head><meta charset="utf-8">'
         full_html += self.getCSS()
+        full_html += self.getMathJax()
         full_html += '</head><body>'
         full_html += markdown_html
         full_html += '</body>'

@@ -19,6 +19,11 @@
     */
     "parser": "default",
 
+    /* 
+        Turn on or off mathjax support
+    */
+    "mathjax": "on",
+
     /*
         Default mode for the github Markdon parser : markdown (documents) or gfm (comments)
         see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
@@ -36,7 +41,7 @@
         default - Use the builtin CSS or github CSS, depending on parser config (markdown.css or github.css)
         other - Set an absolute path or url to any css file
     */
-    "css": "default",
+    "css": "C://Users/Brian/Documents/GDrive/markdown/default2.css",
 
     /*
         Allow CSS overrides
