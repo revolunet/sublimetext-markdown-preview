@@ -95,6 +95,28 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             return open(mathjax_path, 'r').read().decode('utf-8')
         return ''
 
+    def getHighlight(self):
+        ''' return the Highlight.js and css if enabled '''
+
+        highlight = ''
+        if settings.get('enable_highlight') is True and settings.get('parser') == 'default':
+            highlight_path = os.path.join(sublime.packages_path(), 'Markdown Preview', "highlight.js")
+            highlight_css_path = os.path.join(sublime.packages_path(), 'Markdown Preview', "highlight.css")
+
+            if not os.path.isfile(highlight_path):
+                sublime.error_message('highlight.js file not found!')
+                raise Exception("highligh.js file not found!")
+
+            if not os.path.isfile(highlight_css_path):
+                sublime.error_message('highlight.css file not found!')
+                raise Exception("highlight.css file not found!")
+
+            highlight += u"<style>%s</style>" % open(highlight_css_path, 'r').read().decode('utf-8')
+            highlight += u"<script>%s</script>" % open(highlight_path, 'r').read().decode('utf-8')
+            highlight += "<script>hljs.initHighlightingOnLoad();</script>"
+        return highlight
+
+
     def get_contents(self, region):
         ''' Get contents or selection from view and optionally strip the YAML front matter '''
         contents = self.view.substr(region)
@@ -180,6 +202,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         full_html = u'<!DOCTYPE html>'
         full_html += '<html><head><meta charset="utf-8">'
         full_html += self.getCSS()
+        full_html += self.getHighlight()
         full_html += self.getMathJax()
         full_html += '</head><body>'
         full_html += markdown_html

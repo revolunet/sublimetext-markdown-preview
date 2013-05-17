@@ -65,11 +65,19 @@ It's quite easy to show code in markdown files.
 
 Backticks can be used to `highlight` some words.
 
-Also, any indented block is considered a code block.
+Also, any indented block is considered a code block.  If `enable_highlight` is `true`, syntax highlighting will be included (for the builtin parser - the github parser does this automatically).
 
     <script>
         document.location = 'http://lmgtfy.com/?q=markdown+cheat+sheet';
     </script>
+
+## Math
+
+When `enable_mathjax` is `true`, inline math can be included \\(\frac{\pi}{2}\\)
+
+Alternatively, math can be written on it's own line:
+
+$$F(\omega) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} f(t) \, e^{ - i \omega t}dt$$
 
 ## GitHub Flavored Markdown
 
