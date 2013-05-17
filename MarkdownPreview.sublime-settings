@@ -25,6 +25,11 @@
     "enable_mathjax": false,
 
     /*
+        Enable or not highlight.js support for syntax highlighting.
+    */
+    "enable_highlight": false,
+    
+    /*
         Default mode for the github Markdon parser : markdown (documents) or gfm (comments)
         see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
     */
