@@ -11,6 +11,7 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
 
 ## Features :
 
+
  - Markdown conversion via builtin Markdown Parser ([python-markdown2][0]) or via Github API : just choose in your settings.
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
  - Builtin parser : Support TOC, footnotes markdown extensions
@@ -24,6 +25,7 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
  - you should use [sublime package manager][3]
  - use `cmd+shift+P` then `Package Control: Install Package`
  - look for `Markdown Preview` and install it.
+ - OR, Clone or unpack to "Markdown Preview" folder inside "Packages" of your Sublime installation.
 
 ## Usage :
 
