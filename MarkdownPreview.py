@@ -159,13 +159,19 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             sublime.status_message('converting markdown with github API...')
             try:
                 github_mode = settings.get('github_mode', 'gfm')
-                data = {"text": markdown, "mode": github_mode}
-                json_data = json.dumps(data)
+                data = {
+                    "text": markdown,
+                    "mode": github_mode
+                }
+                headers = {
+                    'Content-Type': 'application/json'
+                }
+                if github_oauth_token:
+                    headers['Authorization'] = "token %s" % github_oauth_token
+                data = json.dumps(data).encode('utf-8')
                 url = "https://api.github.com/markdown"
                 sublime.status_message(url)
-                request = urllib2.Request(url, json_data, {'Content-Type': 'application/json'})
-                if github_oauth_token:
-                    request.add_header('Authorization', "token %s" % github_oauth_token)
+                request = urllib2.Request(url, data, headers)
                 markdown_html = urllib2.urlopen(request).read().decode('utf-8')
             except urllib2.HTTPError, e:
                 if e.code == 401:
@@ -212,6 +218,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         if target in ['disk', 'browser']:
             # check if LiveReload ST2 extension installed and add its script to the resulting HTML
             livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
+            # build the html
             if livereload_installed:
                 full_html += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':35729/livereload.js?snipver=1"></\' + \'script>\')</script>'
             # update output html file
