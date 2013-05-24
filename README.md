@@ -1,7 +1,7 @@
-Sublime Text 2 MarkDown preview
+Sublime Text 2/3 MarkDown preview
 ===============================
 
-A simple ST2 plugin to help you preview your markdown files quickly in you web browser.
+Preview your markdown files quickly in you web browser from sublime text 2/3. 
 
 You can use builtin [python-markdown2][0] parser (default) or use the [github markdown API][5] for the conversion (edit your settings to select it).
 
