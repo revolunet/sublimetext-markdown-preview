@@ -280,7 +280,7 @@ class Dialogue:
         try:
             program = self.commands[desktop_in_use]
         except KeyError:
-            raise OSError, "Desktop '%s' not supported (no known dialogue box command could be suggested)" % desktop_in_use
+            raise OSError("Desktop '%s' not supported (no known dialogue box command could be suggested)" % desktop_in_use)
 
         # The handler is one of the functions communicating with the subprocess.
         # Some handlers return boolean values, others strings.
@@ -475,7 +475,7 @@ class Pulldown(Menu):
         "Xdialog" : (_readvalue(_readfrom),
             ["--stdout", "--combobox", String("text"), Integer("height"), Integer("width"), Strings("items")]),
         }
-    item = unicode
+    item = str
     number_of_titles = 2
 
 class Input(Simple):
@@ -546,6 +546,6 @@ available = [Question, Warning, Message, Error, Menu, CheckList, RadioList, Inpu
 
 # Supported desktop environments.
 
-supported = Dialogue.commands.keys()
+supported = list(Dialogue.commands.keys())
 
 # vim: tabstop=4 expandtab shiftwidth=4

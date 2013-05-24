@@ -1,14 +1,17 @@
 # -*- encoding: UTF-8 -*-
 import sublime
 import sublime_plugin
-import desktop
-import tempfile
-import markdown2
+
 import os
 import sys
+import tempfile
 import re
 import json
-import urllib2
+import urllib.request
+import urllib.parse
+
+from . import desktop
+from . import markdown2
 
 
 settings = sublime.load_settings('MarkdownPreview.sublime-settings')
@@ -54,7 +57,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         styles = ''
         if config_css and config_css != 'default':
-            styles += u"<link href='%s' rel='stylesheet' type='text/css'>" % config_css
+            styles += "<link href='%s' rel='stylesheet' type='text/css'>" % config_css
         else:
             css_filename = 'markdown.css'
             if config_parser and config_parser == 'github':
@@ -67,7 +70,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 if not os.path.isfile(css_path):
                     sublime.error_message('markdown.css file not found!')
                     raise Exception("markdown.css file not found!")
-            styles += u"<style>%s</style>" % open(css_path, 'r').read().decode('utf-8')
+            styles += "<style>%s</style>" % open(css_path, 'r', encoding='utf-8').read()
 
         if settings.get('allow_css_overrides'):
             filename = self.view.file_name()
@@ -78,8 +81,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                     if filename.endswith(filetype):
                         css_filename = filename.rpartition(filetype)[0] + '.css'
                         if (os.path.isfile(css_filename)):
-                            styles += u"<style>%s</style>" % open(css_filename, 'r').read().decode('utf-8')
-
+                            styles += "<style>%s</style>" % open(css_path, 'r', encoding='utf-8').read()
         return styles
 
     def getMathJax(self):
@@ -92,7 +94,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 sublime.error_message('mathjax.html file not found!')
                 raise Exception("mathjax.html file not found!")
 
-            return open(mathjax_path, 'r').read().decode('utf-8')
+            return open(mathjax_path, 'r', encoding='utf-8').read()
         return ''
 
     def getHighlight(self):
@@ -111,8 +113,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 sublime.error_message('highlight.css file not found!')
                 raise Exception("highlight.css file not found!")
 
-            highlight += u"<style>%s</style>" % open(highlight_css_path, 'r').read().decode('utf-8')
-            highlight += u"<script>%s</script>" % open(highlight_path, 'r').read().decode('utf-8')
+            highlight += "<style>%s</style>" % open(highlight_css_path, 'r', encoding='utf-8').read()
+            highlight += "<script>%s</script>" % open(highlight_path, 'r', encoding='utf-8').read()
             highlight += "<script>hljs.initHighlightingOnLoad();</script>"
         return highlight
 
@@ -153,26 +155,32 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         config_parser = settings.get('parser')
         github_oauth_token = settings.get('github_oauth_token')
 
-        markdown_html = u'cannot convert markdown'
+        markdown_html = 'cannot convert markdown'
         if config_parser and config_parser == 'github':
             # use the github API
             sublime.status_message('converting markdown with github API...')
             try:
                 github_mode = settings.get('github_mode', 'gfm')
-                data = {"text": markdown, "mode": github_mode}
-                json_data = json.dumps(data)
+                data = {
+                    "text": markdown,
+                    "mode": github_mode
+                }
+                headers = {
+                    'Content-Type': 'application/json'
+                }
+                if github_oauth_token:
+                    headers['Authorization'] = "token %s" % github_oauth_token
+                data = json.dumps(data).encode('utf-8')
                 url = "https://api.github.com/markdown"
                 sublime.status_message(url)
-                request = urllib2.Request(url, json_data, {'Content-Type': 'application/json'})
-                if github_oauth_token:
-                    request.add_header('Authorization', "token %s" % github_oauth_token)
-                markdown_html = urllib2.urlopen(request).read().decode('utf-8')
-            except urllib2.HTTPError, e:
+                request = urllib.request.Request(url, data=data, headers=headers)
+                markdown_html = urllib.request.urlopen(request).read().decode('utf-8')
+            except urllib.error.HTTPError as e:
                 if e.code == 401:
                     sublime.error_message('github API auth failed. Please check your OAuth token.')
                 else:
                     sublime.error_message('github API responded in an unfashion way :/')
-            except urllib2.URLError:
+            except urllib.error.URLError:
                 sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation')
             except:
                 sublime.error_message('cannot use github API to convert markdown. Please check your settings.')
@@ -212,12 +220,13 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         if target in ['disk', 'browser']:
             # check if LiveReload ST2 extension installed and add its script to the resulting HTML
             livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
+            # build the html
             if livereload_installed:
                 full_html += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':35729/livereload.js?snipver=1"></\' + \'script>\')</script>'
             # update output html file
             tmp_fullpath = getTempMarkdownPreviewPath(self.view)
-            tmp_html = open(tmp_fullpath, 'w')
-            tmp_html.write(full_html.encode('utf-8'))
+            tmp_html = open(tmp_fullpath, 'w', encoding='utf-8')
+            tmp_html.write(full_html)
             tmp_html.close()
             # now opens in browser if needed
             if target == 'browser':

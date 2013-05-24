@@ -141,7 +141,7 @@ class Window:
         if match:
             return self._get_handle_and_name(line[:match.start()].strip())
         else:
-            raise OSError, "Window information from %r did not contain window details." % line
+            raise OSError("Window information from %r did not contain window details." % line)
 
     def _descendants(self, s, fn):
         handles = []
@@ -258,7 +258,7 @@ def root(desktop=None):
     if _is_x11():
         return Window(None)
     else:
-        raise OSError, "Desktop '%s' not supported" % use_desktop(desktop)
+        raise OSError("Desktop '%s' not supported" % use_desktop(desktop))
 
 def find(callable, desktop=None):
 
