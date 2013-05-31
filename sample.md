@@ -73,11 +73,17 @@ Also, any indented block is considered a code block.  If `enable_highlight` is `
 
 ## Math
 
-When `enable_mathjax` is `true`, inline math can be included \\(\frac{\pi}{2}\\)
+When `enable_mathjax` is `true`, inline math can be included \\(\frac{\pi}{2}\\) $\pi$
 
 Alternatively, math can be written on it's own line:
 
 $$F(\omega) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} f(t) \, e^{ - i \omega t}dt$$
+
+\\[\int_0^1 f(t) \mathrm{d}t\\]
+
+\\[\sum_j \gamma_j^2/d_j\\]
+
+
 
 ## GitHub Flavored Markdown
 
