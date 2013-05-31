@@ -2,7 +2,7 @@
 <script>
 MathJax.Hub.Config({
   config: ["MMLorHTML.js"],
-  extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+  extensions: ["tex2jax.js"],
   jax: ["input/TeX"],
   tex2jax: {
     inlineMath: [ ['$','$'], ["\\(","\\)"] ],
@@ -10,6 +10,7 @@ MathJax.Hub.Config({
     processEscapes: false
   },
   TeX: {
+    extensions: ["AMSmath.js", "AMSsymbols.js"],
     TagSide: "right",
     TagIndent: ".8em",
     MultLineWidth: "85%",
