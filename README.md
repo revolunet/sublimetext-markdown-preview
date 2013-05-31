@@ -18,7 +18,7 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
  - CSS overriding if you need
  - YAML support thanks to @tommi
  - Clipboard selection and copy to clipboard thanks to @hexatrope
- - MathJax support : \\(\frac{\pi}{2}\\)
+ - MathJax support : \\(\frac{\pi}{2}\\) thanks to @bps10
 
 ## Installation :
 
