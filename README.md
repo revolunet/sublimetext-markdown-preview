@@ -20,12 +20,19 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
  - Clipboard selection and copy to clipboard thanks to @hexatrope
  - MathJax support : \\(\frac{\pi}{2}\\) thanks to @bps10
 
-## Installation :
+## Installation (ST2) :
 
  - you should use [sublime package manager][3]
  - use `cmd+shift+P` then `Package Control: Install Package`
  - look for `Markdown Preview` and install it.
  - OR, Clone or unpack to "Markdown Preview" folder inside "Packages" of your Sublime installation.
+
+## Installation (ST3) :
+
+The package manager cannot handle both versions yet so here's how to install the plugin :
+
+ - Clone or unpack to "Markdown Preview" folder inside "Packages" of your Sublime installation.
+ - change branch to ST3 with `git checkout ST3`.
 
 ## Usage :
 
