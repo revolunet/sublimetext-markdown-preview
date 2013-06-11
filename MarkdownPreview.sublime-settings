@@ -19,7 +19,7 @@
     */
     "parser": "default",
 
-    /* 
+    /*
        Enable or not mathjax support.
     */
     "enable_mathjax": false,
@@ -28,7 +28,19 @@
         Enable or not highlight.js support for syntax highlighting.
     */
     "enable_highlight": false,
-    
+
+    /*
+        List of enabled extensions of markdown2. You can get the full list of
+        extensions at https://github.com/trentm/python-markdown2/wiki/Extras
+    */
+    "enabled_extensions":
+    [
+        "footnotes",
+        "toc",
+        "fenced-code-blocks",
+        "cuddled-lists"
+    ],
+
     /*
         Default mode for the github Markdon parser : markdown (documents) or gfm (comments)
         see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document

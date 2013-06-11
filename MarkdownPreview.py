@@ -190,10 +190,10 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 sublime.status_message('converted markdown with github API successfully')
         else:
             # convert the markdown
+            enabled_extras = set(settings.get('enabled_extensions', ['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists']))
             if settings.get("enable_mathjax") is True or settings.get("enable_highlight") is True:
-                markdown_html = markdown2.markdown(markdown, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly'])
-            else:
-                markdown_html = markdown2.markdown(markdown, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists'])
+                enabled_extras.add('code-friendly')
+            markdown_html = markdown2.markdown(markdown, extras=list(enabled_extras))
             toc_html = markdown_html.toc_html
             if toc_html:
                 toc_markers = ['[toc]', '[TOC]', '<!--TOC-->']
