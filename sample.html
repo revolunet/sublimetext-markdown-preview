@@ -80,12 +80,20 @@
 
 <p>Backticks can be used to <code>highlight</code> some words.</p>
 
-<p>Also, any indented block is considered a code block.</p>
+<p>Also, any indented block is considered a code block.  If <code>enable_highlight</code> is <code>true</code>, syntax highlighting will be included (for the builtin parser - the github parser does this automatically).</p>
 
 <pre><code>&lt;script&gt;
     document.location = 'http://lmgtfy.com/?q=markdown+cheat+sheet';
 &lt;/script&gt;
 </code></pre>
+
+<h2 id="math">Math</h2>
+
+<p>When <code>enable_mathjax</code> is <code>true</code>, inline math can be included \(\frac{\pi}{2}\)</p>
+
+<p>Alternatively, math can be written on its own line:</p>
+
+<p>$$F(\omega) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} f(t) \, e^{ - i \omega t}dt$$</p>
 
 <h2 id="github-flavored-markdown">GitHub Flavored Markdown</h2>
 
@@ -126,6 +134,8 @@ async_call('/path/to/api', function(json) {
     });
 })
 </code></pre>
+
+<p>The Github Markdown also brings some <a href="http://www.emoji-cheat-sheet.com/">nice Emoji support</a> : :+1: :heart: :beer:</p>
 
 <h2 id="about">About</h2>
 
