@@ -136,7 +136,7 @@ def _is_xfce():
     # XFCE detection involves testing the output of a program.
 
     try:
-        return _readfrom(_get_x11_vars() + "xprop -root _DT_SAVE_MODE", shell=1).strip().endswith(' = "xfce4"')
+        return _readfrom(_get_x11_vars() + "xprop -root _DT_SAVE_MODE", shell=1).decode("utf-8").strip().endswith(' = "xfce4"')
     except OSError:
         return 0
 
