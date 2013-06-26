@@ -13,12 +13,11 @@ import urllib.parse
 from . import desktop
 from . import markdown2
 
-
-settings = sublime.load_settings('MarkdownPreview.sublime-settings')
-
-
 def getTempMarkdownPreviewPath(view):
     ''' return a permanent full path of the temp markdown preview file '''
+
+    settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+
     tmp_filename = '%s.html' % view.id()
     if settings.get('path_tempfile'):
         tmp_fullpath = os.path.join(settings.get('path_tempfile'), tmp_filename)
@@ -26,12 +25,15 @@ def getTempMarkdownPreviewPath(view):
         tmp_fullpath = os.path.join(tempfile.gettempdir(), tmp_filename)
     return tmp_fullpath
 
-
 class MarkdownPreviewListener(sublime_plugin.EventListener):
     ''' auto update the output html if markdown file has already been converted once '''
 
+    def __init__(self):
+        self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+        super(MarkdownPreviewListener, self).__init__()
+
     def on_post_save(self, view):
-        filetypes = settings.get('markdown_filetypes', (".md", ".markdown", ".mdown"))
+        filetypes = self.settings.get('markdown_filetypes', (".md", ".markdown", ".mdown"))
         if filetypes and view.file_name().endswith(tuple(filetypes)):
             temp_file = getTempMarkdownPreviewPath(view)
             if os.path.isfile(temp_file):
@@ -51,10 +53,14 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     ''' preview file contents with python-markdown and your web browser '''
 
+    def __init__(self, view):
+        self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+        super(MarkdownPreviewCommand, self).__init__(view)
+
     def getCSS(self):
         ''' return the correct CSS file based on parser and settings '''
-        config_parser = settings.get('parser')
-        config_css = settings.get('css')
+        config_parser = self.settings.get('parser')
+        config_css = self.settings.get('css')
 
         styles = ''
         if config_css and config_css != 'default':
@@ -73,9 +79,9 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                     raise Exception("markdown.css file not found!")
             styles += "<style>%s</style>" % open(css_path, 'r', encoding='utf-8').read()
 
-        if settings.get('allow_css_overrides'):
+        if self.settings.get('allow_css_overrides'):
             filename = self.view.file_name()
-            filetypes = settings.get('markdown_filetypes')
+            filetypes = self.settings.get('markdown_filetypes')
 
             if filename and filetypes:
                 for filetype in filetypes:
@@ -88,7 +94,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     def getMathJax(self):
         ''' return the MathJax script if enabled '''
 
-        if settings.get('enable_mathjax') is True:
+        if self.settings.get('enable_mathjax') is True:
             mathjax_path = os.path.join(sublime.packages_path(), 'Markdown Preview', "mathjax.html")
 
             if not os.path.isfile(mathjax_path):
@@ -102,7 +108,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         ''' return the Highlight.js and css if enabled '''
 
         highlight = ''
-        if settings.get('enable_highlight') is True and settings.get('parser') == 'default':
+        if self.settings.get('enable_highlight') is True and self.settings.get('parser') == 'default':
             highlight_path = os.path.join(sublime.packages_path(), 'Markdown Preview', "highlight.js")
             highlight_css_path = os.path.join(sublime.packages_path(), 'Markdown Preview', "highlight.css")
 
@@ -127,7 +133,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         selection = self.view.substr(self.view.sel()[0])
         if selection.strip() != '':
             contents = selection
-        if settings.get('strip_yaml_front_matter') and contents.startswith('---'):
+        if self.settings.get('strip_yaml_front_matter') and contents.startswith('---'):
             title = ''
             title_match = re.search('(?:title:)(.+)', contents, flags=re.IGNORECASE)
             if title_match:
@@ -153,15 +159,15 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
     def convert_markdown(self, markdown):
         ''' convert input markdown to HTML, with github or builtin parser '''
-        config_parser = settings.get('parser')
-        github_oauth_token = settings.get('github_oauth_token')
+        config_parser = self.settings.get('parser')
+        github_oauth_token = self.settings.get('github_oauth_token')
 
         markdown_html = 'cannot convert markdown'
         if config_parser and config_parser == 'github':
             # use the github API
             sublime.status_message('converting markdown with github API...')
             try:
-                github_mode = settings.get('github_mode', 'gfm')
+                github_mode = self.settings.get('github_mode', 'gfm')
                 data = {
                     "text": markdown,
                     "mode": github_mode
@@ -231,7 +237,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             tmp_html.close()
             # now opens in browser if needed
             if target == 'browser':
-                config_browser = settings.get('browser')
+                config_browser = self.settings.get('browser')
                 if config_browser and config_browser != 'default':
                     cmd = '"%s" %s' % (config_browser, tmp_fullpath)
                     if sys.platform == 'darwin':
