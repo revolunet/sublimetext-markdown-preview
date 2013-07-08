@@ -254,12 +254,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # create a new buffer and paste the output HTML
             new_view = self.view.window().new_file()
             new_view.set_scratch(True)
-            new_view.run_command('append', {
-                'characters': markdown_html,
-            })
-            #new_edit = new_view.begin_edit()
-            #new_view.insert(new_edit, 0, markdown_html)
-            #new_view.end_edit(new_edit)
+            # new_view.run_command('append', {
+            #     'characters': markdown_html,
+            # })
+            new_edit = new_view.begin_edit()
+            new_view.insert(new_edit, 0, markdown_html)
+            new_view.end_edit(new_edit)
             sublime.status_message('Markdown preview launched in sublime')
         elif target == 'clipboard':
             # clipboard copy the full HTML
