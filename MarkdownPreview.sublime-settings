@@ -15,6 +15,7 @@
         Warning for github API : if you have a ST2 linux build, Python is not built with SSL o it may not work
 
         default - Use the builtin python-markdown2 parser
+        markdown - Use the buildin python-markdown parser
         github - User github API to convert markdown, so you can use GitHub flavored Markdown, see http://github.github.com/github-flavored-markdown/
     */
     "parser": "default",

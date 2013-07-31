@@ -191,7 +191,7 @@ class Markdown(object):
         # Setup the module name
         module_name = ext_name
         if '.' not in ext_name:
-            module_name = '.'.join(['markdown.extensions', ext_name])
+            module_name = '.'.join(['Markdown Preview.markdown.extensions', ext_name])
 
         # Try loading the extension first from one place, then another
         try: # New style (markdown.extensons.<extension>)
