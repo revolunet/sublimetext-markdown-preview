@@ -158,6 +158,15 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         html = RE_SOURCES.sub(tag_fix, html)
         return html
 
+    def get_config_extensions(self, default_extensions):
+        config_extensions = self.settings.get('extensions')
+        if not config_extensions or config_extensions == 'default':
+            return default_extensions
+        if 'default' in config_extensions:
+            config_extensions.remove( 'default' )
+            config_extensions.extend( default_extensions )
+        return config_extensions
+
     def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
         config_parser = self.settings.get('parser')
@@ -197,12 +206,14 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 
         elif config_parser and config_parser == 'markdown':
             sublime.status_message('converting markdown with Python markdown...')
-            markdown_html = markdown.markdown(markdown_text, extensions=['extra', 'codehilite'])
+            config_extensions = self.get_config_extensions(['extra', 'codehilite', 'toc'])
+            markdown_html = markdown.markdown(markdown_text, extensions=config_extensions)
             markdown_html = self.postprocessor(markdown_html)
 
         else:
+            config_extensions = self.get_config_extensions(['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists'])
             # convert the markdown
-            markdown_html = markdown2.markdown(markdown_text, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists'])
+            markdown_html = markdown2.markdown(markdown_text,extras=config_extensions)
             toc_html = markdown_html.toc_html
             if toc_html:
                 toc_markers = ['[toc]', '[TOC]', '<!--TOC-->']

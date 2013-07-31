@@ -20,6 +20,21 @@
     */
     "parser": "default",
 
+    /*
+        Provide a list of extensions to use by the selected markdown parser.
+
+        default - use the default set of extensions
+        [ "default", "def_list", ... ] - a list of extensions. Use "default" to include the default extensions.
+        
+         Parser     | "default" Values
+        ------------|---------------------------
+         default    | ["footnotes", "toc", "fenced-code-blocks", "cuddled-lists"]
+         markdown   | ["extra", "codehilite", "toc"] see: http://pythonhosted.org/Markdown/extensions/index.html
+         github     | extensions values are not used.
+
+    */
+    "extensions": "default",
+
     /* 
        Enable or not mathjax support.
     */
