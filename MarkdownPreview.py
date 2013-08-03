@@ -12,6 +12,7 @@ import urllib.parse
 
 from . import desktop
 from . import markdown2
+from . import markdown
 
 def getTempMarkdownPreviewPath(view):
     ''' return a permanent full path of the temp markdown preview file '''
@@ -157,7 +158,16 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         html = RE_SOURCES.sub(tag_fix, html)
         return html
 
-    def convert_markdown(self, markdown):
+    def get_config_extensions(self, default_extensions):
+        config_extensions = self.settings.get('extensions')
+        if not config_extensions or config_extensions == 'default':
+            return default_extensions
+        if 'default' in config_extensions:
+            config_extensions.remove( 'default' )
+            config_extensions.extend( default_extensions )
+        return config_extensions
+
+    def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
         config_parser = self.settings.get('parser')
         github_oauth_token = self.settings.get('github_oauth_token')
@@ -169,7 +179,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             try:
                 github_mode = self.settings.get('github_mode', 'gfm')
                 data = {
-                    "text": markdown,
+                    "text": markdown_text,
                     "mode": github_mode
                 }
                 headers = {
@@ -193,9 +203,17 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 sublime.error_message('cannot use github API to convert markdown. Please check your settings.')
             else:
                 sublime.status_message('converted markdown with github API successfully')
+                
+        elif config_parser and config_parser == 'markdown':
+            sublime.status_message('converting markdown with Python markdown...')
+            config_extensions = self.get_config_extensions(['extra', 'codehilite', 'toc'])
+            markdown_html = markdown.markdown(markdown_text, extensions=config_extensions)
+            markdown_html = self.postprocessor(markdown_html)
+
         else:
+            config_extensions = self.get_config_extensions(['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists'])
             # convert the markdown
-            markdown_html = markdown2.markdown(markdown, extras=['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists'])
+            markdown_html = markdown2.markdown(markdown_text,extras=config_extensions)
             toc_html = markdown_html.toc_html
             if toc_html:
                 toc_markers = ['[toc]', '[TOC]', '<!--TOC-->']
