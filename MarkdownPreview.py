@@ -206,7 +206,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 
         elif config_parser and config_parser == 'markdown':
             sublime.status_message('converting markdown with Python markdown...')
-            config_extensions = self.get_config_extensions(['extra', 'codehilite', 'toc'])
+            config_extensions = self.get_config_extensions(['extra', 'toc'])
             markdown_html = markdown.markdown(markdown_text, extensions=config_extensions)
             markdown_html = self.postprocessor(markdown_html)
 

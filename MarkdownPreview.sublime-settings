@@ -29,7 +29,7 @@
          Parser     | "default" Values
         ------------|---------------------------
          default    | ["footnotes", "toc", "fenced-code-blocks", "cuddled-lists"]
-         markdown   | ["extra", "codehilite", "toc"] see: http://pythonhosted.org/Markdown/extensions/index.html
+         markdown   | ["extra", "toc"] see: http://pythonhosted.org/Markdown/extensions/index.html
          github     | extensions values are not used.
 
     */
