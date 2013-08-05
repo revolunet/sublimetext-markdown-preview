@@ -112,30 +112,23 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
     def getCSS(self):
         ''' return the correct CSS file based on parser and settings '''
-        config_parser = self.settings.get('parser')
-        config_css = self.settings.get('css')
+        
+        css_name = self.settings.get('css', 'default')
+        if os.path.isabs(css_name):
+            return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
 
-        styles = ''
-        if config_css and config_css != 'default':
-            styles += u"<link href='%s' rel='stylesheet' type='text/css'>" % config_css
-        else:
-            css_filename = 'markdown.css'
-            if config_parser and config_parser == 'github':
-                css_filename = 'github.css'
-            styles += u"<style>%s</style>" % load_resource(css_filename)
+        if css_name == 'default':
+            css_name = 'github.css' if self.settings.get('parser', 'default') == 'github' else 'markdown.css'
 
-        if self.settings.get('allow_css_overrides'):
-            filename = self.view.file_name()
-            filetypes = self.settings.get('markdown_filetypes')
+        # Try the local folder for css file.
+        mdfile = self.view.file_name()
+        if mdfile is not None:
+            css_path = os.path.join(os.path.dirname(mdfile), css_name)
+            if os.path.isfile(css_path):
+                return u"<style>%s</style>" % load_utf8(css_path)
 
-            if filename and filetypes:
-                for filetype in filetypes:
-                    if filename.endswith(filetype):
-                        css_filename = filename.rpartition(filetype)[0] + '.css'
-                        if (os.path.isfile(css_filename)):
-                            styles += u"<style>%s</style>" % load_utf8(css_filename)
-
-        return styles
+        # Try the build-in css files.
+        return u"<style>%s</style>" % load_resource(css_name)
 
     def getMathJax(self):
         ''' return the MathJax script if enabled '''
