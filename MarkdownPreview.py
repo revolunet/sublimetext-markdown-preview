@@ -205,6 +205,13 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         return markdown_html
 
+    def get_title(self):
+        title = self.view.name()
+        if not title:
+            fn = self.view.file_name()
+            title = 'untitled' if not fn else os.path.splitext(os.path.basename(fn))[0]
+        return '<title>%s</title>' % title
+
     def run(self, edit, target='browser'):
         region = sublime.Region(0, self.view.size())
 
@@ -217,6 +224,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         full_html += self.getCSS()
         full_html += self.getHighlight()
         full_html += self.getMathJax()
+        full_html += self.get_title()
         full_html += '</head><body>'
         full_html += markdown_html
         full_html += '</body>'
