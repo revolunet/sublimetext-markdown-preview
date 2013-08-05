@@ -187,7 +187,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         return html
 
     def get_config_extensions(self, default_extensions):
-        config_extensions = self.settings.get('extensions')
+        config_extensions = self.settings.get('enabled_extensions')
         if not config_extensions or config_extensions == 'default':
             return default_extensions
         if 'default' in config_extensions:

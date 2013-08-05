@@ -30,16 +30,22 @@
     "enable_highlight": false,
 
     /*
-        List of enabled extensions of markdown2. You can get the full list of
-        extensions at https://github.com/trentm/python-markdown2/wiki/Extras
+        List of enabled extensions of the selected markdown parser. 
+
+        You can get the full list of extensions at:
+            * The markdown2 parser, the `default`: https://github.com/trentm/python-markdown2/wiki/Extras
+
+
+        default - use the default set of extensions, see table latter.
+        [ "default", "def_list", ... ] - a list of extensions. Use "default" to include the default extensions.
+        
+         Parser     | "default" Values
+        ------------|---------------------------
+         default    | ["footnotes", "toc", "fenced-code-blocks", "cuddled-lists" ]
+         github     | extensions values are not used.
+
     */
-    "enabled_extensions":
-    [
-        "footnotes",
-        "toc",
-        "fenced-code-blocks",
-        "cuddled-lists"
-    ],
+    "enabled_extensions": "default",
 
     /*
         Default mode for the github Markdon parser : markdown (documents) or gfm (comments)
