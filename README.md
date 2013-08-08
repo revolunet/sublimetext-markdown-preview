@@ -12,27 +12,22 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
 ## Features :
 
 
- - Markdown conversion via builtin Markdown Parser ([python-markdown2][0]) or via Github API : just choose in your settings.
+ - Markdown conversion via builtin Markdown Parser ([python-markdown2][0]) or via Github API or the original [Python-markdown][10]: just choose in your settings.
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
  - Builtin parser : Support TOC, footnotes markdown extensions
- - CSS overriding if you need
+ - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
  - YAML support thanks to @tommi
  - Clipboard selection and copy to clipboard thanks to @hexatrope
  - MathJax support : \\(\frac{\pi}{2}\\) thanks to @bps10
 
-## Installation (ST2) :
+## Installation:
+
+For both Sublime Text 2 and 3 are now supported via the [sublime package manager][3].
 
  - you should use [sublime package manager][3]
  - use `cmd+shift+P` then `Package Control: Install Package`
  - look for `Markdown Preview` and install it.
  - OR, Clone or unpack to "Markdown Preview" folder inside "Packages" of your Sublime installation.
-
-## Installation (ST3) :
-
-The package manager cannot handle both versions yet so here's how to install the plugin :
-
- - Clone or unpack to "Markdown Preview" folder inside "Packages" of your Sublime installation.
- - change branch to ST3 with `git checkout ST3`.
 
 ## Usage :
 
@@ -44,7 +39,7 @@ The package manager cannot handle both versions yet so here's how to install the
 
 ## Uses :
 
- - [python-markdown2][0] for markdown parsing **OR** the GitHub markdown API.
+ - [python-markdown2][0] for markdown parsing **OR** the GitHub markdown API **OR** [Python-markdown][10].
 
 
 ## Licence :
@@ -60,3 +55,4 @@ The code is available at github [https://github.com/revolunet/sublimetext-markdo
  [7]: https://github.com/dz0ny/LiveReload-sublimetext2
  [8]: https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098
  [9]: https://github.com/revolunet/sublimetext-markdown-preview/issues/78#issuecomment-15644727
+ [10]: https://github.com/waylan/Python-Markdown
