@@ -191,7 +191,12 @@ class Markdown(object):
         # Setup the module name
         module_name = ext_name
         if '.' not in ext_name:
-            module_name = '.'.join(['Markdown Preview.markdown.extensions', ext_name])
+            import sublime
+            if sublime.version() >= '3000':
+                from ..helper import INSTALLED_DIRECTORY
+                module_name = '.'.join([INSTALLED_DIRECTORY, 'markdown.extensions', ext_name])
+            else:
+                module_name = '.'.join(['markdown.extensions', ext_name])
 
         # Try loading the extension first from one place, then another
         try: # New style (markdown.extensons.<extension>)

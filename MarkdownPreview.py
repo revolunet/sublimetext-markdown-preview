@@ -4,16 +4,31 @@ import sublime_plugin
 
 import os
 import sys
+import traceback
 import tempfile
 import re
 import json
-import urllib.request
-import urllib.parse
 
-from . import desktop
-from . import markdown2
-from . import markdown
+if sublime.version() >= '3000':
+    from . import desktop
+    from . import markdown2
+    from . import markdown
+    from .helper import INSTALLED_DIRECTORY
+    from urllib.request import urlopen
+    from urllib.error import HTTPError, URLError
+    
+    def Request(url, data, headers):
+        ''' Adapter for urllib2 used in ST2 '''
+        import urllib.request
+        return urllib.request.Request(url, data=data, headers=headers)
 
+else: # ST2
+    import desktop
+    import markdown2
+    import markdown
+    from helper import INSTALLED_DIRECTORY
+    from urllib2 import Request, urlopen, HTTPError, URLError
+    
 def getTempMarkdownPreviewPath(view):
     ''' return a permanent full path of the temp markdown preview file '''
 
@@ -44,25 +59,30 @@ def load_utf8(filename):
     else: # 2.x
         return open(filename, 'r').read().decode('utf-8')
 
-
 def load_resource(name):
     ''' return file contents for files within the package root folder '''
     v = sublime.version()
     if v >= '3000':
+        filename = '/'.join(['Packages', INSTALLED_DIRECTORY, name])
         try:
-            filename = 'Packages/Markdown Preview/'+name
             return sublime.load_resource(filename)
         except:
+            print("Error while load_resource('%s')" % filename)
+            traceback.print_exc()
             return ''
+            
     else: # 2.x
-        filename = os.path.join(sublime.packages_path(), 'Markdown Preview', name)
+        filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
 
-        if os.path.isfile(filename):
+        if not os.path.isfile(filename):
+            print('Error while lookup resources file: %s', name)
+            return ''
+
+        try:
             return open(filename, 'r').read().decode('utf-8')
-        else:
-            filename = os.path.join(sublime.packages_path(), 'sublimetext-markdown-preview', name) ## why is this ?
-            if os.path.isfile(filename):
-                return open(filename, 'r').read().decode('utf-8')
+        except:
+            print("Error while load_resource('%s')" % filename)
+            traceback.print_exc()
             return ''
 
 def new_scratch_view(window, text):
@@ -84,6 +104,7 @@ def new_scratch_view(window, text):
 
 class MarkdownPreviewListener(sublime_plugin.EventListener):
     ''' auto update the output html if markdown file has already been converted once '''
+
     def on_post_save(self, view):
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         filetypes = settings.get('markdown_filetypes')
@@ -216,7 +237,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # use the github API
             sublime.status_message('converting markdown with github API...')
             try:
-                github_mode = settings.get('github_mode', 'gfm')
+                github_mode = self.settings.get('github_mode', 'gfm')
                 data = {
                     "text": markdown_text,
                     "mode": github_mode
@@ -229,20 +250,21 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                 data = json.dumps(data).encode('utf-8')
                 url = "https://api.github.com/markdown"
                 sublime.status_message(url)
-                request = urllib.request.Request(url, data=data, headers=headers)
-                markdown_html = urllib.request.urlopen(request).read().decode('utf-8')
-            except urllib.error.HTTPError as e:
+                request = Request(url, data, headers)
+                markdown_html = urlopen(request).read().decode('utf-8')
+            except HTTPError:
+                e = sys.exc_info()[1]
                 if e.code == 401:
                     sublime.error_message('github API auth failed. Please check your OAuth token.')
                 else:
                     sublime.error_message('github API responded in an unfashion way :/')
-            except urllib.error.URLError:
+            except URLError:
                 sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation')
             except:
                 sublime.error_message('cannot use github API to convert markdown. Please check your settings.')
             else:
                 sublime.status_message('converted markdown with github API successfully')
-                
+
         elif config_parser and config_parser == 'markdown':
             sublime.status_message('converting markdown with Python markdown...')
             config_extensions = self.get_config_extensions(['extra', 'toc'])
