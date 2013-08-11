@@ -132,7 +132,7 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     ''' preview file contents with python-markdown and your web browser '''
 
-    def getCSsOnSearchPath(self):
+    def getCSSOnSearchPath(self):
         css_name = self.settings.get('css', 'default')
         if os.path.isabs(css_name):
             return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
@@ -167,7 +167,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
     def getCSS(self):
         ''' return the correct CSS file based on parser and settings '''
-        return self.getCSsOnSearchPath() + self.getOverrideCSS()
+        return self.getCSSOnSearchPath() + self.getOverrideCSS()
 
     def getMathJax(self):
         ''' return the MathJax script if enabled '''
