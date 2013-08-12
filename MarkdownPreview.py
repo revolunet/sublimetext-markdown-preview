@@ -170,7 +170,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         return self.getCSSOnSearchPath() + self.getOverrideCSS()
 
     def getJS(self):
-        js_files = settings.get('js')
+        js_files = self.settings.get('js')
         scripts = ''
 
         if js_files is not None:
