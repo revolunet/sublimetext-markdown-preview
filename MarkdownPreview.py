@@ -132,7 +132,7 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     ''' preview file contents with python-markdown and your web browser '''
 
-    def getCSsOnSearchPath(self):
+    def getCSSOnSearchPath(self):
         css_name = self.settings.get('css', 'default')
         if os.path.isabs(css_name):
             return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
@@ -167,7 +167,25 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
     def getCSS(self):
         ''' return the correct CSS file based on parser and settings '''
-        return self.getCSsOnSearchPath() + self.getOverrideCSS()
+        return self.getCSSOnSearchPath() + self.getOverrideCSS()
+
+    def getJS(self):
+        js_files = settings.get('js')
+        scripts = ''
+
+        if js_files is not None:
+            # Ensure string values become a list.
+            if isinstance(js_files, str) or isinstance(js_files, unicode):
+                js_files = [js_files]
+            # Only load scripts if we have a list.
+            if isinstance(js_files, list):
+                for js_file in js_files:
+                    if os.path.isabs(js_file):
+                        # Load the script inline to avoid cross-origin.
+                        scripts += u"<script>%s</script>" % load_utf8(js_file)
+                    else:
+                        scripts += u"<script type='text/javascript' src='%s'></script>" % js_file
+        return scripts
 
     def getMathJax(self):
         ''' return the MathJax script if enabled '''
@@ -306,6 +324,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         full_html = u'<!DOCTYPE html>'
         full_html += '<html><head><meta charset="utf-8">'
         full_html += self.getCSS()
+        full_html += self.getJS()
         full_html += self.getHighlight()
         full_html += self.getMathJax()
         full_html += self.get_title()
