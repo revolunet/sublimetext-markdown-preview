@@ -122,10 +122,19 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
         lines = '\n'.join(load_resource('sample.md').splitlines())
         view = new_scratch_view(self.view.window(), lines)
         view.set_name("Markdown Cheatsheet")
-        try:
-            view.set_syntax_file("Packages/Markdown/Markdown.tmLanguage")
-        except:
-            pass
+        extended_syntax = sublime.find_resources('*Markdown Extended.tmLanguage')
+        for syntax in extended_syntax:
+            try:
+                view.set_syntax_file(syntax)
+                break
+            except:
+                pass
+
+        if not view.settings().get('syntax').endswith('/Markdown Extended.tmLanguage'):
+            try:
+                view.set_syntax_file("Packages/Markdown/Markdown.tmLanguage")
+            except:
+                pass
         sublime.status_message('Markdown cheat sheet opened')
 
 
