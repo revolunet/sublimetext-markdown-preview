@@ -1,4 +1,4 @@
-Sublime Text 2/3 MarkDown preview
+Sublime Text 2/3 Markdown preview
 ===============================
 
 Preview your markdown files quickly in you web browser from sublime text 2/3. 
@@ -20,14 +20,22 @@ You can use builtin [python-markdown2][0] parser (default) or use the [github ma
  - Clipboard selection and copy to clipboard thanks to @hexatrope
  - MathJax support : \\(\frac{\pi}{2}\\) thanks to @bps10
 
-## Installation:
+## Installation :
 
-For both Sublime Text 2 and 3 are now supported via the [sublime package manager][3].
+### Using [Package Control][3] (*Recommanded*)
 
- - you should use [sublime package manager][3]
- - use `cmd+shift+P` then `Package Control: Install Package`
- - look for `Markdown Preview` and install it.
- - OR, Clone or unpack to "Markdown Preview" folder inside "Packages" of your Sublime installation.
+For all Sublime Text 2/3 users we recommand installe via [Package Control][3].
+
+1. [Install][11] Package Control if you haven't yet.
+2. Use `cmd+shift+P` then `Package Control: Install Package`
+3. Look for `Markdown Preview` and install it.
+
+### Manual Install
+
+1. Click the `Preferences > Browse Packages…` menu
+2. Browse up a folder and then into the `Installed Packages/` folder
+3. Download [zip package][12] rename it to `Markdown Preview.sublime-package` and copy it into the `Installed Packages/` directory
+4. Restart Sublime Text
 
 ## Usage :
 
@@ -48,7 +56,7 @@ The code is available at github [https://github.com/revolunet/sublimetext-markdo
 
  [0]: https://github.com/trentm/python-markdown2
  [2]: https://github.com/revolunet/sublimetext-markdown-preview
- [3]: http://wbond.net/sublime_packages/package_control
+ [3]: https://sublime.wbond.net/
  [4]: http://revolunet.mit-license.org
  [5]: http://developer.github.com/v3/markdown
  [6]: http://github.github.com/github-flavored-markdown/
@@ -56,3 +64,5 @@ The code is available at github [https://github.com/revolunet/sublimetext-markdo
  [8]: https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098
  [9]: https://github.com/revolunet/sublimetext-markdown-preview/issues/78#issuecomment-15644727
  [10]: https://github.com/waylan/Python-Markdown
+ [11]: https://sublime.wbond.net/installation
+ [12]: https://github.com/revolunet/sublimetext-markdown-preview/archive/master.zip
