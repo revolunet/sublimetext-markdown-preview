@@ -1,0 +1,12 @@
+{
+    "target": "markdown_build",
+    "selector": "text.html.markdown",
+
+    "variants": [
+
+        {
+         	"target": "markdown_build_github",
+          	"name": "Build with Github API"
+        }
+    ]
+}

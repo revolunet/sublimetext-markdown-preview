@@ -1,23 +1,52 @@
 [
     {
-        "caption": "Markdown Preview: Preview in Browser",
+        "caption": "Markdown Preview: Python Markdown: Preview in Browser",
         "command": "markdown_preview",
         "args": {
-            "target": "browser"
+            "target": "browser",
+            "parser": "markdown"
         }
     },
     {
-        "caption": "Markdown Preview: Export HTML in Sublime Text",
+        "caption": "Markdown Preview: Python Markdown: Export HTML in Sublime Text",
         "command": "markdown_preview",
         "args": {
-            "target": "sublime"
+            "target": "sublime",
+            "parser": "markdown"
         }
     },
     {
-        "caption": "Markdown Preview: Copy to Clipboard",
+        "caption": "Markdown Preview: Python Markdown: Copy to Clipboard",
         "command": "markdown_preview",
         "args": {
-            "target": "clipboard"
+            "target": "clipboard",
+            "parser": "markdown"
+        }
+    },
+
+
+    {
+        "caption": "Markdown Preview: Github Flavored Markdown: Preview in Browser",
+        "command": "markdown_preview",
+        "args": {
+            "target": "browser",
+            "parser": "github"
+        }
+    },
+    {
+        "caption": "Markdown Preview: Github Flavored Markdown: Export HTML in Sublime Text",
+        "command": "markdown_preview",
+        "args": {
+            "target": "sublime",
+            "parser": "github"
+        }
+    },
+    {
+        "caption": "Markdown Preview: Github Flavored Markdown: Copy to Clipboard",
+        "command": "markdown_preview",
+        "args": {
+            "target": "clipboard",
+            "parser": "github"
         }
     },
     {
@@ -25,4 +54,8 @@
         "command": "markdown_cheatsheet",
         "args": {}
     }
+
+
+
+
 ]
