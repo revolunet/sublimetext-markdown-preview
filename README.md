@@ -66,17 +66,18 @@ Using Sublime Text menu: `Preferences`->`Package Settings`->`Markdown Preivew`
 - `Settings - Default` is a good reference with detail description for each setting.
 
 
-## Uses :
+## Support :
 
- - [Python-markdown][10] for markdown parsing **OR** the GitHub markdown API.
+- Any bugs about Markdown Preview please fell free to file a bug [here][issue].
+- And you are welcome to fork and submit pullrequests.
 
 
 ## Licence :
 
-The code is available at github [https://github.com/revolunet/sublimetext-markdown-preview][2] under MIT licence : [http://revolunet.mit-license.org][4]
+The code is available at github [project][home] under [MIT licence][4].
 
  [0]: https://github.com/trentm/python-markdown2
- [2]: https://github.com/revolunet/sublimetext-markdown-preview
+ [home]: https://github.com/revolunet/sublimetext-markdown-preview
  [3]: https://sublime.wbond.net/
  [4]: http://revolunet.mit-license.org
  [5]: http://developer.github.com/v3/markdown
@@ -87,3 +88,4 @@ The code is available at github [https://github.com/revolunet/sublimetext-markdo
  [10]: https://github.com/waylan/Python-Markdown
  [11]: https://sublime.wbond.net/installation
  [12]: https://github.com/revolunet/sublimetext-markdown-preview/archive/master.zip
+ [issue]: https://github.com/revolunet/sublimetext-markdown-preview/issues
