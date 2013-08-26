@@ -1,7 +1,11 @@
 Changes in Markdown Preview
 ===========================
 
-## 1.1.0
+## 1.0.2
+
+* Fixes messages.json and changelog versions.
+
+## 1.0.1
 
 * Removed markdown2 parser for its not well maintained and buggy.
 * Make Python Markdown parser as default.
