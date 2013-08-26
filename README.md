@@ -1,7 +1,7 @@
 Sublime Text 2/3 Markdown Preview
 =================================
 
-Preview your markdown files quickly in you web browser from sublime text 2/3. 
+Preview and build your markdown files quickly in your web browser from sublime text 2/3. 
 
 You can use builtin [python-markdown][10] parser or use the [github markdown API][5] for the conversion.
 
