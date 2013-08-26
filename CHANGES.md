@@ -1,6 +1,10 @@
 Changes in Markdown Preview
 ===========================
 
+## 1.0.3
+
+* The `messages.json` should OK for this time.
+
 ## 1.0.2
 
 * Fixes messages.json and changelog versions.
