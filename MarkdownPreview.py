@@ -90,6 +90,17 @@ def load_resource(name):
             traceback.print_exc()
             return ''
 
+def exists_resource(resource_file_path):
+    if sublime.version() >= '3000':
+        try:
+            sublime.load_resource(resource_file_path)
+            return True
+        except:
+            return False
+    else:
+        filename = os.path.join(os.path.dirname(sublime.packages_path()), resource_file_path)
+        return os.path.isfile(filename)
+
 def new_scratch_view(window, text):
     ''' create a new scratch view and paste text content
         return the new view
@@ -127,19 +138,14 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
         lines = '\n'.join(load_resource('sample.md').splitlines())
         view = new_scratch_view(self.view.window(), lines)
         view.set_name("Markdown Cheatsheet")
-        extended_syntax = sublime.find_resources('*Markdown Extended.tmLanguage')
-        for syntax in extended_syntax:
-            try:
-                view.set_syntax_file(syntax)
-                break
-            except:
-                pass
 
-        if not view.settings().get('syntax').endswith('/Markdown Extended.tmLanguage'):
-            try:
-                view.set_syntax_file("Packages/Markdown/Markdown.tmLanguage")
-            except:
-                pass
+        # Set syntax file
+        syntax_files = ["Packages/Markdown Extended/Syntaxes/Markdown Extended.tmLanguage", "Packages/Markdown/Markdown.tmLanguage"]
+        for file in syntax_files:
+            if exists_resource(file):
+                view.set_syntax_file(file)
+                break # Done if any syntax is set.
+
         sublime.status_message('Markdown cheat sheet opened')
 
 
