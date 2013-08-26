@@ -11,11 +11,16 @@
     "browser": "default",
 
     /*
-        Sets the default parser for converting markdown to html.
+        Sets the parser used for build markdown to html.
+
+        NOTE: The parser setting is not for the preview commands now. 
+        The preivew have sperated commands for each parser markdown.
+
         Warning for github API : if you have a ST2 linux build, Python is not built with SSL o it may not work
 
-        default - Use the builtin python-markdown2 parser
+        default - The current default parser is python-markdown parser.
         markdown - Use the buildin python-markdown parser
+        markdown2 - (Deprecated) Use the builtin python-markdown2 parser.
         github - User github API to convert markdown, so you can use GitHub flavored Markdown, see http://github.github.com/github-flavored-markdown/
     */
     "parser": "default",
