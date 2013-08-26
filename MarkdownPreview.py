@@ -220,13 +220,15 @@ class MarkdownCompiler():
         return highlight
 
 
-    def get_contents(self, region):
+    def get_contents(self, wholefile=False):
         ''' Get contents or selection from view and optionally strip the YAML front matter '''
+        region = sublime.Region(0, self.view.size())
         contents = self.view.substr(region)
-        # use selection if any
-        selection = self.view.substr(self.view.sel()[0])
-        if selection.strip() != '':
-            contents = selection
+        if not wholefile:
+            # use selection if any
+            selection = self.view.substr(self.view.sel()[0])
+            if selection.strip() != '':
+                contents = selection
         if self.settings.get('strip_yaml_front_matter') and contents.startswith('---'):
             title = ''
             title_match = re.search('(?:title:)(.+)', contents, flags=re.IGNORECASE)
@@ -330,14 +332,12 @@ class MarkdownCompiler():
             title = 'untitled' if not fn else os.path.splitext(os.path.basename(fn))[0]
         return '<title>%s</title>' % title
 
-    def run(self, view, parser):
+    def run(self, view, parser, wholefile=False):
         ''' return full html and body html for view. '''
         self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         self.view = view
         
-        region = sublime.Region(0, self.view.size())
-
-        contents = self.get_contents(region)
+        contents = self.get_contents(wholefile)
         
         body = self.convert_markdown(contents, parser)
 
@@ -401,14 +401,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
 
 class MarkdownBuildCommand(sublime_plugin.WindowCommand):
-
-    def show_panel(self):
+    def init_panel(self):
         if not hasattr(self, 'output_view'):
             if sublime.version() >= '3000':
                 self.output_view = self.window.create_output_panel("markdown")
             else:
                 self.output_view = self.window.get_output_panel("markdown")
-        self.window.run_command("show_panel", {"panel": "output.markdown"})
 
     def puts(self, message):
         message = message + '\n'
@@ -432,15 +430,20 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
             return
         start_time = time.time()
 
+        self.init_panel()
+        
+        show_panel_on_build = sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True)
+        if show_panel_on_build:
+            self.window.run_command("show_panel", {"panel": "output.markdown"})
+        
         mdfile = view.file_name()
-        self.show_panel()
         if mdfile is None:
             self.puts("Can't build a unsaved markdown file.")
             return
 
         self.puts("Compiling %s..." % mdfile)
 
-        html, body = compiler.run(view, 'markdown')
+        html, body = compiler.run(view, 'markdown', True)
 
         htmlfile = os.path.splitext(mdfile)[0]+'.html'
         self.puts("        ->"+htmlfile)
@@ -449,5 +452,5 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
         elapsed = time.time() - start_time
         if body == _CANNOT_CONVERT:
             self.puts(_CANNOT_CONVERT)
-        self.puts("[Finished in %.1fs]\n" % (elapsed))
-
+        self.puts("[Finished in %.1fs]" % (elapsed))
+        sublime.status_message("Build finished")
