@@ -33,7 +33,8 @@ else: # ST2
     from urllib2 import Request, urlopen, HTTPError, URLError
 
 _CANNOT_CONVERT = u'cannot convert markdown'
-    
+
+
 def getTempMarkdownPreviewPath(view):
     ''' return a permanent full path of the temp markdown preview file '''
 
@@ -128,8 +129,13 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
             temp_file = getTempMarkdownPreviewPath(view)
             if os.path.isfile(temp_file):
                 # reexec markdown conversion
-                view.run_command('markdown_preview', {'target': 'disk'})
+                # todo : check if browser still opened and reopen it if needed
+                view.run_command('markdown_preview', {
+                    'target': 'disk',
+                    'parser': view.settings().get('parser')
+                })
                 sublime.status_message('Markdown preview file updated')
+
 
 
 class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
@@ -368,6 +374,11 @@ compiler = MarkdownCompiler()
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     def run(self, edit, parser='markdown', target='browser'):
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+
+        # backup parser+target for later saves
+        self.view.settings().set('parser', parser)
+        self.view.settings().set('target', target)
+
         html, body = compiler.run(self.view, parser)
 
         if target in ['disk', 'browser']:
