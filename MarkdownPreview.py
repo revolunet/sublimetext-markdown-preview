@@ -159,9 +159,16 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
 class MarkdownCompiler():
     ''' Do the markdown converting '''
 
+    def isurl(self, css_name):
+        match = re.match(r'https?://', css_name)
+        if match:
+            return True
+        return False
+
     def get_search_path_css(self):
         css_name = self.settings.get('css', 'default')
-        if os.path.isabs(css_name):
+
+        if self.isurl(css_name) or os.path.isabs(css_name):
             return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
 
         if css_name == 'default':
