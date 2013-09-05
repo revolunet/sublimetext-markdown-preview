@@ -165,14 +165,14 @@ class MarkdownCompiler():
             return True
         return False
 
-    def get_search_path_css(self):
+    def get_search_path_css(self, parser):
         css_name = self.settings.get('css', 'default')
 
         if self.isurl(css_name) or os.path.isabs(css_name):
             return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
 
         if css_name == 'default':
-            css_name = 'github.css' if self.settings.get('parser', 'default') == 'github' else 'markdown.css'
+            css_name = 'github.css' if parser == 'github' else 'markdown.css'
 
         # Try the local folder for css file.
         mdfile = self.view.file_name()
@@ -199,9 +199,9 @@ class MarkdownCompiler():
                             return u"<style>%s</style>" % load_utf8(css_filename)
         return ''
 
-    def get_stylesheet(self):
+    def get_stylesheet(self, parser):
         ''' return the correct CSS file based on parser and settings '''
-        return self.get_search_path_css() + self.get_override_css()
+        return self.get_search_path_css(parser) + self.get_override_css()
 
     def get_javascript(self):
         js_files = self.settings.get('js')
@@ -362,7 +362,7 @@ class MarkdownCompiler():
 
         html = u'<!DOCTYPE html>'
         html += '<html><head><meta charset="utf-8">'
-        html += self.get_stylesheet()
+        html += self.get_stylesheet(parser)
         html += self.get_javascript()
         html += self.get_highlight()
         html += self.get_mathjax()
