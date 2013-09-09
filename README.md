@@ -22,9 +22,9 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
 
 ## Installation :
 
-### Using [Package Control][3] (*Recommanded*)
+### Using [Package Control][3] (*Recommended*)
 
-For all Sublime Text 2/3 users we recommand installe via [Package Control][3].
+For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 
 1. [Install][11] Package Control if you haven't yet.
 2. Use `cmd+shift+P` then `Package Control: Install Package`
