@@ -16,7 +16,7 @@
         NOTE: The parser setting is not for the preview commands now. 
         The preivew have sperated commands for each parser markdown.
 
-        Warning for github API : if you have a ST2 linux build, Python is not built with SSL o it may not work
+        Warning for github API : if you have a ST2 linux build, Python is not built with SSL so it may not work
 
         default - The current default parser is python-markdown parser.
         markdown - Use the buildin python-markdown parser
