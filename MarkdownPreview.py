@@ -355,14 +355,12 @@ class MarkdownCompiler():
                 for marker in toc_markers:
                     markdown_html = markdown_html.replace(marker, toc_html)
 
-            # postprocess the html from internal parser
-            markdown_html = self.postprocessor(markdown_html)
         else:
             sublime.status_message('converting markdown with Python markdown...')
             config_extensions = self.get_config_extensions(['extra', 'toc'])
             markdown_html = markdown.markdown(markdown_text, extensions=config_extensions)
-            markdown_html = self.postprocessor(markdown_html)            
 
+        markdown_html = self.postprocessor(markdown_html)
         return markdown_html
 
     def get_title(self):
