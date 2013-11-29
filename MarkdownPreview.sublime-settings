@@ -56,7 +56,7 @@
     "enabled_extensions": "default",
 
     /*
-        Default mode for the github Markdon parser : markdown (documents) or gfm (comments)
+        Default mode for the github Markdown parser : markdown (documents) or gfm (comments)
         see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
     */
     "github_mode": "markdown",
