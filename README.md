@@ -68,7 +68,7 @@ Using Sublime Text menu: `Preferences`->`Package Settings`->`Markdown Preview`
 
 ## Support :
 
-- Any bugs about Markdown Preview please fell free to report [here][issue].
+- Any bugs about Markdown Preview please feel free to report [here][issue].
 - And you are welcome to fork and submit pullrequests.
 
 
