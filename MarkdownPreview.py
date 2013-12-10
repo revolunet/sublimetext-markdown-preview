@@ -284,15 +284,27 @@ class MarkdownCompiler():
     def curl_convert(self, data):
         try:
             import subprocess
-            shell_safe_json = data.decode('utf-8').replace('\"', '\\"').replace("`", "\\`")
+
+            # It looks like the text does NOT need to be escaped and
+            # surrounded with double quotes.
+            # Tested in ubuntu 13.10, python 2.7.5+
+            shell_safe_json = data.decode('utf-8')
             curl_args = [
                 'curl',
                 '-H',
-                '"Content-Type: application/json"',
+                'Content-Type: application/json',
                 '-d',
-                '"' + shell_safe_json + '"',
+                shell_safe_json,
                 'https://api.github.com/markdown'
             ]
+
+            github_oauth_token = self.settings.get('github_oauth_token')
+            if github_oauth_token:
+                curl_args[1:1] = [
+                    '-u',
+                    github_oauth_token
+                ]
+
             markdown_html = subprocess.Popen(curl_args, stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
             return markdown_html
         except subprocess.CalledProcessError as e:
