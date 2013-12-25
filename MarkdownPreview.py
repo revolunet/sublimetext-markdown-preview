@@ -41,10 +41,17 @@ def getTempMarkdownPreviewPath(view):
     settings = sublime.load_settings('MarkdownPreview.sublime-settings')
 
     tmp_filename = '%s.html' % view.id()
+    tmp_dir = tempfile.gettempdir();
     if settings.get('path_tempfile'):
-        tmp_fullpath = os.path.join(settings.get('path_tempfile'), tmp_filename)
-    else:
-        tmp_fullpath = os.path.join(tempfile.gettempdir(), tmp_filename)
+        if os.path.isabs(settings.get('path_tempfile')): #absolute path or not
+            tmp_dir = settings.get('path_tempfile')
+        else:
+            tmp_dir = os.path.join(os.path.dirname(view.file_name()), settings.get('path_tempfile'))
+
+    if not os.path.isdir(tmp_dir): #create dir if not exsits
+        os.makedirs(tmp_dir)
+
+    tmp_fullpath = os.path.join(tmp_dir, tmp_filename)
     return tmp_fullpath
 
 def save_utf8(filename, text):
