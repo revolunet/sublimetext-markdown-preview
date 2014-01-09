@@ -12,7 +12,16 @@ import time
 import traceback
 
 
-if sublime.version() >= '3000':
+def is_ST3():
+    ''' check if ST3 based on python version '''
+    version = sys.version_info
+    if isinstance(version, tuple):
+        version = version[0]
+    elif getattr(version, 'major', None):
+        version = version.major
+    return (version >= 3)
+
+if is_ST3():
     from . import desktop
     from . import markdown2
     from . import markdown
@@ -25,7 +34,7 @@ if sublime.version() >= '3000':
         import urllib.request
         return urllib.request.Request(url, data=data, headers=headers, method='POST')
 
-else: # ST2
+else:
     import desktop
     import markdown2
     import markdown
@@ -55,8 +64,7 @@ def getTempMarkdownPreviewPath(view):
     return tmp_fullpath
 
 def save_utf8(filename, text):
-    v = sublime.version()
-    if v >= '3000':
+    if is_ST3():
         f = open(filename, 'w', encoding='utf-8')
         f.write(text)
         f.close()
@@ -66,48 +74,29 @@ def save_utf8(filename, text):
         f.close()
 
 def load_utf8(filename):
-    v = sublime.version()
-    if v >= '3000':
+    if is_ST3():
         return open(filename, 'r', encoding='utf-8').read()
     else: # 2.x
         return open(filename, 'r').read().decode('utf-8')
 
 def load_resource(name):
     ''' return file contents for files within the package root folder '''
-    v = sublime.version()
-    if v >= '3000':
-        filename = '/'.join(['Packages', INSTALLED_DIRECTORY, name])
-        try:
-            return sublime.load_resource(filename)
-        except:
-            print("Error while load_resource('%s')" % filename)
-            traceback.print_exc()
-            return ''
-            
-    else: # 2.x
-        filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
+    filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
 
-        if not os.path.isfile(filename):
-            print('Error while lookup resources file: %s', name)
-            return ''
+    if not os.path.isfile(filename):
+        print('Error while lookup resources file: %s', name)
+        return ''
 
-        try:
-            return open(filename, 'r').read().decode('utf-8')
-        except:
-            print("Error while load_resource('%s')" % filename)
-            traceback.print_exc()
-            return ''
+    try:
+        return load_utf8(filename)
+    except:
+        print("Error while load_resource('%s')" % filename)
+        traceback.print_exc()
+        return ''
 
 def exists_resource(resource_file_path):
-    if sublime.version() >= '3000':
-        try:
-            sublime.load_resource(resource_file_path)
-            return True
-        except:
-            return False
-    else:
-        filename = os.path.join(os.path.dirname(sublime.packages_path()), resource_file_path)
-        return os.path.isfile(filename)
+    filename = os.path.join(os.path.dirname(sublime.packages_path()), resource_file_path)
+    return os.path.isfile(filename)
 
 def new_scratch_view(window, text):
     ''' create a new scratch view and paste text content
@@ -116,7 +105,7 @@ def new_scratch_view(window, text):
 
     new_view = window.new_file()
     new_view.set_scratch(True)
-    if sublime.version() >= '3000':
+    if is_ST3():
         new_view.run_command('append', {
             'characters': text,
         })
@@ -465,14 +454,14 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 class MarkdownBuildCommand(sublime_plugin.WindowCommand):
     def init_panel(self):
         if not hasattr(self, 'output_view'):
-            if sublime.version() >= '3000':
+            if is_ST3():
                 self.output_view = self.window.create_output_panel("markdown")
             else:
                 self.output_view = self.window.get_output_panel("markdown")
 
     def puts(self, message):
         message = message + '\n'
-        if sublime.version() >= '3000':
+        if is_ST3():
             self.output_view.run_command('append', {'characters': message, 'force': True, 'scroll_to_end': True})
         else:
             selection_was_at_end = (len(self.output_view.sel()) == 1
