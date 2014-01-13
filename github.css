@@ -239,6 +239,9 @@ body table
   display:block;
   overflow:auto;
   width:100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  padding: 0;
 }
 
 body table th
