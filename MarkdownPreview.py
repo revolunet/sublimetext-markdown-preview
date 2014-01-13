@@ -84,7 +84,7 @@ def load_resource(name):
 
     try:
         if is_ST3():
-            filename = os.path.join('Packages', INSTALLED_DIRECTORY, name)
+            filename = '/'.join(['Packages', INSTALLED_DIRECTORY, name])
             return sublime.load_resource(filename)
         else:
             filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
