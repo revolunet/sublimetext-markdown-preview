@@ -81,14 +81,17 @@ def load_utf8(filename):
 
 def load_resource(name):
     ''' return file contents for files within the package root folder '''
-    filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
-
-    if not os.path.isfile(filename):
-        print('Error while lookup resources file: %s', name)
-        return ''
 
     try:
-        return load_utf8(filename)
+        if is_ST3():
+            filename = os.path.join('Packages', INSTALLED_DIRECTORY, name)
+            return sublime.load_resource(filename)
+        else:
+            filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
+            if not os.path.isfile(filename):
+                print('Error while lookup resources file: %s', name)
+                return ''
+            return load_utf8(filename)
     except:
         print("Error while load_resource('%s')" % filename)
         traceback.print_exc()
