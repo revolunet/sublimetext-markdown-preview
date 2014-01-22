@@ -36,7 +36,9 @@ from .__version__ import version, version_info
 import re
 import codecs
 import sys
+import sublime
 import logging
+import importlib
 from . import util
 from .preprocessors import build_preprocessors
 from .blockprocessors import build_block_parser
@@ -200,7 +202,7 @@ class Markdown(object):
 
         # Try loading the extension first from one place, then another
         try: # New style (markdown.extensons.<extension>)
-            module = __import__(module_name, {}, {}, [module_name.rpartition('.')[0]])
+            module = importlib.import_module(module_name)
         except ImportError:
             module_name_old_style = '_'.join(['mdx', ext_name])
             try: # Old style (mdx_<extension>)
