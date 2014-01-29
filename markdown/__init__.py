@@ -38,7 +38,12 @@ import codecs
 import sys
 import sublime
 import logging
-import importlib
+try:
+    # ST3
+    import importlib
+except ImportError:
+    # ST2
+    pass
 from . import util
 from .preprocessors import build_preprocessors
 from .blockprocessors import build_block_parser
@@ -202,7 +207,10 @@ class Markdown(object):
 
         # Try loading the extension first from one place, then another
         try: # New style (markdown.extensons.<extension>)
-            module = importlib.import_module(module_name)
+            if 'importlib' in globals():
+                module = importlib.import_module(module_name)
+            else:
+                module = __import__(module_name, {}, {}, [module_name.rpartition('.')[0]])
         except ImportError:
             module_name_old_style = '_'.join(['mdx', ext_name])
             try: # Old style (mdx_<extension>)
