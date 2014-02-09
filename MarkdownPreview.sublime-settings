@@ -83,6 +83,22 @@
     "allow_css_overrides": true,
 
     /*
+        Specify a HTML template file to render your markdown within.
+
+        Available place holders in HTML template:
+        {{ HEAD }} - would be replaced by generated stylesheets, javascripts enabled above
+        {{ BODY }} - would be replaced by HTML converted from markdown
+
+        By setting "skip_default_stylesheet" to true you can use the styles only in your HTML
+        templat. In most case you should turn this setting on to have a full featured design.
+
+        Refer to 'customized-template-sample.html' as a show case.
+    */
+    // "html_template": "/ABS_PATH_TO_A_HTML_FILE",
+    // "skip_default_stylesheet": true,
+
+
+    /*
         Sets the JavaScript files to embed in the HTML
 
         Set an array of URLs or filepaths to JavaScript files. Absolute filepaths will be loaded
