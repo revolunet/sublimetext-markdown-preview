@@ -390,17 +390,34 @@ class MarkdownCompiler():
         
         body = self.convert_markdown(contents, parser)
 
-        html = u'<!DOCTYPE html>'
-        html += '<html><head><meta charset="utf-8">'
-        html += self.get_stylesheet(parser)
-        html += self.get_javascript()
-        html += self.get_highlight()
-        html += self.get_mathjax()
-        html += self.get_title()
-        html += '</head><body>'
-        html += body
-        html += '</body>'
-        html += '</html>'
+        html_template = self.settings.get('html_template')
+
+        # use customized html template if given
+        if html_template and os.path.exists(html_template):
+            head = u''
+            if not self.settings.get('skip_default_stylesheet'):
+                head += self.get_stylesheet(parser)
+            head += self.get_javascript()
+            head += self.get_highlight()
+            head += self.get_mathjax()
+            head += self.get_title()
+
+            html = load_utf8(html_template)
+            html = html.replace('{{ HEAD }}', head, 1)
+            html = html.replace('{{ BODY }}', body, 1)
+        else:
+            html = u'<!DOCTYPE html>'
+            html += '<html><head><meta charset="utf-8">'
+            html += self.get_stylesheet(parser)
+            html += self.get_javascript()
+            html += self.get_highlight()
+            html += self.get_mathjax()
+            html += self.get_title()
+            html += '</head><body>'
+            html += body
+            html += '</body>'
+            html += '</html>'
+
         return html, body
 
 
