@@ -19,6 +19,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - YAML support thanks to @tommi
  - Clipboard selection and copy to clipboard thanks to @hexatrope
  - MathJax support : \\(\frac{\pi}{2}\\) thanks to @bps10
+ - HTML template customisation thanks to @hozaka
 
 ## Installation :
 
@@ -89,3 +90,4 @@ The code is available at github [project][home] under [MIT licence][4].
  [11]: https://sublime.wbond.net/installation
  [12]: https://github.com/revolunet/sublimetext-markdown-preview/archive/master.zip
  [issue]: https://github.com/revolunet/sublimetext-markdown-preview/issues
+ [settings]: https://github.com/revolunet/sublimetext-markdown-preview/issues
