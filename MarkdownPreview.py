@@ -503,6 +503,9 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         self.init_panel()
         
+        self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+        parser = self.settings.get('parser', 'markdown')
+
         show_panel_on_build = sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True)
         if show_panel_on_build:
             self.window.run_command("show_panel", {"panel": "output.markdown"})
@@ -514,7 +517,7 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         self.puts("Compiling %s..." % mdfile)
 
-        html, body = compiler.run(view, 'markdown', True)
+        html, body = compiler.run(view, parser, True)
 
         htmlfile = os.path.splitext(mdfile)[0]+'.html'
         self.puts("        ->"+htmlfile)
