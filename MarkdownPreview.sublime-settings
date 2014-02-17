@@ -133,7 +133,10 @@
     "strip_yaml_front_matter": false,
 
     /* do we show the panel when build with CMD+B */
-    "show_panel_on_build": true
+    "show_panel_on_build": true,
+
+    /* do we include the CSS in when outputing HTML into a new sublime view ? */
+    "embed_css_for_sublime_output": true
 }
 
 

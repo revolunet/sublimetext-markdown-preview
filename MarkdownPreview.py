@@ -462,7 +462,11 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                     sublime.status_message('Markdown preview launched in default html viewer')
         elif target == 'sublime':
             # create a new buffer and paste the output HTML
-            new_scratch_view(self.view.window(), body)
+            embed_css = settings.get('embed_css_for_sublime_output', True)
+            if embed_css:
+                new_scratch_view(self.view.window(), html)
+            else:
+                new_scratch_view(self.view.window(), body)
             sublime.status_message('Markdown preview launched in sublime')
         elif target == 'clipboard':
             # clipboard copy the full HTML
