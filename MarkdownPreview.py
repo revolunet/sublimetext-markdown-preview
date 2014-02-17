@@ -9,7 +9,6 @@ import tempfile
 import re
 import json
 import time
-import traceback
 
 
 def is_ST3():
@@ -503,10 +502,10 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         self.init_panel()
         
-        self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
-        parser = self.settings.get('parser', 'markdown')
+        settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+        parser = settings.get('parser', 'markdown')
 
-        show_panel_on_build = sublime.load_settings("Preferences.sublime-settings").get("show_panel_on_build", True)
+        show_panel_on_build = settings.get("show_panel_on_build", True)
         if show_panel_on_build:
             self.window.run_command("show_panel", {"panel": "output.markdown"})
         

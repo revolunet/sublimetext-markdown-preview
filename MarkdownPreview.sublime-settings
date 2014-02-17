@@ -130,7 +130,10 @@
     /*
         Strips the YAML front matter header and converts title to a heading
     */
-    "strip_yaml_front_matter": false
+    "strip_yaml_front_matter": false,
+
+    /* do we show the panel when build with CMD+B */
+    "show_panel_on_build": true
 }
 
 
