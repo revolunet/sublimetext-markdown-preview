@@ -185,6 +185,8 @@ class MarkdownCompiler():
         if css_path is not None and os.path.isfile(css_path):
             return u"<style>%s</style>" % load_utf8(css_path)
 
+        return ''
+
     def get_override_css(self):
         ''' handls allow_css_overrides setting. '''
 
