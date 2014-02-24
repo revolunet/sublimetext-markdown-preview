@@ -78,18 +78,20 @@ def load_utf8(filename):
     else: # 2.x
         return open(filename, 'r').read().decode('utf-8')
 
+def get_ressource_path(name):
+    return os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
+
 def load_resource(name):
     ''' return file contents for files within the package root folder '''
 
     try:
+        filename = get_ressource_path(name)
+        if not os.path.isfile(filename):
+            print('Error while lookup resources file: %s', name)
+            return ''
         if is_ST3():
-            filename = '/'.join(['Packages', INSTALLED_DIRECTORY, name])
             return sublime.load_resource(filename)
         else:
-            filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
-            if not os.path.isfile(filename):
-                print('Error while lookup resources file: %s', name)
-                return ''
             return load_utf8(filename)
     except:
         print("Error while load_resource('%s')" % filename)
@@ -163,24 +165,25 @@ class MarkdownCompiler():
             return True
         return False
 
-    def get_search_path_css(self, parser):
+    def get_default_css(self, parser):
+        ''' locate the correct CSS with the 'css' setting '''
         css_name = self.settings.get('css', 'default')
+        css_path = None
 
-        if self.isurl(css_name) or os.path.isabs(css_name):
-            return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
-
-        if css_name == 'default':
-            css_name = 'github.css' if parser == 'github' else 'markdown.css'
-
-        # Try the local folder for css file.
         mdfile = self.view.file_name()
-        if mdfile is not None:
-            css_path = os.path.join(os.path.dirname(mdfile), css_name)
-            if os.path.isfile(css_path):
-                return u"<style>%s</style>" % load_utf8(css_path)
+        if css_name == 'default':
+            # use builtin CSS
+            css_path = get_ressource_path('github.css' if parser == 'github' else 'markdown.css')
+        elif self.isurl(css_name):
+            # link to remote URL
+            return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
+        elif os.path.isfile(os.path.expanduser(css_name)):
+            # use custom CSS file
+            css_path = os.path.expanduser(css_name)
 
-        # Try the build-in css files.
-        return u"<style>%s</style>" % load_resource(css_name)
+        # local CSS are directly embedded in the doc
+        if css_path is not None and os.path.isfile(css_path):
+            return u"<style>%s</style>" % load_utf8(css_path)
 
     def get_override_css(self):
         ''' handls allow_css_overrides setting. '''
@@ -199,7 +202,7 @@ class MarkdownCompiler():
 
     def get_stylesheet(self, parser):
         ''' return the correct CSS file based on parser and settings '''
-        return self.get_search_path_css(parser) + self.get_override_css()
+        return self.get_default_css(parser) + self.get_override_css()
 
     def get_javascript(self):
         js_files = self.settings.get('js')
