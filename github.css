@@ -9,7 +9,7 @@ body
     border: 3px solid #EEE;
     box-shadow: inset 0 0 0 1px #CECECE;
     font-family: Helvetica, arial, freesans, clean, sans-serif;
-    width: 912px;
+    max-width: 912px;
     padding: 30px;
     margin: 2em auto;
 
