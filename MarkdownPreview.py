@@ -170,11 +170,10 @@ class MarkdownCompiler():
         css_name = self.settings.get('css', 'default')
         css_path = None
 
-        mdfile = self.view.file_name()
-        if css_name == 'default':
-            # use builtin CSS
-            css_path = get_ressource_path('github.css' if parser == 'github' else 'markdown.css')
-        elif self.isurl(css_name):
+        # use default CSS
+        css_path = get_ressource_path('github.css' if parser == 'github' else 'markdown.css')
+
+        if self.isurl(css_name):
             # link to remote URL
             return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
         elif os.path.isfile(os.path.expanduser(css_name)):
