@@ -12,7 +12,7 @@ this is `important` text. and percentage signs : % and `%`
 
 This is a paragraph with a footnote (builtin parser only). [^note-id]
 
-Insert `[ toc ]` without spaces to generate a table of contents (builtin parsers only).
+Insert `[ TOC ]` without spaces to generate a table of contents (builtin parsers only).
 
 ## Indentation
 > Here is some indented text
