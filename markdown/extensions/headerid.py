@@ -80,26 +80,18 @@ from . import Extension
 from ..treeprocessors import Treeprocessor
 import re
 import logging
-try:
-    import unicodedata
-    has_unicodedata = True
-except:
-    has_unicodedata = False
-    DISALLOWED_RE = re.compile(r'[^a-z0-9]')
+from string import punctuation
 
 logger = logging.getLogger('MARKDOWN')
 
+
+DISALLOW_RE = re.compile(r'([\s{}]+)'.format(re.escape(punctuation)))
 IDCOUNT_RE = re.compile(r'^(.*)_([0-9]+)$')
 
 
 def slugify(value, separator):
     """ Slugify a string, to make it URL friendly. """
-    if has_unicodedata:
-        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
-        value = re.sub('[^\w\s-]', '', value.decode('ascii')).strip().lower()
-        return re.sub('[%s\s]+' % separator, separator, value)
-    else:
-        return separator.join(filter(None, re.split(DISALLOWED_RE, value.lower())))
+    return re.sub(DISALLOW_RE, separator, value.lower()).strip(separator)
 
 
 def unique(id, ids):
