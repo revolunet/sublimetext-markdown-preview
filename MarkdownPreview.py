@@ -447,6 +447,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
                         cmd = "open -a %s" % cmd
                     elif sys.platform == 'linux2':
                         cmd += ' &'
+                    elif sys.platform == 'win32':
+                        cmd = 'start "" %s' % cmd
                     result = os.system(cmd)
                     if result != 0:
                         sublime.error_message('cannot execute "%s" Please check your Markdown Preview settings' % config_browser)
