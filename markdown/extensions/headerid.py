@@ -85,7 +85,7 @@ from string import punctuation
 logger = logging.getLogger('MARKDOWN')
 
 
-DISALLOW_RE = re.compile(r'([\s{}]+)'.format(re.escape(punctuation)))
+DISALLOW_RE = re.compile(r'([\s{0}]+)'.format(re.escape(punctuation)))
 IDCOUNT_RE = re.compile(r'^(.*)_([0-9]+)$')
 
 
