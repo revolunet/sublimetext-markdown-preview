@@ -433,7 +433,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
             # build the html
             if livereload_installed:
-                port = sublime.load_settings('LiveReload.sublime-settings').get('port')
+                port = sublime.load_settings('LiveReload.sublime-settings').get('port', 35729)
                 html += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':%d/livereload.js?snipver=1"></\' + \'script>\')</script>' % port
             # update output html file
             tmp_fullpath = getTempMarkdownPreviewPath(self.view)
