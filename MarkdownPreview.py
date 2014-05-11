@@ -440,7 +440,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             save_utf8(tmp_fullpath, html)
             # now opens in browser if needed
             if target == 'browser':
-                self.__class__.open_in_browser(tmp_fullpath)
+                self.__class__.open_in_browser(tmp_fullpath, settings.get('browser', 'default'))
         elif target == 'sublime':
             # create a new buffer and paste the output HTML
             embed_css = settings.get('embed_css_for_sublime_output', True)
