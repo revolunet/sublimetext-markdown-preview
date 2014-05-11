@@ -458,20 +458,21 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     def open_in_browser(cls, path, browser='default'):
         if browser == 'default':
             if sys.platform == 'darwin':
-                # To open HTML files, Mac OS uses the file associated with
-                # .html. For many developers this is Sublime, not the default
-                # browser. Getting the right value is embarrassingly difficult.
+                # To open HTML files, Mac OS the open command uses the file
+                # associated with .html. For many developers this is Sublime,
+                # not the default browser. Getting the right value is
+                # embarrassingly difficult.
                 import shlex, subprocess
                 env = {'VERSIONER_PERL_PREFER_32_BIT': 'true'}
                 raw = """perl -MMac::InternetConfig -le 'print +(GetICHelper "http")[1]'"""
                 process = subprocess.Popen(shlex.split(raw), env=env, stdout=subprocess.PIPE)
                 out, err = process.communicate()
-                default_browser = out.strip()
+                default_browser = out.strip().decode('utf-8')
                 cmd = "open -a '%s' %s" % (default_browser, path)
                 os.system(cmd)
             else:
                 desktop.open(tmp_fullpath)
-            sublime.status_message('Markdown preview launched in default html viewer')
+            sublime.status_message('Markdown preview launched in default browser')
         else:
             cmd = '"%s" %s' % (browser, path)
             if sys.platform == 'darwin':
