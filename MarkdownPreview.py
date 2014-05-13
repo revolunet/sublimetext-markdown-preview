@@ -440,23 +440,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             save_utf8(tmp_fullpath, html)
             # now opens in browser if needed
             if target == 'browser':
-                config_browser = settings.get('browser')
-                if config_browser and config_browser != 'default':
-                    cmd = '"%s" %s' % (config_browser, tmp_fullpath)
-                    if sys.platform == 'darwin':
-                        cmd = "open -a %s" % cmd
-                    elif sys.platform == 'linux2':
-                        cmd += ' &'
-                    elif sys.platform == 'win32':
-                        cmd = 'start "" %s' % cmd
-                    result = os.system(cmd)
-                    if result != 0:
-                        sublime.error_message('cannot execute "%s" Please check your Markdown Preview settings' % config_browser)
-                    else:
-                        sublime.status_message('Markdown preview launched in %s' % config_browser)
-                else:
-                    desktop.open(tmp_fullpath)
-                    sublime.status_message('Markdown preview launched in default html viewer')
+                self.__class__.open_in_browser(tmp_fullpath, settings.get('browser', 'default'))
         elif target == 'sublime':
             # create a new buffer and paste the output HTML
             embed_css = settings.get('embed_css_for_sublime_output', True)
@@ -470,6 +454,38 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             sublime.set_clipboard(html)
             sublime.status_message('Markdown export copied to clipboard')
 
+    @classmethod
+    def open_in_browser(cls, path, browser='default'):
+        if browser == 'default':
+            if sys.platform == 'darwin':
+                # To open HTML files, Mac OS the open command uses the file
+                # associated with .html. For many developers this is Sublime,
+                # not the default browser. Getting the right value is
+                # embarrassingly difficult.
+                import shlex, subprocess
+                env = {'VERSIONER_PERL_PREFER_32_BIT': 'true'}
+                raw = """perl -MMac::InternetConfig -le 'print +(GetICHelper "http")[1]'"""
+                process = subprocess.Popen(shlex.split(raw), env=env, stdout=subprocess.PIPE)
+                out, err = process.communicate()
+                default_browser = out.strip().decode('utf-8')
+                cmd = "open -a '%s' %s" % (default_browser, path)
+                os.system(cmd)
+            else:
+                desktop.open(tmp_fullpath)
+            sublime.status_message('Markdown preview launched in default browser')
+        else:
+            cmd = '"%s" %s' % (browser, path)
+            if sys.platform == 'darwin':
+                cmd = "open -a %s" % cmd
+            elif sys.platform == 'linux2':
+                cmd += ' &'
+            elif sys.platform == 'win32':
+                cmd = 'start "" %s' % cmd
+            result = os.system(cmd)
+            if result != 0:
+                sublime.error_message('cannot execute "%s" Please check your Markdown Preview settings' % config_browser)
+            else:
+                sublime.status_message('Markdown preview launched in %s' % config_browser)
 
 class MarkdownBuildCommand(sublime_plugin.WindowCommand):
     def init_panel(self):
