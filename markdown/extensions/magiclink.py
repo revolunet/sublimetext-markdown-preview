@@ -7,9 +7,9 @@ Modified to work with Sublime Markdown Preview
 """
 from __future__ import unicode_literals
 from __future__ import absolute_import
-from ..markdown.extensions import Extension
-from ..markdown.inlinepatterns import LinkPattern
-from ..markdown import util
+from ..extensions import Extension
+from ..inlinepatterns import LinkPattern
+from .. import util
 
 RE_LINK = r"((ht|f)tp(s?)://(([a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)|localhost)(/?)([a-zA-Z0-9\-.?,'/\\+&%$#_]*)?([\d\w./%+-=&?:\\"',|~;]*)[^.,'"\s<])"
 

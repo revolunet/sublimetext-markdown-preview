@@ -7,8 +7,8 @@ Modified to work with Sublime Markdown Preview
 """
 from __future__ import unicode_literals
 from __future__ import absolute_import
-from ..markdown.extensions import Extension
-from ..markdown.inlinepatterns import SimpleTagPattern
+from ..extensions import Extension
+from ..inlinepatterns import SimpleTagPattern
 
 RE_DEL = r"(\~{2})(.+?)\2"
 

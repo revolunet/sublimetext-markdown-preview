@@ -8,8 +8,8 @@ Modified to work with Sublime Markdown Preview
 """
 from __future__ import unicode_literals
 from __future__ import absolute_import
-from ..markdown.extensions import Extension
-from ..markdown.treeprocessors import Treeprocessor
+from ..extensions import Extension
+from ..treeprocessors import Treeprocessor
 from os.path import abspath, exists, normpath, splitext, join
 import sys
 import base64
@@ -60,7 +60,6 @@ def repl(path, base_path):
                     with open(file_name, "rb") as f:
                         link = "data:%s;base64,%s" % (file_types[ext], base64.b64encode(f.read()).decode('ascii'))
                 except Exception as e:
-                    link += str(e)
                     pass
     return link
 

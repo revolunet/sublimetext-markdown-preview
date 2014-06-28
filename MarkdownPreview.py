@@ -10,6 +10,11 @@ import re
 import json
 import time
 
+ABS_EXCLUDE = (
+    'file://', 'https://', 'http://', '/', '#',
+    "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
+)
+
 
 def is_ST3():
     ''' check if ST3 based on python version '''
@@ -256,7 +261,7 @@ class MarkdownCompiler():
             tag, src = match.groups()
             filename = self.view.file_name()
             if filename:
-                if not src.startswith(('file://', 'https://', 'http://', '/', '#')):
+                if not src.startswith(ABS_EXCLUDE):
                     abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
                     tag = tag.replace(src, abs_path)
             return tag
@@ -269,13 +274,6 @@ class MarkdownCompiler():
         base_path = ""
         if filename and os.path.exists(filename):
             base_path = os.path.dirname(filename)
-
-        # Ensure mpextras.absolutepath is included for previews to work
-        for i in range(0, len(extensions)):
-            name = extensions[i]
-            if name.startswith("mpextras"):
-                if is_ST3():
-                    extensions[i] = "Markdown Preview.%s" % name
 
         # Replace BASE_PATH keyword with the actual base_path
         return [e.replace("${BASE_PATH}", base_path) for e in extensions]
