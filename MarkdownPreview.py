@@ -10,6 +10,11 @@ import re
 import json
 import time
 
+ABS_EXCLUDE = (
+    'file://', 'https://', 'http://', '/', '#',
+    "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
+)
+
 
 def is_ST3():
     ''' check if ST3 based on python version '''
@@ -256,7 +261,7 @@ class MarkdownCompiler():
             tag, src = match.groups()
             filename = self.view.file_name()
             if filename:
-                if not src.startswith(('file://', 'https://', 'http://', '/', '#')):
+                if not src.startswith(ABS_EXCLUDE):
                     abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
                     tag = tag.replace(src, abs_path)
             return tag
@@ -264,14 +269,23 @@ class MarkdownCompiler():
         html = RE_SOURCES.sub(tag_fix, html)
         return html
 
+    def process_extensions(self, extensions):
+        filename = self.view.file_name()
+        base_path = ""
+        if filename and os.path.exists(filename):
+            base_path = os.path.dirname(filename)
+
+        # Replace BASE_PATH keyword with the actual base_path
+        return [e.replace("${BASE_PATH}", base_path) for e in extensions]
+
     def get_config_extensions(self, default_extensions):
         config_extensions = self.settings.get('enabled_extensions')
         if not config_extensions or config_extensions == 'default':
-            return default_extensions
+            return self.process_extensions(default_extensions)
         if 'default' in config_extensions:
             config_extensions.remove( 'default' )
             config_extensions.extend( default_extensions )
-        return config_extensions
+        return self.process_extensions(config_extensions)
 
     def curl_convert(self, data):
         try:
