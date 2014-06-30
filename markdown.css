@@ -91,6 +91,7 @@ ul, ol { margin: 1em 0; padding: 0 0 0 2em; }
 li p:last-child { margin:0 }
 li.task-list-item { list-style-type: none; margin-left: -1.5em;}
 li.task-list-item input { margin-right: .5em; }
+li.task-list-item ul.task-list, li.task-list-item ol.task-list { margin-left: 1.5em; }
 dd { margin: 0 0 0 2em; }
 
 img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
