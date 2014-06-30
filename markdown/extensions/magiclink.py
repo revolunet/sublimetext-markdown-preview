@@ -21,7 +21,7 @@ from ..extensions import Extension
 from ..inlinepatterns import LinkPattern
 from .. import util
 
-RE_LINK = r"((ht|f)tp(s?)://(([a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)|localhost)(/?)([a-zA-Z0-9\-.?,'/\\+&%$#_]*)([\d\w./%+-=&?:\\"',|~;]*)[^.,'"\s<])"
+RE_LINK = r'''((ht|f)tp(s?)://(([a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)|localhost)(/?)([a-zA-Z0-9\-.?,'/+&%$#_]*)([\d\w./%+-=&?:"',|~;]*)[A-Za-z\d\-_~:/?#@!$*+=])'''
 
 
 class MagiclinkPattern(LinkPattern):
