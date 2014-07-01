@@ -14,12 +14,18 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - Markdown preview using the [Python-markdown][10] or the Github API just choose select the build commands.
  - Build markdown file using Sublime Text build system. The build parser are config via the `"parser"` config.
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
- - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong` and `toc` markdown extensions.
+ - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong`, `smarty` and `toc` markdown extensions.
  - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
  - YAML support thanks to @tommi
  - Clipboard selection and copy to clipboard thanks to @hexatrope
  - MathJax support : \\(\frac{\pi}{2}\\) thanks to @bps10
  - HTML template customisation thanks to @hozaka
+ - 3rd party extensions for the builtin parser:
+     - Convert and embed local files in base64 via `b64` extension.  Just add `b64(base_path=${BASE_PATH})` to your extention list, and the extension will dynamically use the file's base path as the reference point.
+     - Lazy http address to link conversion via `magiclink` extension.  Just add `magiclink` to you extension list.
+     - Support for using `~~word~~` notation to insert `<del>word</word>` via the `delete` extension.  Just add `delete` to your extension list.
+     - Github style task lists via the `tasklist` extension.  Just add `tasklist` to your extension list.
+     - Use Github emoji notation `:smile:` and get Github emojis :smile: (creates img links that point to githubs emoji assests).  Just add `githubemoji` to your extension list.
 
 ## Installation :
 
