@@ -28,7 +28,7 @@ def is_ST3():
 if is_ST3():
     from . import desktop
     from . import markdown2
-    from . import markdown
+    from . import markdown_wrapper as markdown
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
@@ -43,7 +43,7 @@ if is_ST3():
 else:
     import desktop
     import markdown2
-    import markdown
+    import markdown_wrapper as markdown
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
 
