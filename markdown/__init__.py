@@ -33,17 +33,9 @@ License: BSD (see LICENSE for details).
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from .__version__ import version, version_info
-import re
 import codecs
 import sys
-import sublime
 import logging
-try:
-    # ST3
-    import importlib
-except ImportError:
-    # ST2
-    pass
 from . import util
 from .preprocessors import build_preprocessors
 from .blockprocessors import build_block_parser
@@ -108,7 +100,7 @@ class Markdown(object):
         * html_replacement_text: Text used when safe_mode is set to "replace".
         * tab_length: Length of tabs in the source. Default: 4
         * enable_attributes: Enable the conversion of attributes. Default: True
-        * smart_emphasis: Treat `_connected_words_` intelegently Default: True
+        * smart_emphasis: Treat `_connected_words_` intelligently Default: True
         * lazy_ol: Ignore number of first item of ordered lists. Default: True
 
         """
@@ -141,9 +133,9 @@ class Markdown(object):
 
         self.references = {}
         self.htmlStash = util.HtmlStash()
-        self.set_output_format(kwargs.get('output_format', 'xhtml1'))
         self.registerExtensions(extensions=kwargs.get('extensions', []),
                                 configs=kwargs.get('extension_configs', {}))
+        self.set_output_format(kwargs.get('output_format', 'xhtml1'))
         self.reset()
 
     def build_parser(self):
@@ -198,19 +190,11 @@ class Markdown(object):
         # Setup the module name
         module_name = ext_name
         if '.' not in ext_name:
-            import sublime
-            if sublime.version() >= '3000':
-                from ..helper import INSTALLED_DIRECTORY
-                module_name = '.'.join([INSTALLED_DIRECTORY, 'markdown.extensions', ext_name])
-            else:
-                module_name = '.'.join(['markdown.extensions', ext_name])
+            module_name = '.'.join(['markdown.extensions', ext_name])
 
         # Try loading the extension first from one place, then another
-        try: # New style (markdown.extensons.<extension>)
-            if 'importlib' in globals():
-                module = importlib.import_module(module_name)
-            else:
-                module = __import__(module_name, {}, {}, [module_name.rpartition('.')[0]])
+        try: # New style (markdown.extensions.<extension>)
+            module = __import__(module_name, {}, {}, [module_name.rpartition('.')[0]])
         except ImportError:
             module_name_old_style = '_'.join(['mdx', ext_name])
             try: # Old style (mdx_<extension>)
@@ -309,7 +293,7 @@ class Markdown(object):
         # Run the tree-processors
         for treeprocessor in self.treeprocessors.values():
             newRoot = treeprocessor.run(root)
-            if newRoot:
+            if newRoot is not None:
                 root = newRoot
 
         # Serialize _properly_.  Strip top-level tags.
