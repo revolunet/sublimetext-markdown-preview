@@ -320,9 +320,16 @@ class MarkdownCompiler():
             filename = self.view.file_name()
             if filename:
                 if not src.startswith(ABS_EXCLUDE):
-                    abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
+                    # Don't explicitly add file:// prefix,
+                    # But don't remove them either
+                    abs_path = u'%s/%s' % (os.path.dirname(filename), src)
+                    # Don't replace just the first instance,
+                    # but explicitly place it where it was before
+                    # to ensure a file name 'img' dosen't replace
+                    # the tag name etc.
                     tag = m.group('begin') + abs_path + m.group('end')
             return tag
+        # Compile the appropriate regex to find images and/or files
         RE_SOURCES = re.compile(
             r"""(?P<tag>(?P<begin><(?:%s%s%s)[^>]+(?:src%s)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""" % (
                 r"img" if image_convert else "",
