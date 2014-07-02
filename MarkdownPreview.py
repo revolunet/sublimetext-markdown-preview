@@ -9,6 +9,7 @@ import tempfile
 import re
 import json
 import time
+import codecs
 
 ABS_EXCLUDE = (
     'file://', 'https://', 'http://', '/', '#',
@@ -73,21 +74,13 @@ def getTempMarkdownPreviewPath(view):
 
 
 def save_utf8(filename, text):
-    if is_ST3():
-        f = open(filename, 'w', encoding='utf-8')
+    with codecs.open(filename, 'w', encoding='utf-8')as f:
         f.write(text)
-        f.close()
-    else:  # 2.x
-        f = open(filename, 'w')
-        f.write(text.encode('utf-8'))
-        f.close()
 
 
 def load_utf8(filename):
-    if is_ST3():
-        return open(filename, 'r', encoding='utf-8').read()
-    else:  # 2.x
-        return open(filename, 'r').read().decode('utf-8')
+    with codecs.open(filename, 'r', encoding='utf-8') as f:
+        return f.read()
 
 
 def load_resource(name):
