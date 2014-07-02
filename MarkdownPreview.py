@@ -379,8 +379,10 @@ class MarkdownCompiler():
             absolute = False
             if src.startswith('file://'):
                 src = src.replace('file://', '', 1)
-                if sublime.platform() == "windows":
+                if sublime.platform() == "windows" and not src.startswith('//'):
                     src = src.lstrip("/")
+                absolute = True
+            elif sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None:
                 absolute = True
 
             # Make sure we are working with an absolute path
@@ -402,6 +404,7 @@ class MarkdownCompiler():
                         except Exception:
                             pass
             return data
+        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
         RE_SOURCES = re.compile(r"""(?P<tag>(?P<begin><(?:img)[^>]+(?:src)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""")
         html = RE_SOURCES.sub(b64, html)
         return html
