@@ -11,9 +11,11 @@ import json
 import time
 import codecs
 
-ABS_EXCLUDE = (
-    'file://', 'https://', 'http://', '/', '#',
-    "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
+ABS_EXCLUDE = tuple(
+    [
+        'file://', 'https://', 'http://', '/', '#',
+        "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
+    ] + ['\\'] if sys.platform.startswith('win') else []
 )
 
 
@@ -319,7 +321,10 @@ class MarkdownCompiler():
             src = m.group('src')
             filename = self.view.file_name()
             if filename:
-                if not src.startswith(ABS_EXCLUDE):
+                if (
+                    not src.startswith(ABS_EXCLUDE) and
+                    not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None)
+                ):
                     # Don't explicitly add file:// prefix,
                     # But don't remove them either
                     abs_path = u'%s/%s' % (os.path.dirname(filename), src)
@@ -330,6 +335,7 @@ class MarkdownCompiler():
                     tag = m.group('begin') + abs_path + m.group('end')
             return tag
         # Compile the appropriate regex to find images and/or files
+        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
         RE_SOURCES = re.compile(
             r"""(?P<tag>(?P<begin><(?:%s%s%s)[^>]+(?:src%s)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""" % (
                 r"img" if image_convert else "",
