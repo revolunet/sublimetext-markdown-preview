@@ -155,9 +155,9 @@
 
     /*
         Sets whether highlight JS will autoguess raw block's syntax.
-        Default is True (don't guess)
+        Default is True (guess)
     */
-    "highlight_js_noguess": true,
+    "highlight_js_guess": true,
 
     /*
         Strips the YAML front matter header and converts title to a heading
