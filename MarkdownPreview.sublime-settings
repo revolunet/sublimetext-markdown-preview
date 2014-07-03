@@ -3,7 +3,7 @@
 */
 {
     /*
-        Sets the default opener for html files
+        Sets the default opener for HTML files
 
         default - Use the system default HTML viewer
         other - Set a full path to any executable. ex: /Applications/Google Chrome Canary.app or /Applications/Firefox.app
@@ -11,17 +11,17 @@
     "browser": "default",
 
     /*
-        Sets the parser used for build markdown to html.
+        Sets the parser used for building markdown to HTML.
 
         NOTE: The parser setting is not for the preview commands now.
-        The preivew have sperated commands for each parser markdown.
+        The previews have separate commands for each parser markdown.
 
-        Warning for github API : if you have a ST2 linux build, Python is not built with SSL so it may not work
+        Warning for github API: if you have a ST2 linux build, Python is not built with SSL so it may not work
 
         default - The current default parser is python-markdown parser.
-        markdown - Use the buildin python-markdown parser
-        markdown2 - (Deprecated) Use the builtin python-markdown2 parser.
-        github - User github API to convert markdown, so you can use GitHub flavored Markdown, see http://github.github.com/github-flavored-markdown/
+        markdown - Use the built-in python-markdown parser
+        markdown2 - (Deprecated) Use the built-in python-markdown2 parser.
+        github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see http://github.github.com/github-flavored-markdown/
     */
     "parser": "default",
 
@@ -31,7 +31,7 @@
     "enable_mathjax": false,
 
     /*
-        Enable or not highlight.js support for syntax highlighting.
+        Highlight.js support for syntax highlighting.
     */
     "enable_highlight": false,
 
@@ -43,14 +43,14 @@
             * The python markdown parser, the `markdown`: http://pythonhosted.org/Markdown/extensions/index.html
 
 
-        default - use the default set of extensions, see table latter.
+        default - use the default set of extensions, see table later.
         [ "default", "def_list", ... ] - a list of extensions. Use "default" to include the default extensions.
 
          Parser     | "default" Values
         ------------|---------------------------
          default    | ["footnotes", "toc", "fenced-code-blocks", "cuddled-lists" ]
          markdown   | ["extra", "toc"]
-         github     | extensions values are not used.
+         github     | extension's values are not used.
 
     */
     "enabled_extensions": "default",
@@ -62,7 +62,7 @@
     "github_mode": "markdown",
 
     /*
-        Uses an OAuth token to when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
+        Uses an OAuth token when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
     */
     // "github_oauth_token": "secret",
 
@@ -90,7 +90,7 @@
         {{ BODY }} - would be replaced by HTML converted from markdown
 
         By setting "skip_default_stylesheet" to true you can use the styles only in your HTML
-        templat. In most case you should turn this setting on to have a full featured design.
+        template. In most cases you should turn this setting on to have a full-featured design.
 
         Refer to 'customized-template-sample.html' as a show case.
     */
@@ -113,10 +113,10 @@
     "markdown_filetypes": [".md", ".markdown", ".mdown"],
 
     /*
-        Sets a custom temporary folder for MarkdownPreview-generated html files. Useful if you're
-        using LiveReload and don't want to use the OS default. The directory will be created if not
-        exists. Relative path is supportted, and is checked against `os.path.isabs`, see doc:
-        http://docs.python.org/3/library/os.path.html#os.path.isabs
+        Sets a custom temporary folder for MarkdownPreview-generated HTML files. Useful if you're
+        using LiveReload and don't want to use the OS default. The directory will be created if it
+        doesn't exist. Relative paths are supported, and are checked against `os.path.isabs`, see
+        doc: http://docs.python.org/3/library/os.path.html#os.path.isabs
 
         Examples: /tmp/custom_folder   (Linux/OSX - absolute path)
                   C:/TEMP/MYNOTES
@@ -161,6 +161,6 @@
     /* do we show the panel when build with CMD+B */
     "show_panel_on_build": true,
 
-    /* do we include the CSS in when outputing HTML into a new sublime view ? */
+    /* do we include the CSS when outputting HTML into a new sublime view ? */
     "embed_css_for_sublime_output": true
 }
