@@ -286,7 +286,10 @@ class MarkdownCompiler():
         if self.settings.get('enable_highlight') is True and self.settings.get('parser') == 'default':
             highlight += "<style>%s</style>" % load_resource('highlight.css')
             highlight += "<script>%s</script>" % load_resource('highlight.js')
-            highlight += "<script>hljs.initHighlightingOnLoad();</script>"
+            if self.settings.get("highlight_js_noguess", True):
+                highlight += "<script>%s</script>" % load_resource("highlight.noguess.js")
+            else:
+                highlight += "<script>%s</script>" % load_resource("highlight.guess.js")
         return highlight
 
     def get_contents(self, wholefile=False):

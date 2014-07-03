@@ -154,6 +154,12 @@
     "strip_critic_marks": "none",
 
     /*
+        Sets whether highlight JS will autoguess raw block's syntax.
+        Default is True (don't guess)
+    */
+    "highlight_js_noguess": true,
+
+    /*
         Strips the YAML front matter header and converts title to a heading
     */
     "strip_yaml_front_matter": false,
