@@ -21,9 +21,10 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 from ..extensions import Extension
 from ..treeprocessors import Treeprocessor
-from os.path import abspath, exists, normpath, splitext, join
+from os.path import exists, normpath, splitext, join
 import sys
 import base64
+import re
 
 if sys.platform.startswith('win'):
     _PLATFORM = "windows"
@@ -50,12 +51,15 @@ def repl(path, base_path):
 
     link = path
     absolute = False
+    re_win_drive = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
 
     # Format the link
     if path.startswith('file://'):
         path = path.replace('file://', '', 1)
-        if _PLATFORM == "windows":
+        if _PLATFORM == "windows" and not path.startswith('//'):
             path = path.lstrip("/")
+        absolute = True
+    elif _PLATFORM == "windows" and re_win_drive.match(path) is not None:
         absolute = True
 
     if not path.startswith(exclusion_list):

@@ -13,7 +13,7 @@
     /*
         Sets the parser used for build markdown to html.
 
-        NOTE: The parser setting is not for the preview commands now. 
+        NOTE: The parser setting is not for the preview commands now.
         The preivew have sperated commands for each parser markdown.
 
         Warning for github API : if you have a ST2 linux build, Python is not built with SSL so it may not work
@@ -26,7 +26,7 @@
     "parser": "default",
 
     /*
-       Enable or not mathjax support.
+        Enable or not mathjax support.
     */
     "enable_mathjax": false,
 
@@ -36,7 +36,7 @@
     "enable_highlight": false,
 
     /*
-        List of enabled extensions of the selected markdown parser. 
+        List of enabled extensions of the selected markdown parser.
 
         You can get the full list of extensions at:
             * The markdown2 parser, the `default`: https://github.com/trentm/python-markdown2/wiki/Extras
@@ -45,7 +45,7 @@
 
         default - use the default set of extensions, see table latter.
         [ "default", "def_list", ... ] - a list of extensions. Use "default" to include the default extensions.
-        
+
          Parser     | "default" Values
         ------------|---------------------------
          default    | ["footnotes", "toc", "fenced-code-blocks", "cuddled-lists" ]
@@ -128,6 +128,32 @@
     // "path_tempfile": "/tmp/my_notes",
 
     /*
+        Sets how image paths are handled.
+        Setting is a string value: (absolute | base64 | none)
+            absolute: converts relative local paths to absolute
+            base64: coverts the local file to base64 and embeds it in the HTML
+            none: does nothing
+    */
+    "image_path_conversion": "absolute",
+
+    /*
+        Sets how file paths are handled.
+        Setting is a string value: (absolute | none)
+            absolute: converts relative local paths to absolute
+            none: does nothing
+    */
+    "file_path_conversions": "absolute",
+
+    /*
+        Sets how multimarkdown critic marks are handled.
+        Setting is a string value: (accept | reject | none)
+            accept: Accepts the proposed inserts and deletions (comments etc. are discarded)
+            reject: Rejects the proposed inserts and deletions (comments etc. are discarded)
+            none: does nothing
+    */
+    "strip_critic_marks": "none",
+
+    /*
         Strips the YAML front matter header and converts title to a heading
     */
     "strip_yaml_front_matter": false,
@@ -138,5 +164,3 @@
     /* do we include the CSS in when outputing HTML into a new sublime view ? */
     "embed_css_for_sublime_output": true
 }
-
-

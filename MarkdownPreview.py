@@ -9,10 +9,13 @@ import tempfile
 import re
 import json
 import time
+import codecs
 
-ABS_EXCLUDE = (
-    'file://', 'https://', 'http://', '/', '#',
-    "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
+ABS_EXCLUDE = tuple(
+    [
+        'file://', 'https://', 'http://', '/', '#',
+        "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
+    ] + ['\\'] if sys.platform.startswith('win') else []
 )
 
 
@@ -52,6 +55,58 @@ else:
 _CANNOT_CONVERT = u'cannot convert markdown'
 
 
+class CriticDump(object):
+    RE_CRITIC = re.compile(
+        r'''
+            ((?P<open>\{)
+                (?:
+                    (?P<ins_open>\+{2})(?P<ins_text>.*?)(?P<ins_close>\+{2})
+                  | (?P<del_open>\-{2})(?P<del_text>.*?)(?P<del_close>\-{2})
+                  | (?P<mark_open>\={2})(?P<mark_text>.*?)(?P<mark_close>\={2})
+                  | (?P<comment>(?P<com_open>\>{2})(?P<com_text>.*?)(?P<com_close>\<{2}))
+                  | (?P<sub_open>\~{2})(?P<sub_del_text>.*?)(?P<sub_mid>\~\>)(?P<sub_ins_text>.*?)(?P<sub_close>\~{2})
+                )
+            (?P<close>\})|.)
+        ''',
+        re.MULTILINE | re.DOTALL | re.VERBOSE
+    )
+
+    def process(self, m):
+        if self.accept:
+            if m.group('ins_open'):
+                return m.group('ins_text')
+            elif m.group('del_open'):
+                return ''
+            elif m.group('mark_open'):
+                return m.group('mark_text')
+            elif m.group('com_open'):
+                return ''
+            elif m.group('sub_open'):
+                return m.group('sub_ins_text')
+            else:
+                return m.group(0)
+        else:
+            if m.group('ins_open'):
+                return ''
+            elif m.group('del_open'):
+                return m.group('del_text')
+            elif m.group('mark_open'):
+                return m.group('mark_text')
+            elif m.group('com_open'):
+                return ''
+            elif m.group('sub_open'):
+                return m.group('sub_del_text')
+            else:
+                return m.group(0)
+
+    def dump(self, source, accept):
+        text = ''
+        self.accept = accept
+        for m in self.RE_CRITIC.finditer(source):
+            text += self.process(m)
+        return text
+
+
 def getTempMarkdownPreviewPath(view):
     ''' return a permanent full path of the temp markdown preview file '''
 
@@ -73,21 +128,13 @@ def getTempMarkdownPreviewPath(view):
 
 
 def save_utf8(filename, text):
-    if is_ST3():
-        f = open(filename, 'w', encoding='utf-8')
+    with codecs.open(filename, 'w', encoding='utf-8')as f:
         f.write(text)
-        f.close()
-    else:  # 2.x
-        f = open(filename, 'w')
-        f.write(text.encode('utf-8'))
-        f.close()
 
 
 def load_utf8(filename):
-    if is_ST3():
-        return open(filename, 'r', encoding='utf-8').read()
-    else:  # 2.x
-        return open(filename, 'r').read().decode('utf-8')
+    with codecs.open(filename, 'r', encoding='utf-8') as f:
+        return f.read()
 
 
 def load_resource(name):
@@ -251,6 +298,12 @@ class MarkdownCompiler():
             selection = self.view.substr(self.view.sel()[0])
             if selection.strip() != '':
                 contents = selection
+
+        # Strip out multi-markdown critic marks as first task
+        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
+            contents = self.preprocessor_critic(contents)
+
+        # Remove yaml front matter
         if self.settings.get('strip_yaml_front_matter') and contents.startswith('---'):
             title = ''
             title_match = re.search('(?:title:)(.+)', contents, flags=re.IGNORECASE)
@@ -261,18 +314,100 @@ class MarkdownCompiler():
             contents = '%s%s' % (title, contents_without_front_matter)
         return contents
 
-    def postprocessor(self, html):
+    def postprocessor_absolute(self, html, image_convert, file_convert):
         ''' fix relative paths in images, scripts, and links for the internal parser '''
-        def tag_fix(match):
-            tag, src = match.groups()
+        def tag_fix(m):
+            tag = m.group('tag')
+            src = m.group('src')
             filename = self.view.file_name()
             if filename:
-                if not src.startswith(ABS_EXCLUDE):
-                    abs_path = u'file://%s/%s' % (os.path.dirname(filename), src)
-                    tag = tag.replace(src, abs_path)
+                if (
+                    not src.startswith(ABS_EXCLUDE) and
+                    not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None)
+                ):
+                    # Don't explicitly add file:// prefix,
+                    # But don't remove them either
+                    abs_path = u'%s/%s' % (os.path.dirname(filename), src)
+                    # Don't replace just the first instance,
+                    # but explicitly place it where it was before
+                    # to ensure a file name 'img' dosen't replace
+                    # the tag name etc.
+                    if os.path.exists(abs_path):
+                        tag = m.group('begin') + abs_path + m.group('end')
             return tag
-        RE_SOURCES = re.compile("""(?P<tag><(?:img|script|a)[^>]+(?:src|href)=["'](?P<src>[^"']+)[^>]*>)""")
+        # Compile the appropriate regex to find images and/or files
+        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+        RE_SOURCES = re.compile(
+            r"""(?P<tag>(?P<begin><(?:%s%s%s)[^>]+(?:src%s)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""" % (
+                r"img" if image_convert else "",
+                r"|" if image_convert and file_convert else "",
+                r"script|a" if file_convert else "",
+                r"|href" if file_convert else ""
+            )
+        )
         html = RE_SOURCES.sub(tag_fix, html)
+        return html
+
+    def preprocessor_critic(self, text):
+        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
+        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+
+    def postprocessor_base64(self, html):
+        ''' convert resources (currently images only) to base64 '''
+
+        file_types = {
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".gif": "image/gif"
+        }
+
+        exclusion_list = tuple(
+            ['https://', 'http://', '#'] +
+            ["data:%s;base64," % ft for ft in file_types.values()]
+        )
+
+        def b64(m):
+            import base64
+            src = m.group('src')
+            data = src
+            filename = self.view.file_name()
+            base_path = ""
+            if filename and os.path.exists(filename):
+                base_path = os.path.dirname(filename)
+
+            # Format the link
+            absolute = False
+            if src.startswith('file://'):
+                src = src.replace('file://', '', 1)
+                if sublime.platform() == "windows" and not src.startswith('//'):
+                    src = src.lstrip("/")
+                absolute = True
+            elif sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None:
+                absolute = True
+
+            # Make sure we are working with an absolute path
+            if not src.startswith(exclusion_list):
+                if absolute:
+                    src = os.path.normpath(src)
+                else:
+                    src = os.path.normpath(os.path.join(base_path, src))
+
+                if os.path.exists(src):
+                    ext = os.path.splitext(src)[1].lower()
+                    if ext in file_types:
+                        try:
+                            with open(src, "rb") as f:
+                                data = m.group('begin') + "data:%s;base64,%s" % (
+                                    file_types[ext],
+                                    base64.b64encode(f.read()).decode('ascii')
+                                ) + m.group('end')
+                        except Exception:
+                            pass
+            return data
+        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+        RE_SOURCES = re.compile(r"""(?P<tag>(?P<begin><(?:img)[^>]+(?:src)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""")
+        html = RE_SOURCES.sub(b64, html)
         return html
 
     def process_extensions(self, extensions):
@@ -384,7 +519,15 @@ class MarkdownCompiler():
             config_extensions = self.get_config_extensions(['extra', 'toc'])
             markdown_html = markdown.markdown(markdown_text, extensions=config_extensions)
 
-        markdown_html = self.postprocessor(markdown_html)
+        image_convert = self.settings.get("image_path_conversion", "absolute")
+        file_convert = self.settings.get("file_path_conversions", "absolute")
+
+        if "absolute" in (image_convert, file_convert):
+            markdown_html = self.postprocessor_absolute(markdown_html, image_convert, file_convert)
+
+        if image_convert == "base64":
+            markdown_html = self.postprocessor_base64(markdown_html)
+
         return markdown_html
 
     def get_title(self):
