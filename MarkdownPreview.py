@@ -286,7 +286,10 @@ class MarkdownCompiler():
         if self.settings.get('enable_highlight') is True and self.settings.get('parser') == 'default':
             highlight += "<style>%s</style>" % load_resource('highlight.css')
             highlight += "<script>%s</script>" % load_resource('highlight.js')
-            highlight += "<script>hljs.initHighlightingOnLoad();</script>"
+            if self.settings.get("highlight_js_guess", True):
+                highlight += "<script>%s</script>" % load_resource("highlight.guess.js")
+            else:
+                highlight += "<script>%s</script>" % load_resource("highlight.noguess.js")
         return highlight
 
     def get_contents(self, wholefile=False):
@@ -415,6 +418,15 @@ class MarkdownCompiler():
         base_path = ""
         if filename and os.path.exists(filename):
             base_path = os.path.dirname(filename)
+
+        if self.settings.get("get_highlight") and self.settings.get("parser") == "default":
+            found = False
+            for e in extensions:
+                if e.startswith("codehilite"):
+                    found = True
+                    break
+            if not found:
+                extensions.append("codehilite")
 
         # Replace BASE_PATH keyword with the actual base_path
         return [e.replace("${BASE_PATH}", base_path) for e in extensions]
