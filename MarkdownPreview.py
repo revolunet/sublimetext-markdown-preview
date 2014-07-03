@@ -332,7 +332,8 @@ class MarkdownCompiler():
                     # but explicitly place it where it was before
                     # to ensure a file name 'img' dosen't replace
                     # the tag name etc.
-                    tag = m.group('begin') + abs_path + m.group('end')
+                    if os.path.exists(abs_path):
+                        tag = m.group('begin') + abs_path + m.group('end')
             return tag
         # Compile the appropriate regex to find images and/or files
         RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
