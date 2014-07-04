@@ -1,18 +1,48 @@
 from __future__ import absolute_import
 import sublime
+import traceback
 
 ST3 = int(sublime.version()) >= 3000
 
 if ST3:
-    from .markdown import Markdown
+    from .markdown import Markdown, util
+    from .markdown.extensions import Extension
     import importlib
 else:
-    from markdown import Markdown
+    from markdown import Markdown, util
+    from markdown.extensions import Extension
 
 
 class StMarkdown(Markdown):
     def __init__(self, *args, **kwargs):
         super(StMarkdown, self).__init__(*args, **kwargs)
+
+    def registerExtensions(self, extensions, configs):
+        """
+        Register extensions with this instance of Markdown.
+
+        Keyword arguments:
+
+        * extensions: A list of extensions, which can either
+           be strings or objects.  See the docstring on Markdown.
+        * configs: A dictionary mapping module names to config options.
+
+        """
+        for ext in extensions:
+            try:
+                if isinstance(ext, util.string_type):
+                    ext = self.build_extension(ext, configs.get(ext, []))
+                if isinstance(ext, Extension):
+                    ext.extendMarkdown(self, globals())
+                elif ext is not None:
+                    raise TypeError(
+                        'Extension "%s.%s" must be of type: "markdown.Extension"'
+                        % (ext.__class__.__module__, ext.__class__.__name__))
+            except:
+                print(str(traceback.format_exc()))
+                continue
+
+        return self
 
     def build_extension(self, ext_name, configs=[]):
         """Build extension by name, then return the module.
