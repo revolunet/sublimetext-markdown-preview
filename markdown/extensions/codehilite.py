@@ -24,11 +24,20 @@ from . import Extension
 from ..treeprocessors import Treeprocessor
 import warnings
 try:
-    from pygments import highlight
-    from pygments.lexers import get_lexer_by_name, guess_lexer, TextLexer
-    from pygments.formatters import HtmlFormatter
+    import sys
+    if sys.version_info >= (3, 0):
+        from ...lib.markdown_preview_lib.pygments import highlight
+        from ...lib.markdown_preview_lib.pygments.lexers import get_lexer_by_name, guess_lexer
+        from ...lib.markdown_preview_lib.pygments.lexers.special import TextLexer
+        from ...lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
+    else:
+        from lib.markdown_preview_lib.pygments import highlight
+        from lib.markdown_preview_lib.pygments.lexers import get_lexer_by_name, guess_lexer
+        from lib.markdown_preview_lib.pygments.lexers.special import TextLexer
+        from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     pygments = True
-except ImportError:
+except ImportError as e:
+    print(e)
     pygments = False
 
 

@@ -32,6 +32,7 @@ if is_ST3():
     from . import desktop
     from . import markdown2
     from . import markdown_wrapper as markdown
+    from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
@@ -47,6 +48,7 @@ else:
     import desktop
     import markdown2
     import markdown_wrapper as markdown
+    from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
 
@@ -280,16 +282,12 @@ class MarkdownCompiler():
         return ''
 
     def get_highlight(self):
-        ''' return the Highlight.js and css if enabled '''
+        ''' return the Pygments css if enabled '''
 
         highlight = ''
-        if self.settings.get('enable_highlight') is True and self.parser == 'default':
-            highlight += "<style>%s</style>" % load_resource('highlight.css')
-            highlight += "<script>%s</script>" % load_resource('highlight.js')
-            if self.settings.get("highlight_js_guess", True):
-                highlight += "<script>%s</script>" % load_resource("highlight.guess.js")
-            else:
-                highlight += "<script>%s</script>" % load_resource("highlight.noguess.js")
+        if self.pygments_style and self.parser == 'markdown':
+            highlight += '<style>%s</style>' % HtmlFormatter(style=self.pygments_style).get_style_defs('.codehilite pre')
+
         return highlight
 
     def get_contents(self, wholefile=False):
@@ -414,19 +412,35 @@ class MarkdownCompiler():
         return html
 
     def process_extensions(self, extensions):
+        re_pygments = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
+
+        # First search if pygments has manually been set,
+        # and if so, read what the desired color scheme to use is
+        self.pygments_style = None
+        for e in extensions:
+            if e.startswith("codehilite"):
+                pygments_style = re_pygments.search(e)
+                if pygments_style is None:
+                    self.pygments_style = "github"
+                else:
+                    self.pygments_style = pygments_style.group(1)
+                break
+
+        # Second, if nothing manual was set, see if "enable_highlight" is enabled with pygment support
+        # If no style has been set, setup the default
+        if (
+            self.pygments_style is None and
+            self.settings.get("enable_highlight") is True
+        ):
+            guess_lang = str(bool(self.settings.get("guess_language", True)))
+            extensions.append("codehilite(guess_lang=%s,pygments_style=github)" % guess_lang)
+            self.pygments_style = "github"
+
+        # Get the base path of source file if available
         filename = self.view.file_name()
         base_path = ""
         if filename and os.path.exists(filename):
             base_path = os.path.dirname(filename)
-
-        if self.settings.get("get_highlight") and self.parser == "default":
-            found = False
-            for e in extensions:
-                if e.startswith("codehilite"):
-                    found = True
-                    break
-            if not found:
-                extensions.append("codehilite")
 
         # Replace BASE_PATH keyword with the actual base_path
         return [e.replace("${BASE_PATH}", base_path) for e in extensions]
@@ -553,7 +567,7 @@ class MarkdownCompiler():
         ''' return full html and body html for view. '''
         self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         self.view = view
-        self.parser = parser
+        self.parser = "markdown" if parser == "default" else parser
 
         contents = self.get_contents(wholefile)
 
@@ -610,6 +624,7 @@ class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
                 enabled_parsers.add(p)
 
         self.user_parsers = list(enabled_parsers)
+        self.user_parsers.sort()
 
         window = self.view.window()
         length = len(self.user_parsers)

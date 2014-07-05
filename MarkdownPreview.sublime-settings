@@ -31,7 +31,7 @@
     "enable_mathjax": false,
 
     /*
-        Highlight.js support for syntax highlighting.
+        Pygments support for syntax highlighting.
     */
     "enable_highlight": false,
 
@@ -164,10 +164,19 @@
     "strip_critic_marks": "none",
 
     /*
-        Sets whether highlight JS will autoguess raw block's syntax.
-        Default is True (guess)
+        Sets whether highlight JS will auto-guess raw block's syntax.
+        Alternative is to to only highlight blocks where a language has
+        been defined.
+
+        Default is True (guess).
+
+        If you manually set codehilite as an included extension in "enabled_extensions",
+        your settings will override this one.  To configure language guessing manually:
+            "enabled_extensions": [
+                "codehilite(guess_lang=False)" // <-Turn off language guessing
+            ]
     */
-    "highlight_js_guess": true,
+    "guess_language": true,
 
     /*
         Strips the YAML front matter header and converts title to a heading
