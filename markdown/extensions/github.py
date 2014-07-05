@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 from ..extensions import Extension
 
 extensions = [
-    'extra',
     'delete',
     'githubemoji',
     'magiclink',
