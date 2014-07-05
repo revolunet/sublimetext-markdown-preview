@@ -219,7 +219,7 @@ class MarkdownCompiler():
             return True
         return False
 
-    def get_default_css(self, parser):
+    def get_default_css(self):
         ''' locate the correct CSS with the 'css' setting '''
         css_name = self.settings.get('css', 'default')
 
@@ -231,7 +231,7 @@ class MarkdownCompiler():
             return u"<style>%s</style>" % load_utf8(os.path.expanduser(css_name))
         elif css_name == 'default':
             # use parser CSS file
-            return u"<style>%s</style>" % load_resource('github.css' if parser == 'github' else 'markdown.css')
+            return u"<style>%s</style>" % load_resource('github.css' if self.parser == 'github' else 'markdown.css')
 
         return ''
 
@@ -250,9 +250,9 @@ class MarkdownCompiler():
                             return u"<style>%s</style>" % load_utf8(css_filename)
         return ''
 
-    def get_stylesheet(self, parser):
+    def get_stylesheet(self):
         ''' return the correct CSS file based on parser and settings '''
-        return self.get_default_css(parser) + self.get_override_css()
+        return self.get_default_css() + self.get_override_css()
 
     def get_javascript(self):
         js_files = self.settings.get('js')
@@ -283,7 +283,7 @@ class MarkdownCompiler():
         ''' return the Highlight.js and css if enabled '''
 
         highlight = ''
-        if self.settings.get('enable_highlight') is True and self.settings.get('parser') == 'default':
+        if self.settings.get('enable_highlight') is True and self.parser == 'default':
             highlight += "<style>%s</style>" % load_resource('highlight.css')
             highlight += "<script>%s</script>" % load_resource('highlight.js')
             if self.settings.get("highlight_js_guess", True):
@@ -419,7 +419,7 @@ class MarkdownCompiler():
         if filename and os.path.exists(filename):
             base_path = os.path.dirname(filename)
 
-        if self.settings.get("get_highlight") and self.settings.get("parser") == "default":
+        if self.settings.get("get_highlight") and self.parser == "default":
             found = False
             for e in extensions:
                 if e.startswith("codehilite"):
@@ -470,11 +470,11 @@ class MarkdownCompiler():
             sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation. And using curl didn\'t work either')
         return None
 
-    def convert_markdown(self, markdown_text, parser):
+    def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
 
         markdown_html = _CANNOT_CONVERT
-        if parser == 'github':
+        if self.parser == 'github':
             github_oauth_token = self.settings.get('github_oauth_token')
 
             # use the github API
@@ -514,7 +514,7 @@ class MarkdownCompiler():
             else:
                 sublime.status_message('converted markdown with github API successfully')
 
-        elif parser == 'markdown2':
+        elif self.parser == 'markdown2':
             # convert the markdown
             enabled_extras = set(self.get_config_extensions(['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists']))
             if self.settings.get("enable_mathjax") is True or self.settings.get("enable_highlight") is True:
@@ -553,10 +553,11 @@ class MarkdownCompiler():
         ''' return full html and body html for view. '''
         self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         self.view = view
+        self.parser = parser
 
         contents = self.get_contents(wholefile)
 
-        body = self.convert_markdown(contents, parser)
+        body = self.convert_markdown(contents)
 
         html_template = self.settings.get('html_template')
 
@@ -564,7 +565,7 @@ class MarkdownCompiler():
         if html_template and os.path.exists(html_template):
             head = u''
             if not self.settings.get('skip_default_stylesheet'):
-                head += self.get_stylesheet(parser)
+                head += self.get_stylesheet()
             head += self.get_javascript()
             head += self.get_highlight()
             head += self.get_mathjax()
@@ -576,7 +577,7 @@ class MarkdownCompiler():
         else:
             html = u'<!DOCTYPE html>'
             html += '<html><head><meta charset="utf-8">'
-            html += self.get_stylesheet(parser)
+            html += self.get_stylesheet()
             html += self.get_javascript()
             html += self.get_highlight()
             html += self.get_mathjax()
@@ -590,6 +591,49 @@ class MarkdownCompiler():
 
 
 compiler = MarkdownCompiler()
+
+
+class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
+    def run(self, edit, target='browser'):
+        parsers = [
+            "markdown",
+            "markdown2",
+            "github"
+        ]
+
+        self.target = target
+
+        settings = sublime.load_settings("MarkdownPreview.sublime-settings")
+        enabled_parsers = set()
+        for p in settings.get("enabled_parsers", ["markdown", "github"]):
+            if p in parsers:
+                enabled_parsers.add(p)
+
+        self.user_parsers = list(enabled_parsers)
+
+        window = self.view.window()
+        length = len(self.user_parsers)
+        if window is not None and length:
+            if length == 1:
+                self.view.run_command(
+                    "markdown_preview",
+                    {
+                        "parser": self.user_parsers[0],
+                        "target": self.target
+                    }
+                )
+            else:
+                window.show_quick_panel(self.user_parsers, self.run_command)
+
+    def run_command(self, value):
+        if value > -1:
+            self.view.run_command(
+                "markdown_preview",
+                {
+                    "parser": self.user_parsers[value],
+                    "target": self.target
+                }
+            )
 
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):

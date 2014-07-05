@@ -55,6 +55,16 @@
     */
     "enabled_extensions": "default",
 
+    /* 
+        Enabled parsers for the parser "select parser" command
+        Available parsers: markdown, markdown2, github
+
+        When there are more than one parser in the list, Sublime will prompt
+        via the quick panel for which one to use.  If there is only one, it
+        will automatically run that parser.
+    */
+    "enabed_parsers": ["markdown", "github"],
+
     /*
         Default mode for the github Markdown parser : markdown (documents) or gfm (comments)
         see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
