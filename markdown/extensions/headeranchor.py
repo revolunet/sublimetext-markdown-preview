@@ -17,7 +17,7 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 from ..extensions import Extension
 from ..treeprocessors import Treeprocessor
-from .headerid import slugify, stashedHTML2text, itertext
+from .headerid import slugify, stashedHTML2text, itertext, unique
 
 LINK = '<a name="user-content-%(id)s" href="#%(id)s" class="headeranchor-link"  aria-hidden="true"><span class="headeranchor"></span></a>'
 
@@ -26,13 +26,19 @@ class HeaderAnchorTreeprocessor(Treeprocessor):
     def run(self, root):
         """ Add header anchors """
 
+        # Get a list of id attributes
+        used_ids = set()
+        for tag in root.getiterator():
+            if "id" in tag.attrib:
+                used_ids.add(tag.attrib["id"])
+
         for tag in root.getiterator():
             if tag.tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6'):
                 if "id" in tag.attrib:
                     id = tag.get('id')
                 else:
                     id = stashedHTML2text(''.join(itertext(tag)), self.md)
-                    id = slugify(id, self.config.get('sep'))
+                    id = unique(slugify(id, self.config.get('sep')), used_ids)
                     tag.set('id', id)
                 tag.text = self.markdown.htmlStash.store(
                     LINK % {"id": id},
@@ -59,7 +65,7 @@ class HeaderAnchorExtension(Extension):
         if 'toc' in md.treeprocessors.keys():
             insertion = ">toc"
         else:
-            insertion = ">_end"
+            insertion = "_end"
         md.treeprocessors.add("headeranchor", self.processor, insertion)
         md.registerExtension(self)
 

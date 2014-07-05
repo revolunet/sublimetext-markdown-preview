@@ -373,7 +373,7 @@ class MarkdownCompiler():
         def b64(m):
             import base64
             src = m.group('src')
-            data = src
+            data = m.group('tag')
             filename = self.view.file_name()
             base_path = ""
             if filename and os.path.exists(filename):
