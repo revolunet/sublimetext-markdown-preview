@@ -12,6 +12,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
 ## Features :
 
  - Markdown preview using the [Python-markdown][10] or the Github API just choose select the build commands.
+ - Syntax highlighting via Pygments. See "[Configuring Pygments](#configuring-pygments)" for more info.
  - Build markdown file using Sublime Text build system. The build parser are config via the `"parser"` config.
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
  - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong`, `smarty`,  `wikilinks`, `meta`, `sane_lists`, `codehilite`, `nl2br`, and `toc` markdown extensions.
@@ -72,6 +73,16 @@ Using Sublime Text menu: `Preferences`->`Package Settings`->`Markdown Preview`
 
 - `Settings - User` is where you change your settings for Markdown Preview.
 - `Settings - Default` is a good reference with detailed descriptions for each setting.
+
+### Configuring Pygments
+If you add the codehilite extension manually in the enabled extensions, you can override some of the default settings.
+
+* Turn language guessing *on* or *off* (*on* will highlight fenced blocks even if you don't specify a language)  `codehilite(guess_lang=False)` (True|False).
+* Show line numbers: `codehilite(linenums=True)` (True|False).
+* Change the higlight theme: `codehilite(pygments_style=emacs)`.
+* Inline the CSS: `codehilite(noclasses=True)` (True|False).
+
+See [codehilte page](https://pythonhosted.org/Markdown/extensions/code_hilite.html) for more info.
 
 ### Parsing Github Flavored Markdown :
 Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can actually handle them in a couple of ways: online and offline.
