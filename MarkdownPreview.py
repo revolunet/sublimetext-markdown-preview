@@ -52,6 +52,7 @@ DEFAULT_EXT = [
     "meta", "sane_lists", "smarty", "wikilinks"
 ]
 
+
 def getTempMarkdownPreviewPath(view):
     ''' return a permanent full path of the temp markdown preview file '''
 
