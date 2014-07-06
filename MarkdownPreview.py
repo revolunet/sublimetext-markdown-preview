@@ -18,7 +18,6 @@ def is_ST3():
 
 if is_ST3():
     from . import desktop
-    from . import markdown2
     from . import markdown_wrapper as markdown
     from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
@@ -34,7 +33,6 @@ if is_ST3():
 
 else:
     import desktop
-    import markdown2
     import markdown_wrapper as markdown
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
@@ -542,32 +540,6 @@ class GithubCompiler(Compiler):
         return markdown_html
 
 
-class Markdown2Compiler(Compiler):
-    default_css = "markdown.css"
-
-    def get_config_extensions(self, default_extensions):
-        config_extensions = self.settings.get('enabled_extensions')
-        if not config_extensions or config_extensions == 'default':
-            return default_extensions
-        if 'default' in config_extensions:
-            config_extensions.remove('default')
-            config_extensions.extend(default_extensions)
-        return config_extensions
-
-    def parser_specific_convert(self, markdown_text):
-        # convert the markdown
-        enabled_extras = set(self.get_config_extensions(['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists']))
-        if self.settings.get("enable_mathjax") is True or self.settings.get("enable_highlight") is True:
-            enabled_extras.add('code-friendly')
-        markdown_html = markdown2.markdown(markdown_text, extras=list(enabled_extras))
-        toc_html = markdown_html.toc_html
-        if toc_html:
-            toc_markers = ['[toc]', '[TOC]', '<!--TOC-->']
-            for marker in toc_markers:
-                markdown_html = markdown_html.replace(marker, toc_html)
-        return markdown_html
-
-
 class MarkdownCompiler(Compiler):
     default_css = "markdown.css"
 
@@ -633,7 +605,6 @@ class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, target='browser'):
         parsers = [
             "markdown",
-            "markdown2",
             "github"
         ]
 
@@ -681,9 +652,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         self.view.settings().set('parser', parser)
         self.view.settings().set('target', target)
 
-        if parser == "markdown2":
-            compiler = Markdown2Compiler()
-        elif parser == "github":
+        if parser == "github":
             compiler = GithubCompiler()
         else:
             compiler = MarkdownCompiler()
@@ -799,9 +768,7 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         self.puts("Compiling %s..." % mdfile)
 
-        if parser == "markdown2":
-            compiler = Markdown2Compiler()
-        elif parser == "github":
+        if parser == "github":
             compiler = GithubCompiler()
         else:
             compiler = MarkdownCompiler()

@@ -80,7 +80,7 @@ Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can 
 Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting `github_mode` to `gfm` to get things like tasklists to render properly.
 
 #### Offline :
-A number of extensions are included that can allow parsing GFM without using the Github API.  Make sure you are using the Python Markdown (markdown or default) parser and not the markdown2 parser.  Enable the following recommended extensions to get really close to the look and feel:
+A number of extensions are included that can allow parsing GFM without using the Github API.  Make sure you are using the Python Markdown (markdown or default) parser.  Enable the following recommended extensions to get really close to the look and feel:
 
 ```javascript
 	"enabled_extensions": [
@@ -103,7 +103,6 @@ This may be further enhanced in the future.
 
 The code is available at github [project][home] under [MIT licence][4].
 
- [0]: https://github.com/trentm/python-markdown2
  [home]: https://github.com/revolunet/sublimetext-markdown-preview
  [3]: https://sublime.wbond.net/
  [4]: http://revolunet.mit-license.org
