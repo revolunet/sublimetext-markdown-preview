@@ -47,7 +47,10 @@ ABS_EXCLUDE = tuple(
         "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
     ] + ['\\'] if sys.platform.startswith('win') else []
 )
-
+DEFAULT_EXT = [
+    "extra", "github", "toc", "headerid",
+    "meta", "sane_lists", "smarty", "wikilinks"
+]
 
 def getTempMarkdownPreviewPath(view):
     ''' return a permanent full path of the temp markdown preview file '''
@@ -597,7 +600,7 @@ class MarkdownCompiler(Compiler):
 
     def parser_specific_convert(self, markdown_text):
         sublime.status_message('converting markdown with Python markdown...')
-        config_extensions = self.get_config_extensions(['extra', 'toc'])
+        config_extensions = self.get_config_extensions(DEFAULT_EXT)
         return markdown.markdown(markdown_text, extensions=config_extensions)
 
 

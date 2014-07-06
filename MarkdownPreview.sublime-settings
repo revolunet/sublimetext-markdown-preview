@@ -46,8 +46,8 @@
 
          Parser     | "default" Values
         ------------|---------------------------
-         default    | ["footnotes", "toc", "fenced-code-blocks", "cuddled-lists" ]
-         markdown   | ["extra", "toc"]
+         default    | ["extra", "github", "toc", "headerid", "meta", "sane_lists", "smarty", "wikilinks"]
+         markdown   | ["extra", "github", "toc", "headerid", "meta", "sane_lists", "smarty", "wikilinks"]
          github     | extension's values are not used.
 
     */

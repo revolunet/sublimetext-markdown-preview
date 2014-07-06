@@ -185,6 +185,7 @@ but come in the standard Python-Markdown library.
 * `nl2br` -- [New Line to Break][]
 * `rss` -- [RSS][]
 * `sane_lists` -- [Sane Lists][]
+* `smarty` -- [Smarty][]
 * `toc` -- [Table of Contents][]
 * `wikilinks` -- [WikiLinks][]
 
@@ -197,6 +198,7 @@ but come in the standard Python-Markdown library.
 [Sane Lists]:  http://pythonhosted.org/Markdown/extensions/sane_lists.html
 [Table of Contents]:  http://pythonhosted.org/Markdown/extensions/toc.html
 [WikiLinks]:  http://pythonhosted.org/Markdown/extensions/wikilinks.html
+[Smarty]: https://pythonhosted.org/Markdown/extensions/smarty.html
 
 #### 3rd Party Extensions
 

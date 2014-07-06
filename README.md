@@ -14,7 +14,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - Markdown preview using the [Python-markdown][10] or the Github API just choose select the build commands.
  - Build markdown file using Sublime Text build system. The build parser are config via the `"parser"` config.
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
- - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong`, `smarty` and `toc` markdown extensions.
+ - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong`, `smarty`,  `wikilinks`, `meta`, `sane_lists`, `codehilite`, `nl2br`, and `toc` markdown extensions.
  - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
  - YAML support thanks to @tommi
  - Clipboard selection and copy to clipboard thanks to @hexatrope
@@ -80,7 +80,15 @@ Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can 
 Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting `github_mode` to `gfm` to get things like tasklists to render properly.
 
 #### Offline :
-A number of extensions are included that can allow parsing GFM without using the Github API.  Make sure you are using the Python Markdown (markdown or default) parser.  Enable the following recommended extensions to get really close to the look and feel:
+By default almost all extensions are enabled to help with the github feel, but there are some tweaks needed to get the full experience.
+
+GFM does not auto guess language in fenced blocks, but Markdown Preview does this by default.  You can fix this in one of two ways:
+
+1. Disable auto language guessing in the settings file `"guess_language": false,`
+2. Or if you are manually defining extensions: `"enabled_extensions": ["codehilite(guess_lang=False,pygments_style=github)"]`
+
+
+As mentioned earlier, almost all extensions are enabled by default, but as a reference, the minimum extensions that should be enabled are listed below:
 
 ```javascript
 	"enabled_extensions": [
