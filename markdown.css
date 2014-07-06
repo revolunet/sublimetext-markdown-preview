@@ -214,8 +214,9 @@ table.codehilitetable td.code div pre {
 
 @media print {
   * { background: transparent !important; color: black !important; filter:none !important; -ms-filter: none !important; }
-  body{ font-size:12pt; max-width:100%; outline:none; }
+  body{ font-size:12pt; max-width:100%; outline:none; border: 0;}
   a, a:visited { text-decoration: underline; }
+  a.headeranchor-link { display: none; }
   hr { height: 1px; border:0; border-bottom:1px solid black; }
   a[href]:after { content: " (" attr(href) ")"; }
   abbr[title]:after { content: " (" attr(title) ")"; }
