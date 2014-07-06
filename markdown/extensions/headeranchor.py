@@ -40,10 +40,13 @@ class HeaderAnchorTreeprocessor(Treeprocessor):
                     id = stashedHTML2text(''.join(itertext(tag)), self.md)
                     id = unique(slugify(id, self.config.get('sep')), used_ids)
                     tag.set('id', id)
-                tag.text = self.markdown.htmlStash.store(
+                text = self.markdown.htmlStash.store(
                     LINK % {"id": id},
                     safe=True
-                ) + tag.text
+                )
+                if tag.text is not None:
+                    text + tag.text
+                tag.text = text
         return root
 
 
