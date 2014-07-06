@@ -254,8 +254,6 @@ class _automodule(types.ModuleType):
 
     def __getattr__(self, name):
         info = LEXERS.get(name)
-        print(info)
-        print(LEXERS)
         if info:
             _load_lexers(info[0])
             cls = _lexer_cache[info[1]]
