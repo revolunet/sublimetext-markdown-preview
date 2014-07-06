@@ -550,25 +550,41 @@ class MarkdownCompiler(Compiler):
         ''' return the Pygments css if enabled '''
 
         highlight = ''
-        if self.pygments_style:
+        if self.pygments_style and not self.noclasses:
             highlight += '<style>%s</style>' % HtmlFormatter(style=self.pygments_style).get_style_defs('.codehilite pre')
 
         return highlight
 
     def process_extensions(self, extensions):
         re_pygments = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
-
+        re_insert_pygment = re.compile(r"(?P<bracket_start>codehilite\([^)]+?)(?P<bracket_end>\s*\)$)|(?P<start>codehilite)")
+        re_no_classes = re.compile(r"noclasses\s*=\s*(True|False)")
         # First search if pygments has manually been set,
         # and if so, read what the desired color scheme to use is
         self.pygments_style = None
+        self.noclasses = False
+        count = 0
         for e in extensions:
             if e.startswith("codehilite"):
                 pygments_style = re_pygments.search(e)
                 if pygments_style is None:
                     self.pygments_style = "github"
+                    m = re_insert_pygment.match(e)
+                    if m is not None:
+                        if m.group('bracket_start'):
+                            start = m.group('bracket_start') + ',pygments_style='
+                            end = ")"
+                        else:
+                            start = m.group('start') + "(pygments_style="
+                            end = ')'
+
+                        extensions[count] = start + self.pygments_style + end
                 else:
                     self.pygments_style = pygments_style.group(1)
-                break
+                noclasses = re_no_classes.search(e)
+                if noclasses is not None and noclasses.group(1) == "True":
+                    self.noclasses = True
+            count += 1
 
         # Second, if nothing manual was set, see if "enable_highlight" is enabled with pygment support
         # If no style has been set, setup the default

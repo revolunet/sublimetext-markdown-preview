@@ -168,9 +168,10 @@ td, th { border: 1px solid #ddd; padding: 6px 13px; }
 
 /* Codehilite Tables */
 table.codehilitetable { border: 0; border-spacing: 0; width: 100%; }
-td.linenos, td.code { border: 0; padding: 0; }
+td.linenos, td.code, table.codehilitetable td { border: 0; padding: 0; }
+table.codehilitetable td div.linenodiv { padding: 0 !important; }
 td.code { width: 100%; }
-table.codehilitetable td.linenos div pre {
+table.codehilitetable td.linenos div pre, td div.linenodiv pre {
   border: 0;
   border-top: 1px solid #CCC;
   border-left: 1px solid #CCC;
