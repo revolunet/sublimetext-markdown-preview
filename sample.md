@@ -131,7 +131,7 @@ The Github Markdown also brings some [nice Emoji support][emoji] : :+1: :heart: 
 
 ## Parsers and Extensions
 
-Markdown Preview comes with **Python-Markdown** and **Markdown2** preloaded.
+Markdown Preview comes with **Python-Markdown** preloaded.
 
 ### *Python-Markdown*
 
@@ -185,6 +185,7 @@ but come in the standard Python-Markdown library.
 * `nl2br` -- [New Line to Break][]
 * `rss` -- [RSS][]
 * `sane_lists` -- [Sane Lists][]
+* `smarty` -- [Smarty][]
 * `toc` -- [Table of Contents][]
 * `wikilinks` -- [WikiLinks][]
 
@@ -197,11 +198,24 @@ but come in the standard Python-Markdown library.
 [Sane Lists]:  http://pythonhosted.org/Markdown/extensions/sane_lists.html
 [Table of Contents]:  http://pythonhosted.org/Markdown/extensions/toc.html
 [WikiLinks]:  http://pythonhosted.org/Markdown/extensions/wikilinks.html
+[Smarty]: https://pythonhosted.org/Markdown/extensions/smarty.html
 
 #### 3rd Party Extensions
 
-
 *Python-Markdown* is designed to be extended.
+
+Some included ones are:
+
+* `delete` -- github style delte support via `~~word~~`
+* `githubemoji` --  github emoji support
+* `tasklist` -- github style tasklists
+* `magiclink` -- github style auto link conversion of http|ftp links
+* `headeranchor` -- github style header anchor links
+* `github` -- Adds the above extensions in one shot
+* `b64` -- convert and embed local images to base64.  Setup by adding this `b64(base_path=${BASE_PATH})`
+
+There are also a number of others available:
+
 Just fork this repo and add your extensions inside the `.../Packages/Markdown Preview/markdown/extensions/` folder.
 
 Check out the list of [3rd Party extensions](
@@ -228,50 +242,7 @@ your settings would look like this:
         ...
     }
 
-
-### *Markdown2*
-
-The [Markdown2 Parser][] also provides support for extensions, known as [Extras][].   
-You can configure the list of extras you want to use inside the package settings.
-
-[Markdown2 Parser]: https://github.com/trentm/python-markdown2
-
-
-#### Default Extras
-
-The default extras are:
-
-* `footnotes` -- [Footnotes][Footnotes Extra]
-* `toc` -- Table of Contents
-* `fenced-code-blocks` -- [Fenced CodeBlocks][]
-* `cuddled-lists` -- [Cuddled Lists][]
-
-[Footnotes Extra]:      https://github.com/trentm/python-markdown2/wiki/footnotes
-[Fenced CodeBlocks]:    https://github.com/trentm/python-markdown2/wiki/fenced-code-blocks
-[Cuddled Lists]:        https://github.com/trentm/python-markdown2/wiki/cuddled-lists
-
-
-You can enable all default extras at once using the `default` keyword.
-If you want all the default extras plus the 'wiki-table' extra,
-your settings would look like this:
-
-    {
-        ...
-        parser: 'markdown2',
-        extensions: ['default', 'wiki-table'],
-        ...
-    }
-
-
-#### Other Extras
-
-For a complete list of extras please checkout the [Extras Wiki Page][Extras].
-
-[Extras]:   https://github.com/trentm/python-markdown2/wiki/Extras
-
-
 ## Examples
-
 
 ### Tables
 

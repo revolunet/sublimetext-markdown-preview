@@ -11,27 +11,15 @@ import json
 import time
 import codecs
 
-ABS_EXCLUDE = tuple(
-    [
-        'file://', 'https://', 'http://', '/', '#',
-        "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
-    ] + ['\\'] if sys.platform.startswith('win') else []
-)
-
 
 def is_ST3():
     ''' check if ST3 based on python version '''
-    version = sys.version_info
-    if isinstance(version, tuple):
-        version = version[0]
-    elif getattr(version, 'major', None):
-        version = version.major
-    return (version >= 3)
+    return sys.version_info >= (3, 0)
 
 if is_ST3():
     from . import desktop
-    from . import markdown2
     from . import markdown_wrapper as markdown
+    from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
@@ -45,66 +33,24 @@ if is_ST3():
 
 else:
     import desktop
-    import markdown2
     import markdown_wrapper as markdown
+    from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
 
     unicode_str = unicode
 
 _CANNOT_CONVERT = u'cannot convert markdown'
-
-
-class CriticDump(object):
-    RE_CRITIC = re.compile(
-        r'''
-            ((?P<open>\{)
-                (?:
-                    (?P<ins_open>\+{2})(?P<ins_text>.*?)(?P<ins_close>\+{2})
-                  | (?P<del_open>\-{2})(?P<del_text>.*?)(?P<del_close>\-{2})
-                  | (?P<mark_open>\={2})(?P<mark_text>.*?)(?P<mark_close>\={2})
-                  | (?P<comment>(?P<com_open>\>{2})(?P<com_text>.*?)(?P<com_close>\<{2}))
-                  | (?P<sub_open>\~{2})(?P<sub_del_text>.*?)(?P<sub_mid>\~\>)(?P<sub_ins_text>.*?)(?P<sub_close>\~{2})
-                )
-            (?P<close>\})|.)
-        ''',
-        re.MULTILINE | re.DOTALL | re.VERBOSE
-    )
-
-    def process(self, m):
-        if self.accept:
-            if m.group('ins_open'):
-                return m.group('ins_text')
-            elif m.group('del_open'):
-                return ''
-            elif m.group('mark_open'):
-                return m.group('mark_text')
-            elif m.group('com_open'):
-                return ''
-            elif m.group('sub_open'):
-                return m.group('sub_ins_text')
-            else:
-                return m.group(0)
-        else:
-            if m.group('ins_open'):
-                return ''
-            elif m.group('del_open'):
-                return m.group('del_text')
-            elif m.group('mark_open'):
-                return m.group('mark_text')
-            elif m.group('com_open'):
-                return ''
-            elif m.group('sub_open'):
-                return m.group('sub_del_text')
-            else:
-                return m.group(0)
-
-    def dump(self, source, accept):
-        text = ''
-        self.accept = accept
-        for m in self.RE_CRITIC.finditer(source):
-            text += self.process(m)
-        return text
+ABS_EXCLUDE = tuple(
+    [
+        'file://', 'https://', 'http://', '/', '#',
+        "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
+    ] + ['\\'] if sys.platform.startswith('win') else []
+)
+DEFAULT_EXT = [
+    "extra", "github", "toc", "headerid",
+    "meta", "sane_lists", "smarty", "wikilinks"
+]
 
 
 def getTempMarkdownPreviewPath(view):
@@ -175,6 +121,58 @@ def new_scratch_view(window, text):
     return new_view
 
 
+class CriticDump(object):
+    RE_CRITIC = re.compile(
+        r'''
+            ((?P<open>\{)
+                (?:
+                    (?P<ins_open>\+{2})(?P<ins_text>.*?)(?P<ins_close>\+{2})
+                  | (?P<del_open>\-{2})(?P<del_text>.*?)(?P<del_close>\-{2})
+                  | (?P<mark_open>\={2})(?P<mark_text>.*?)(?P<mark_close>\={2})
+                  | (?P<comment>(?P<com_open>\>{2})(?P<com_text>.*?)(?P<com_close>\<{2}))
+                  | (?P<sub_open>\~{2})(?P<sub_del_text>.*?)(?P<sub_mid>\~\>)(?P<sub_ins_text>.*?)(?P<sub_close>\~{2})
+                )
+            (?P<close>\})|.)
+        ''',
+        re.MULTILINE | re.DOTALL | re.VERBOSE
+    )
+
+    def process(self, m):
+        if self.accept:
+            if m.group('ins_open'):
+                return m.group('ins_text')
+            elif m.group('del_open'):
+                return ''
+            elif m.group('mark_open'):
+                return m.group('mark_text')
+            elif m.group('com_open'):
+                return ''
+            elif m.group('sub_open'):
+                return m.group('sub_ins_text')
+            else:
+                return m.group(0)
+        else:
+            if m.group('ins_open'):
+                return ''
+            elif m.group('del_open'):
+                return m.group('del_text')
+            elif m.group('mark_open'):
+                return m.group('mark_text')
+            elif m.group('com_open'):
+                return ''
+            elif m.group('sub_open'):
+                return m.group('sub_del_text')
+            else:
+                return m.group(0)
+
+    def dump(self, source, accept):
+        text = ''
+        self.accept = accept
+        for m in self.RE_CRITIC.finditer(source):
+            text += self.process(m)
+        return text
+
+
 class MarkdownPreviewListener(sublime_plugin.EventListener):
     ''' auto update the output html if markdown file has already been converted once '''
 
@@ -210,8 +208,9 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
         sublime.status_message('Markdown cheat sheet opened')
 
 
-class MarkdownCompiler():
+class Compiler(object):
     ''' Do the markdown converting '''
+    default_css = "markdown.css"
 
     def isurl(self, css_name):
         match = re.match(r'https?://', css_name)
@@ -231,7 +230,7 @@ class MarkdownCompiler():
             return u"<style>%s</style>" % load_utf8(os.path.expanduser(css_name))
         elif css_name == 'default':
             # use parser CSS file
-            return u"<style>%s</style>" % load_resource('github.css' if self.parser == 'github' else 'markdown.css')
+            return u"<style>%s</style>" % load_resource(self.default_css)
 
         return ''
 
@@ -280,17 +279,7 @@ class MarkdownCompiler():
         return ''
 
     def get_highlight(self):
-        ''' return the Highlight.js and css if enabled '''
-
-        highlight = ''
-        if self.settings.get('enable_highlight') is True and self.parser == 'default':
-            highlight += "<style>%s</style>" % load_resource('highlight.css')
-            highlight += "<script>%s</script>" % load_resource('highlight.js')
-            if self.settings.get("highlight_js_guess", True):
-                highlight += "<script>%s</script>" % load_resource("highlight.guess.js")
-            else:
-                highlight += "<script>%s</script>" % load_resource("highlight.noguess.js")
-        return highlight
+        return ''
 
     def get_contents(self, wholefile=False):
         ''' Get contents or selection from view and optionally strip the YAML front matter '''
@@ -413,123 +402,10 @@ class MarkdownCompiler():
         html = RE_SOURCES.sub(b64, html)
         return html
 
-    def process_extensions(self, extensions):
-        filename = self.view.file_name()
-        base_path = ""
-        if filename and os.path.exists(filename):
-            base_path = os.path.dirname(filename)
-
-        if self.settings.get("get_highlight") and self.parser == "default":
-            found = False
-            for e in extensions:
-                if e.startswith("codehilite"):
-                    found = True
-                    break
-            if not found:
-                extensions.append("codehilite")
-
-        # Replace BASE_PATH keyword with the actual base_path
-        return [e.replace("${BASE_PATH}", base_path) for e in extensions]
-
-    def get_config_extensions(self, default_extensions):
-        config_extensions = self.settings.get('enabled_extensions')
-        if not config_extensions or config_extensions == 'default':
-            return self.process_extensions(default_extensions)
-        if 'default' in config_extensions:
-            config_extensions.remove('default')
-            config_extensions.extend(default_extensions)
-        return self.process_extensions(config_extensions)
-
-    def curl_convert(self, data):
-        try:
-            import subprocess
-
-            # It looks like the text does NOT need to be escaped and
-            # surrounded with double quotes.
-            # Tested in ubuntu 13.10, python 2.7.5+
-            shell_safe_json = data.decode('utf-8')
-            curl_args = [
-                'curl',
-                '-H',
-                'Content-Type: application/json',
-                '-d',
-                shell_safe_json,
-                'https://api.github.com/markdown'
-            ]
-
-            github_oauth_token = self.settings.get('github_oauth_token')
-            if github_oauth_token:
-                curl_args[1:1] = [
-                    '-u',
-                    github_oauth_token
-                ]
-
-            markdown_html = subprocess.Popen(curl_args, stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
-            return markdown_html
-        except subprocess.CalledProcessError:
-            sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation. And using curl didn\'t work either')
-        return None
-
     def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
 
-        markdown_html = _CANNOT_CONVERT
-        if self.parser == 'github':
-            github_oauth_token = self.settings.get('github_oauth_token')
-
-            # use the github API
-            sublime.status_message('converting markdown with github API...')
-            github_mode = self.settings.get('github_mode', 'gfm')
-            data = {
-                "text": markdown_text,
-                "mode": github_mode
-            }
-            data = json.dumps(data).encode('utf-8')
-
-            try:
-                headers = {
-                    'Content-Type': 'application/json'
-                }
-                if github_oauth_token:
-                    headers['Authorization'] = "token %s" % github_oauth_token
-                url = "https://api.github.com/markdown"
-                sublime.status_message(url)
-                request = Request(url, data, headers)
-                markdown_html = urlopen(request).read().decode('utf-8')
-            except HTTPError:
-                e = sys.exc_info()[1]
-                if e.code == 401:
-                    sublime.error_message('github API auth failed. Please check your OAuth token.')
-                else:
-                    sublime.error_message('github API responded in an unfashion way :/')
-            except URLError:
-                # Maybe this is a Linux-install of ST which doesn't bundle with SSL support
-                # So let's try wrapping curl instead
-                markdown_html = self.curl_convert(data)
-            except:
-                e = sys.exc_info()[1]
-                print(e)
-                traceback.print_exc()
-                sublime.error_message('cannot use github API to convert markdown. Please check your settings.')
-            else:
-                sublime.status_message('converted markdown with github API successfully')
-
-        elif self.parser == 'markdown2':
-            # convert the markdown
-            enabled_extras = set(self.get_config_extensions(['footnotes', 'toc', 'fenced-code-blocks', 'cuddled-lists']))
-            if self.settings.get("enable_mathjax") is True or self.settings.get("enable_highlight") is True:
-                enabled_extras.add('code-friendly')
-            markdown_html = markdown2.markdown(markdown_text, extras=list(enabled_extras))
-            toc_html = markdown_html.toc_html
-            if toc_html:
-                toc_markers = ['[toc]', '[TOC]', '<!--TOC-->']
-                for marker in toc_markers:
-                    markdown_html = markdown_html.replace(marker, toc_html)
-
-        else:
-            sublime.status_message('converting markdown with Python markdown...')
-            config_extensions = self.get_config_extensions(['extra', 'toc'])
-            markdown_html = markdown.markdown(markdown_text, extensions=config_extensions)
+        markdown_html = self.parser_specific_convert(markdown_text)
 
         image_convert = self.settings.get("image_path_conversion", "absolute")
         file_convert = self.settings.get("file_path_conversions", "absolute")
@@ -549,11 +425,10 @@ class MarkdownCompiler():
             title = 'untitled' if not fn else os.path.splitext(os.path.basename(fn))[0]
         return '<title>%s</title>' % title
 
-    def run(self, view, parser, wholefile=False):
+    def run(self, view, wholefile=False):
         ''' return full html and body html for view. '''
         self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         self.view = view
-        self.parser = parser
 
         contents = self.get_contents(wholefile)
 
@@ -590,14 +465,166 @@ class MarkdownCompiler():
         return html, body
 
 
-compiler = MarkdownCompiler()
+class GithubCompiler(Compiler):
+    default_css = "github.css"
+
+    def curl_convert(self, data):
+        try:
+            import subprocess
+
+            # It looks like the text does NOT need to be escaped and
+            # surrounded with double quotes.
+            # Tested in ubuntu 13.10, python 2.7.5+
+            shell_safe_json = data.decode('utf-8')
+            curl_args = [
+                'curl',
+                '-H',
+                'Content-Type: application/json',
+                '-d',
+                shell_safe_json,
+                'https://api.github.com/markdown'
+            ]
+
+            github_oauth_token = self.settings.get('github_oauth_token')
+            if github_oauth_token:
+                curl_args[1:1] = [
+                    '-u',
+                    github_oauth_token
+                ]
+
+            markdown_html = subprocess.Popen(curl_args, stdout=subprocess.PIPE).communicate()[0].decode('utf-8')
+            return markdown_html
+        except subprocess.CalledProcessError:
+            sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation. And using curl didn\'t work either')
+        return None
+
+    def parser_specific_convert(self, markdown_text):
+        ''' convert input markdown to HTML, with github or builtin parser '''
+
+        markdown_html = _CANNOT_CONVERT
+        github_oauth_token = self.settings.get('github_oauth_token')
+
+        # use the github API
+        sublime.status_message('converting markdown with github API...')
+        github_mode = self.settings.get('github_mode', 'gfm')
+        data = {
+            "text": markdown_text,
+            "mode": github_mode
+        }
+        data = json.dumps(data).encode('utf-8')
+
+        try:
+            headers = {
+                'Content-Type': 'application/json'
+            }
+            if github_oauth_token:
+                headers['Authorization'] = "token %s" % github_oauth_token
+            url = "https://api.github.com/markdown"
+            sublime.status_message(url)
+            request = Request(url, data, headers)
+            markdown_html = urlopen(request).read().decode('utf-8')
+        except HTTPError:
+            e = sys.exc_info()[1]
+            if e.code == 401:
+                sublime.error_message('github API auth failed. Please check your OAuth token.')
+            else:
+                sublime.error_message('github API responded in an unfashion way :/')
+        except URLError:
+            # Maybe this is a Linux-install of ST which doesn't bundle with SSL support
+            # So let's try wrapping curl instead
+            markdown_html = self.curl_convert(data)
+        except:
+            e = sys.exc_info()[1]
+            print(e)
+            traceback.print_exc()
+            sublime.error_message('cannot use github API to convert markdown. Please check your settings.')
+        else:
+            sublime.status_message('converted markdown with github API successfully')
+
+        return markdown_html
+
+
+class MarkdownCompiler(Compiler):
+    default_css = "markdown.css"
+
+    def get_highlight(self):
+        ''' return the Pygments css if enabled '''
+
+        highlight = ''
+        if self.pygments_style and not self.noclasses:
+            highlight += '<style>%s</style>' % HtmlFormatter(style=self.pygments_style).get_style_defs('.codehilite pre')
+
+        return highlight
+
+    def process_extensions(self, extensions):
+        re_pygments = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
+        re_insert_pygment = re.compile(r"(?P<bracket_start>codehilite\([^)]+?)(?P<bracket_end>\s*\)$)|(?P<start>codehilite)")
+        re_no_classes = re.compile(r"noclasses\s*=\s*(True|False)")
+        # First search if pygments has manually been set,
+        # and if so, read what the desired color scheme to use is
+        self.pygments_style = None
+        self.noclasses = False
+        count = 0
+        for e in extensions:
+            if e.startswith("codehilite"):
+                pygments_style = re_pygments.search(e)
+                if pygments_style is None:
+                    self.pygments_style = "github"
+                    m = re_insert_pygment.match(e)
+                    if m is not None:
+                        if m.group('bracket_start'):
+                            start = m.group('bracket_start') + ',pygments_style='
+                            end = ")"
+                        else:
+                            start = m.group('start') + "(pygments_style="
+                            end = ')'
+
+                        extensions[count] = start + self.pygments_style + end
+                else:
+                    self.pygments_style = pygments_style.group(1)
+                noclasses = re_no_classes.search(e)
+                if noclasses is not None and noclasses.group(1) == "True":
+                    self.noclasses = True
+            count += 1
+
+        # Second, if nothing manual was set, see if "enable_highlight" is enabled with pygment support
+        # If no style has been set, setup the default
+        if (
+            self.pygments_style is None and
+            self.settings.get("enable_highlight") is True
+        ):
+            guess_lang = str(bool(self.settings.get("guess_language", True)))
+            extensions.append("codehilite(guess_lang=%s,pygments_style=github)" % guess_lang)
+            self.pygments_style = "github"
+
+        # Get the base path of source file if available
+        filename = self.view.file_name()
+        base_path = ""
+        if filename and os.path.exists(filename):
+            base_path = os.path.dirname(filename)
+
+        # Replace BASE_PATH keyword with the actual base_path
+        return [e.replace("${BASE_PATH}", base_path) for e in extensions]
+
+    def get_config_extensions(self, default_extensions):
+        config_extensions = self.settings.get('enabled_extensions')
+        if not config_extensions or config_extensions == 'default':
+            return self.process_extensions(default_extensions)
+        if 'default' in config_extensions:
+            config_extensions.remove('default')
+            config_extensions.extend(default_extensions)
+        return self.process_extensions(config_extensions)
+
+    def parser_specific_convert(self, markdown_text):
+        sublime.status_message('converting markdown with Python markdown...')
+        config_extensions = self.get_config_extensions(DEFAULT_EXT)
+        return markdown.markdown(markdown_text, extensions=config_extensions)
 
 
 class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, target='browser'):
         parsers = [
             "markdown",
-            "markdown2",
             "github"
         ]
 
@@ -610,6 +637,7 @@ class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
                 enabled_parsers.add(p)
 
         self.user_parsers = list(enabled_parsers)
+        self.user_parsers.sort()
 
         window = self.view.window()
         length = len(self.user_parsers)
@@ -644,7 +672,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         self.view.settings().set('parser', parser)
         self.view.settings().set('target', target)
 
-        html, body = compiler.run(self.view, parser)
+        if parser == "github":
+            compiler = GithubCompiler()
+        else:
+            compiler = MarkdownCompiler()
+
+        html, body = compiler.run(self.view)
 
         if target in ['disk', 'browser']:
             # check if LiveReload ST2 extension installed and add its script to the resulting HTML
@@ -741,6 +774,8 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         parser = settings.get('parser', 'markdown')
+        if parser == "default":
+            parser = "markdown"
 
         show_panel_on_build = settings.get("show_panel_on_build", True)
         if show_panel_on_build:
@@ -753,7 +788,12 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         self.puts("Compiling %s..." % mdfile)
 
-        html, body = compiler.run(view, parser, True)
+        if parser == "github":
+            compiler = GithubCompiler()
+        else:
+            compiler = MarkdownCompiler()
+
+        html, body = compiler.run(view, True)
 
         htmlfile = os.path.splitext(mdfile)[0] + '.html'
         self.puts("        ->" + htmlfile)

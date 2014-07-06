@@ -20,7 +20,6 @@
 
         default - The current default parser is python-markdown parser.
         markdown - Use the built-in python-markdown parser
-        markdown2 - (Deprecated) Use the built-in python-markdown2 parser.
         github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see http://github.github.com/github-flavored-markdown/
     */
     "parser": "default",
@@ -31,7 +30,7 @@
     "enable_mathjax": false,
 
     /*
-        Highlight.js support for syntax highlighting.
+        Pygments support for syntax highlighting.
     */
     "enable_highlight": false,
 
@@ -39,7 +38,6 @@
         List of enabled extensions of the selected markdown parser.
 
         You can get the full list of extensions at:
-            * The markdown2 parser, the `default`: https://github.com/trentm/python-markdown2/wiki/Extras
             * The python markdown parser, the `markdown`: http://pythonhosted.org/Markdown/extensions/index.html
 
 
@@ -48,16 +46,16 @@
 
          Parser     | "default" Values
         ------------|---------------------------
-         default    | ["footnotes", "toc", "fenced-code-blocks", "cuddled-lists" ]
-         markdown   | ["extra", "toc"]
+         default    | ["extra", "github", "toc", "headerid", "meta", "sane_lists", "smarty", "wikilinks"]
+         markdown   | ["extra", "github", "toc", "headerid", "meta", "sane_lists", "smarty", "wikilinks"]
          github     | extension's values are not used.
 
     */
     "enabled_extensions": "default",
 
-    /* 
+    /*
         Enabled parsers for the parser "select parser" command
-        Available parsers: markdown, markdown2, github
+        Available parsers: markdown, github
 
         When there are more than one parser in the list, Sublime will prompt
         via the quick panel for which one to use.  If there is only one, it
@@ -129,11 +127,11 @@
         doc: http://docs.python.org/3/library/os.path.html#os.path.isabs
 
         Examples: /tmp/custom_folder   (Linux/OSX - absolute path)
-                  C:/TEMP/MYNOTES
-                  C:\\TEMP\\MYNOTES    (Windows - absolute path, forward slash or escaped back slash)
-                  build                (All OS - relative path, current dir)
-                  ../build             (Linux/OSX - relative path, in parent dir)
-                  ..\\build            (Windows - relative path, in parent dir)
+                    C:/TEMP/MYNOTES
+                    C:\\TEMP\\MYNOTES    (Windows - absolute path, forward slash or escaped back slash)
+                    build                (All OS - relative path, current dir)
+                    ../build             (Linux/OSX - relative path, in parent dir)
+                    ..\\build            (Windows - relative path, in parent dir)
     */
     // "path_tempfile": "/tmp/my_notes",
 
@@ -164,10 +162,19 @@
     "strip_critic_marks": "none",
 
     /*
-        Sets whether highlight JS will autoguess raw block's syntax.
-        Default is True (guess)
+        Sets whether highlight JS will auto-guess raw block's syntax.
+        Alternative is to to only highlight blocks where a language has
+        been defined.
+
+        Default is True (guess).
+
+        If you manually set codehilite as an included extension in "enabled_extensions",
+        your settings will override this one.  To configure language guessing manually:
+            "enabled_extensions": [
+                "codehilite(guess_lang=False)" // <-Turn off language guessing
+            ]
     */
-    "highlight_js_guess": true,
+    "guess_language": true,
 
     /*
         Strips the YAML front matter header and converts title to a heading
