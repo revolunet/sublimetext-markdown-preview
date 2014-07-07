@@ -81,7 +81,13 @@ from ..treeprocessors import Treeprocessor
 from ..util import HTML_PLACEHOLDER_RE, parseBoolValue
 import re
 import logging
-import unicodedata
+try:
+    import unicodedata
+except:
+    import sys
+    from os.path import dirname
+    sys.path.append(dirname(sys.executable))
+    import unicodedata
 
 logger = logging.getLogger('MARKDOWN')
 
