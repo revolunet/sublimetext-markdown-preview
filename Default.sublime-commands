@@ -14,6 +14,13 @@
         }
     },
     {
+        "caption": "Markdown Preview: Save to Source Directory",
+        "command": "markdown_preview_select",
+        "args": {
+            "target": "save"
+        }
+    },
+    {
         "caption": "Markdown Preview: Copy to Clipboard",
         "command": "markdown_preview_select",
         "args": {

@@ -103,13 +103,15 @@ def exists_resource(resource_file_path):
     return os.path.isfile(filename)
 
 
-def new_scratch_view(window, text):
-    ''' create a new scratch view and paste text content
-        return the new view
+def new_view(window, text, scratch=False):
+    ''' create a new view and paste text content
+        return the new view.
+        Optionally can be set as scratch.
     '''
 
     new_view = window.new_file()
-    new_view.set_scratch(True)
+    if scratch:
+        new_view.set_scratch(True)
     if is_ST3():
         new_view.run_command('append', {
             'characters': text,
@@ -195,7 +197,7 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
     ''' open our markdown cheat sheet in ST2 '''
     def run(self, edit):
         lines = '\n'.join(load_resource('sample.md').splitlines())
-        view = new_scratch_view(self.view.window(), lines)
+        view = new_view(self.view.window(), lines, scratch=True)
         view.set_name("Markdown Cheatsheet")
 
         # Set syntax file
@@ -734,14 +736,23 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # create a new buffer and paste the output HTML
             embed_css = settings.get('embed_css_for_sublime_output', True)
             if embed_css:
-                new_scratch_view(self.view.window(), html)
+                new_view(self.view.window(), html, scratch=True)
             else:
-                new_scratch_view(self.view.window(), body)
+                new_view(self.view.window(), body, scratch=True)
             sublime.status_message('Markdown preview launched in sublime')
         elif target == 'clipboard':
             # clipboard copy the full HTML
             sublime.set_clipboard(html)
             sublime.status_message('Markdown export copied to clipboard')
+        elif target == 'save':
+            save_location = self.view.file_name()
+            if save_location is None or not os.path.exists(save_location):
+                v = new_view(self.view.window(), html)
+                if v is not None:
+                    v.run_command('save')
+            else:
+                htmlfile = os.path.splitext(save_location)[0] + '.html'
+                save_utf8(htmlfile, html)
 
     @classmethod
     def open_in_browser(cls, path, browser='default'):
