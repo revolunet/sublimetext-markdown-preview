@@ -544,6 +544,41 @@ class GithubCompiler(Compiler):
         return markdown_html
 
 
+class MultiMarkdownCompiler(Compiler):
+    default_css = "markdown.css"
+
+    def parser_specific_convert(self, markdown_text):
+        import subprocess
+        binary = self.settings.get("multimarkdown_binary", "")
+        if os.path.exists(binary):
+            cmd = [binary]
+            sublime.status_message('converting markdown with multimarkdown...')
+            if sublime.platform() == "windows":
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                p = subprocess.Popen(
+                    cmd, startupinfo=startupinfo,
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                )
+            else:
+                p = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                )
+            for line in markdown_text.split('\n'):
+                p.stdin.write((line + '\n').encode('utf-8'))
+            markdown_html = p.communicate()[0].decode("utf-8")
+            if p.returncode:
+                # Log info to console
+                sublime.error_message("Could not convert file! See console for more info.")
+                print(markdown_html)
+                markdown_html = _CANNOT_CONVERT
+        else:
+            sublime.error_message("Cannot find multimarkdown binary!")
+            markdown_html = _CANNOT_CONVERT
+        return markdown_html
+
+
 class MarkdownCompiler(Compiler):
     default_css = "markdown.css"
 
@@ -625,7 +660,8 @@ class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, target='browser'):
         parsers = [
             "markdown",
-            "github"
+            "github",
+            "multimarkdown"
         ]
 
         self.target = target
@@ -674,6 +710,8 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         if parser == "github":
             compiler = GithubCompiler()
+        elif parser == "multimarkdown":
+            compiler = MultiMarkdownCompiler()
         else:
             compiler = MarkdownCompiler()
 
@@ -790,6 +828,8 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         if parser == "github":
             compiler = GithubCompiler()
+        elif parser == "multimarkdown":
+            compiler = MultiMarkdownCompiler()
         else:
             compiler = MarkdownCompiler()
 

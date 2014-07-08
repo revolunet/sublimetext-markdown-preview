@@ -136,6 +136,11 @@
     // "path_tempfile": "/tmp/my_notes",
 
     /*
+        Absolute path to multimarkdown executable
+    */
+    "multimarkdown_binary": "",
+
+    /*
         Sets how image paths are handled.
         Setting is a string value: (absolute | base64 | none)
             absolute: converts relative local paths to absolute
