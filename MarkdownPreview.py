@@ -297,27 +297,23 @@ class Compiler(object):
 
         contents = self.parser_specific_preprocess(contents)
 
-        # Strip out multi-markdown critic marks as first task
-        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
-            contents = self.preprocessor_critic(contents)
-
         # Remove yaml front matter
         if self.settings.get('strip_yaml_front_matter') and contents.startswith('---'):
-            title = ''
-            title_match = re.search('(?:title:)(.+)', contents, flags=re.IGNORECASE)
-            if title_match:
-                stripped_title = title_match.group(1).strip()
-                title = '%s\n%s\n\n' % (stripped_title, '=' * len(stripped_title))
-            contents_without_front_matter = re.sub(r'(?s)^---.*?---\n', '', contents)
-            contents = '%s%s' % (title, contents_without_front_matter)
+            contents = self.preprocessor_yaml_frontmatter(contents)
+
         return contents
 
     def parser_specific_preprocess(self, text):
         return text
 
-    def preprocessor_critic(self, text):
-        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
-        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+    def preprocessor_yaml_frontmatter(self, text):
+        title = ''
+        title_match = re.search('(?:title:)(.+)', text, flags=re.IGNORECASE)
+        if title_match:
+            stripped_title = title_match.group(1).strip()
+            title = '%s\n%s\n\n' % (stripped_title, '=' * len(stripped_title))
+        contents_without_front_matter = re.sub(r'(?s)^---.*?---\n', '', text)
+        return '%s%s' % (title, contents_without_front_matter)
 
     def parser_specific_postprocess(self, text):
         return text
@@ -574,6 +570,15 @@ class GithubCompiler(Compiler):
             sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation. And using curl didn\'t work either')
         return None
 
+    def preprocessor_critic(self, text):
+        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
+        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+
+    def parser_specific_preprocess(self, text):
+        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
+            text = self.preprocessor_critic(text)
+        return text
+
     def parser_specific_postprocess(self, html):
         ''' Post-processing for github API '''
 
@@ -668,6 +673,9 @@ class MultiMarkdownCompiler(Compiler):
         binary = self.settings.get("multimarkdown_binary", "")
         if os.path.exists(binary):
             cmd = [binary]
+            critic_mode = self.settings.get("strip_critic_marks", "accept")
+            if critic_mode in ("accept", "reject"):
+                cmd.append('-a' if critic_mode == "accept" else '-r')
             sublime.status_message('converting markdown with multimarkdown...')
             if sublime.platform() == "windows":
                 startupinfo = subprocess.STARTUPINFO()
@@ -706,6 +714,15 @@ class MarkdownCompiler(Compiler):
             highlight += '<style>%s</style>' % HtmlFormatter(style=self.pygments_style).get_style_defs('.codehilite pre')
 
         return highlight
+
+    def preprocessor_critic(self, text):
+        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
+        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+
+    def parser_specific_preprocess(self, text):
+        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
+            text = self.preprocessor_critic(text)
+        return text
 
     def process_extensions(self, extensions):
         re_pygments = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
