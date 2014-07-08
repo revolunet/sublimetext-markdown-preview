@@ -87,6 +87,11 @@
     "github_mode": "markdown",
 
     /*
+        Enables a post process to inject header ids to ensure hrefs to headers work
+    */
+    "github_inject_header_ids": false,
+
+    /*
         Uses an OAuth token when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
     */
     // "github_oauth_token": "secret",

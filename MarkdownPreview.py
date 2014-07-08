@@ -23,6 +23,7 @@ if is_ST3():
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
+    from urllib.parse import quote
 
     def Request(url, data, headers):
         ''' Adapter for urllib2 used in ST2 '''
@@ -37,6 +38,7 @@ else:
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
+    from urllib import quote
 
     unicode_str = unicode
 
@@ -571,6 +573,46 @@ class GithubCompiler(Compiler):
         except subprocess.CalledProcessError:
             sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation. And using curl didn\'t work either')
         return None
+
+    def parser_specific_postprocess(self, html):
+        ''' Post-processing for github API '''
+
+        if self.settings.get("github_inject_header_ids", False):
+            html = self.postprocess_inject_header_id(html)
+        return html
+
+    def postprocess_inject_header_id(self, html):
+        ''' Insert header ids when no anchors are present '''
+        unique = {}
+
+        def header_to_id(text):
+            if text is None:
+                return ''
+            # Strip html tags and lower
+            id = RE_TAGS.sub('', text).lower()
+            # Remove non word characters or non spaces and dashes
+            # Then convert spaces to dashes
+            id = RE_WORD.sub('', id).replace(' ', '-')
+            # Encode anything that needs to be
+            return quote(id)
+
+        def inject_id(m):
+            id = header_to_id(m.group('text'))
+            if id == '':
+                return m.group(0)
+            # Append a dash and number for uniqueness if needed
+            value = unique.get(id, None)
+            if value is None:
+                unique[id] = 1
+            else:
+                unique[id] += 1
+                id += "-%d" % value
+            return m.group('open')[:-1] + (' id="%s">' % id) + m.group('text') + m.group('close')
+
+        RE_TAGS = re.compile(r'''</?[^>]*>''')
+        RE_WORD = re.compile(r'''[^\w\- ]''')
+        RE_HEADER = re.compile(r'''(?P<open><h([1-6])>)(?P<text>.*?)(?P<close></h\2>)''', re.DOTALL)
+        return RE_HEADER.sub(inject_id, html)
 
     def parser_specific_convert(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
