@@ -293,6 +293,8 @@ class Compiler(object):
             if selection.strip() != '':
                 contents = selection
 
+        contents = self.parser_specific_preprocess(contents)
+
         # Strip out multi-markdown critic marks as first task
         if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
             contents = self.preprocessor_critic(contents)
@@ -307,6 +309,16 @@ class Compiler(object):
             contents_without_front_matter = re.sub(r'(?s)^---.*?---\n', '', contents)
             contents = '%s%s' % (title, contents_without_front_matter)
         return contents
+
+    def parser_specific_preprocess(self, text):
+        return text
+
+    def preprocessor_critic(self, text):
+        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
+        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+
+    def parser_specific_postprocess(self, text):
+        return text
 
     def postprocessor_absolute(self, html, image_convert, file_convert):
         ''' fix relative paths in images, scripts, and links for the internal parser '''
@@ -339,12 +351,7 @@ class Compiler(object):
                 r"|href" if file_convert else ""
             )
         )
-        html = RE_SOURCES.sub(tag_fix, html)
-        return html
-
-    def preprocessor_critic(self, text):
-        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
-        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+        return RE_SOURCES.sub(tag_fix, html)
 
     def postprocessor_base64(self, html):
         ''' convert resources (currently images only) to base64 '''
@@ -401,8 +408,66 @@ class Compiler(object):
             return data
         RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
         RE_SOURCES = re.compile(r"""(?P<tag>(?P<begin><(?:img)[^>]+(?:src)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""")
-        html = RE_SOURCES.sub(b64, html)
-        return html
+        return RE_SOURCES.sub(b64, html)
+
+    def postprocessor_simple(self, html):
+        ''' Strip out ids and classes for a simplified HTML output '''
+        def strip_html(m):
+            tag = m.group('open')
+            if m.group('attr1'):
+                tag += m.group('attr1')
+            if m.group('attr2'):
+                tag += m.group('attr2')
+            if m.group('attr3'):
+                tag += m.group('attr3')
+            if m.group('attr4'):
+                tag += m.group('attr4')
+            if m.group('attr5'):
+                tag += m.group('attr5')
+            if m.group('attr6'):
+                tag += m.group('attr6')
+            tag += m.group('close')
+            return tag
+
+        # Strip out id, class and style attributes for a simple html output
+        # Since we are stripping out two attributes, we need to set up the groups in such
+        # a way so we can retrieve the data we don't want to throw away
+        # up to these worst case scenarios:
+        #
+        # <tag attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""...>
+        # <tag (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""...>
+        STRIP_HTML = re.compile(
+            r'''
+                (?P<open><[\w\:\.\-]+)                                                      # Tag open
+                (?:
+                    (?P<attr1>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target1>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )
+                (?:
+                    (?P<attr2>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target2>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr3>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target3>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr4>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target4>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr5>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target5>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr6>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target6>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?P<close>\s*(?:\/?)>)                                                      # Tag end
+            ''',
+            re.MULTILINE | re.DOTALL | re.VERBOSE
+        )
+        return STRIP_HTML.sub(strip_html, html)
 
     def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
@@ -412,11 +477,16 @@ class Compiler(object):
         image_convert = self.settings.get("image_path_conversion", "absolute")
         file_convert = self.settings.get("file_path_conversions", "absolute")
 
+        markdown_html = self.parser_specific_postprocess(markdown_html)
+
         if "absolute" in (image_convert, file_convert):
             markdown_html = self.postprocessor_absolute(markdown_html, image_convert, file_convert)
 
         if image_convert == "base64":
             markdown_html = self.postprocessor_base64(markdown_html)
+
+        if self.settings.get("html_simple", False):
+            markdown_html = self.postprocessor_simple(markdown_html)
 
         return markdown_html
 
@@ -439,7 +509,9 @@ class Compiler(object):
         html_template = self.settings.get('html_template')
 
         # use customized html template if given
-        if html_template and os.path.exists(html_template):
+        if self.settings.get('html_simple', False):
+            html = body
+        elif html_template and os.path.exists(html_template):
             head = u''
             if not self.settings.get('skip_default_stylesheet'):
                 head += self.get_stylesheet()

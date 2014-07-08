@@ -78,7 +78,7 @@
         via the quick panel for which one to use.  If there is only one, it
         will automatically run that parser.
     */
-    "enabed_parsers": ["markdown", "github"],
+    "enabled_parsers": ["markdown", "github"],
 
     /*
         Default mode for the github Markdown parser : markdown (documents) or gfm (comments)
@@ -156,6 +156,16 @@
         Absolute path to multimarkdown executable
     */
     "multimarkdown_binary": "",
+
+    /*
+        Sets HTML output to a simple form:
+            - No head
+            - No body tags
+            - ids, classes, and style are stripped out
+            - Just bare minimum HTML tags and attributes
+            - extension modifications included
+    */
+    "html_simple": false,
 
     /*
         Sets how image paths are handled.
