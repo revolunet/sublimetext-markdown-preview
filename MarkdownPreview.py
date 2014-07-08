@@ -747,10 +747,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         elif target == 'save':
             save_location = self.view.file_name()
             if save_location is None or not os.path.exists(save_location):
+                # Save as...
                 v = new_view(self.view.window(), html)
                 if v is not None:
                     v.run_command('save')
             else:
+                # Save
                 htmlfile = os.path.splitext(save_location)[0] + '.html'
                 save_utf8(htmlfile, html)
 
@@ -823,16 +825,21 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         parser = settings.get('parser', 'markdown')
-        if parser == "default":
-            parser = "markdown"
+        if parser == 'default':
+            parser = 'markdown'
+
+        target = settings.get('build_action', 'build')
+        if target in ('browser', 'sublime', 'clipboard', 'save'):
+            view.run_command("markdown_preview", {"parser": parser, "target": target})
+            return
 
         show_panel_on_build = settings.get("show_panel_on_build", True)
         if show_panel_on_build:
             self.window.run_command("show_panel", {"panel": "output.markdown"})
 
         mdfile = view.file_name()
-        if mdfile is None:
-            self.puts("Can't build a unsaved markdown file.")
+        if mdfile is None or not os.path.exists(mdfile):
+            self.puts("Can't build an unsaved markdown file.")
             return
 
         self.puts("Compiling %s..." % mdfile)

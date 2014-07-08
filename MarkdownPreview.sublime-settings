@@ -25,6 +25,23 @@
     "parser": "default",
 
     /*
+        By default, Markdown Preview builds the HTML in the source directory.
+        It expects the file to exist on disk.  It pops up the build output panel etc.
+
+        If you wish to override this behavior, you can change "build_action"
+
+        build - The default build behavior.
+        browser - Preview the file in your browser.
+        clipboard - Copy the HTML output to the clipboard.
+        sublime - Export the HTML to a Sublime tab.
+        save - Run the normal save command that outputs to the source directory.
+            It will also prompt for "save as" if the file does not exit on disk.
+
+        All the build options use the default parser defined above in "parser"
+    */
+    "build_action": "build",
+
+    /*
         Enable or not mathjax support.
     */
     "enable_mathjax": false,
