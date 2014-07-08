@@ -302,7 +302,7 @@ class Compiler(object):
             if title_match:
                 stripped_title = title_match.group(1).strip()
                 title = '%s\n%s\n\n' % (stripped_title, '=' * len(stripped_title))
-            contents_without_front_matter = re.sub(r'(?s)^---.*---\n', '', contents)
+            contents_without_front_matter = re.sub(r'(?s)^---.*?---\n', '', contents)
             contents = '%s%s' % (title, contents_without_front_matter)
         return contents
 
