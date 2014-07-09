@@ -69,6 +69,8 @@ h4:hover a span.headeranchor:before { content: '\f05c'; }
 h5:hover a span.headeranchor:before { content: '\f05c'; }
 h6:hover a span.headeranchor:before { content: '\f05c'; }
 
+abbr { cursor: pointer; }
+
 /* Paragraphs */
 p { margin:1em 0; }
 
