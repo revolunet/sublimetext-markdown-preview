@@ -156,7 +156,7 @@ dt { font-weight: bold; font-style: italic;}
 dd { margin: 0 0 0 2em; }
 
 /* Tables */
-table { border-collapse: collapse; border: 1px solid #ddd; }
+table { border-collapse: collapse; border: 1px solid #ddd; background-color: #fefefe; }
 table tr:nth-child(2n) { background-color: #f8f8f8; }
 td, th { border: 1px solid #ddd; padding: 6px 13px; }
 
