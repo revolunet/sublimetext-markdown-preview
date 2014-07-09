@@ -51,7 +51,8 @@ ABS_EXCLUDE = tuple(
 )
 DEFAULT_EXT = [
     "extra", "github", "toc", "headerid",
-    "meta", "sane_lists", "smarty", "wikilinks"
+    "meta", "sane_lists", "smarty", "wikilinks",
+    "admonition"
 ]
 
 

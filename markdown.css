@@ -134,6 +134,55 @@ pre code { border: 0 }
 
 code { padding: 0 3px 0 3px; }
 
+/* Admonition */
+div.admonition {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  font-size: 0.88em;
+  padding: 0.5em 1em 0.5em 1em;
+  margin: 10px auto;
+}
+
+div.admonition p {
+  padding: 0;
+  margin: 0.5em 0 0.5em 0;
+}
+
+p.admonition-title {
+  font-weight: bold;
+}
+
+div.admonition.attention {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  border: 1px solid #4F8A10;
+}
+
+div.admonition.caution {
+  color: #9F6000;
+  background-color: #FEEFB3;
+  border: 1px solid #9F6000;
+}
+
+div.admonition.hint {
+  color: #00529B;
+  background-color: #BDE5F8;
+  border: 1px solid #00529B;
+}
+
+div.admonition.danger {
+  color: #D8000C;
+  background-color: #FFBABA;
+  border: 1px solid #D8000C;
+}
+
+div.admonition.note {
+  color: #888888;
+  background-color: #F8F8F8;
+  border: 1px solid #888888;
+}
+
 /* Inlines */
 b, strong { font-weight: bold; }
 
