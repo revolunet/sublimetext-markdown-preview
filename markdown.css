@@ -134,12 +134,6 @@ pre code { border: 0 }
 
 code { padding: 0 3px 0 3px; }
 
-/* Multimarkdown Critic Blocks */
-span.critic_mark { background: #ff0; }
-span.critic_delete { color: #c82829; text-decoration: line-through; }
-span.critic_insert { color: #718c00 ; text-decoration: underline; }
-span.critic_comment { color: #8e908c; font-style: italic; }
-
 /* Inlines */
 b, strong { font-weight: bold; }
 
