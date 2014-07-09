@@ -148,11 +148,11 @@ sub { bottom: -0.25em; }
 dfn { font-style: italic; }
 
 /* Lists */
-ul, ol { margin: 0.5em 0; padding: 0 0 0 2em; }
+ul, ol { padding-left: 30px; }
 li p:last-child { margin:0 }
-li.task-list-item { list-style-type: none; margin-left: -1.5em; }
-li.task-list-item input { margin-right: .5em; }
-li.task-list-item ul, li.task-list-item ol { margin-left: 1.5em; }
+li.task-list-item { list-style-type: none; }
+li.task-list-item input { float:left; margin-left: -20px; margin-top: 6px; }
+dt { font-weight: bold; font-style: italic;}
 dd { margin: 0 0 0 2em; }
 
 /* Tables */
