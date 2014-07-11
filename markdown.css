@@ -116,7 +116,7 @@ span.backtick {
 
 pre, code, kbd, samp {
   color: #000;
-  font-family: monospace;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
