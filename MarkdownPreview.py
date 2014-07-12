@@ -23,6 +23,7 @@ if is_ST3():
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
+    from urllib.parse import quote
 
     def Request(url, data, headers):
         ''' Adapter for urllib2 used in ST2 '''
@@ -37,6 +38,7 @@ else:
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
+    from urllib import quote
 
     unicode_str = unicode
 
@@ -49,7 +51,8 @@ ABS_EXCLUDE = tuple(
 )
 DEFAULT_EXT = [
     "extra", "github", "toc", "headerid",
-    "meta", "sane_lists", "smarty", "wikilinks"
+    "meta", "sane_lists", "smarty", "wikilinks",
+    "admonition"
 ]
 
 
@@ -103,13 +106,15 @@ def exists_resource(resource_file_path):
     return os.path.isfile(filename)
 
 
-def new_scratch_view(window, text):
-    ''' create a new scratch view and paste text content
-        return the new view
+def new_view(window, text, scratch=False):
+    ''' create a new view and paste text content
+        return the new view.
+        Optionally can be set as scratch.
     '''
 
     new_view = window.new_file()
-    new_view.set_scratch(True)
+    if scratch:
+        new_view.set_scratch(True)
     if is_ST3():
         new_view.run_command('append', {
             'characters': text,
@@ -178,24 +183,25 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
 
     def on_post_save(self, view):
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
-        filetypes = settings.get('markdown_filetypes')
-        if filetypes and view.file_name().endswith(tuple(filetypes)):
-            temp_file = getTempMarkdownPreviewPath(view)
-            if os.path.isfile(temp_file):
-                # reexec markdown conversion
-                # todo : check if browser still opened and reopen it if needed
-                view.run_command('markdown_preview', {
-                    'target': 'disk',
-                    'parser': view.settings().get('parser')
-                })
-                sublime.status_message('Markdown preview file updated')
+        if settings.get('enable_autoreload', True):
+            filetypes = settings.get('markdown_filetypes')
+            if filetypes and view.file_name().endswith(tuple(filetypes)):
+                temp_file = getTempMarkdownPreviewPath(view)
+                if os.path.isfile(temp_file):
+                    # reexec markdown conversion
+                    # todo : check if browser still opened and reopen it if needed
+                    view.run_command('markdown_preview', {
+                        'target': 'disk',
+                        'parser': view.settings().get('parser')
+                    })
+                    sublime.status_message('Markdown preview file updated')
 
 
 class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
     ''' open our markdown cheat sheet in ST2 '''
     def run(self, edit):
         lines = '\n'.join(load_resource('sample.md').splitlines())
-        view = new_scratch_view(self.view.window(), lines)
+        view = new_view(self.view.window(), lines, scratch=True)
         view.set_name("Markdown Cheatsheet")
 
         # Set syntax file
@@ -291,20 +297,28 @@ class Compiler(object):
             if selection.strip() != '':
                 contents = selection
 
-        # Strip out multi-markdown critic marks as first task
-        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
-            contents = self.preprocessor_critic(contents)
+        contents = self.parser_specific_preprocess(contents)
 
         # Remove yaml front matter
         if self.settings.get('strip_yaml_front_matter') and contents.startswith('---'):
-            title = ''
-            title_match = re.search('(?:title:)(.+)', contents, flags=re.IGNORECASE)
-            if title_match:
-                stripped_title = title_match.group(1).strip()
-                title = '%s\n%s\n\n' % (stripped_title, '=' * len(stripped_title))
-            contents_without_front_matter = re.sub(r'(?s)^---.*---\n', '', contents)
-            contents = '%s%s' % (title, contents_without_front_matter)
+            contents = self.preprocessor_yaml_frontmatter(contents)
+
         return contents
+
+    def parser_specific_preprocess(self, text):
+        return text
+
+    def preprocessor_yaml_frontmatter(self, text):
+        title = ''
+        title_match = re.search('(?:title:)(.+)', text, flags=re.IGNORECASE)
+        if title_match:
+            stripped_title = title_match.group(1).strip()
+            title = '%s\n%s\n\n' % (stripped_title, '=' * len(stripped_title))
+        contents_without_front_matter = re.sub(r'(?s)^---.*?---\n', '', text)
+        return '%s%s' % (title, contents_without_front_matter)
+
+    def parser_specific_postprocess(self, text):
+        return text
 
     def postprocessor_absolute(self, html, image_convert, file_convert):
         ''' fix relative paths in images, scripts, and links for the internal parser '''
@@ -337,12 +351,7 @@ class Compiler(object):
                 r"|href" if file_convert else ""
             )
         )
-        html = RE_SOURCES.sub(tag_fix, html)
-        return html
-
-    def preprocessor_critic(self, text):
-        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
-        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+        return RE_SOURCES.sub(tag_fix, html)
 
     def postprocessor_base64(self, html):
         ''' convert resources (currently images only) to base64 '''
@@ -399,8 +408,66 @@ class Compiler(object):
             return data
         RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
         RE_SOURCES = re.compile(r"""(?P<tag>(?P<begin><(?:img)[^>]+(?:src)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""")
-        html = RE_SOURCES.sub(b64, html)
-        return html
+        return RE_SOURCES.sub(b64, html)
+
+    def postprocessor_simple(self, html):
+        ''' Strip out ids and classes for a simplified HTML output '''
+        def strip_html(m):
+            tag = m.group('open')
+            if m.group('attr1'):
+                tag += m.group('attr1')
+            if m.group('attr2'):
+                tag += m.group('attr2')
+            if m.group('attr3'):
+                tag += m.group('attr3')
+            if m.group('attr4'):
+                tag += m.group('attr4')
+            if m.group('attr5'):
+                tag += m.group('attr5')
+            if m.group('attr6'):
+                tag += m.group('attr6')
+            tag += m.group('close')
+            return tag
+
+        # Strip out id, class and style attributes for a simple html output
+        # Since we are stripping out two attributes, we need to set up the groups in such
+        # a way so we can retrieve the data we don't want to throw away
+        # up to these worst case scenarios:
+        #
+        # <tag attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""...>
+        # <tag (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""...>
+        STRIP_HTML = re.compile(
+            r'''
+                (?P<open><[\w\:\.\-]+)                                                      # Tag open
+                (?:
+                    (?P<attr1>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target1>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )
+                (?:
+                    (?P<attr2>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target2>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr3>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target3>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr4>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target4>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr5>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target5>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?:
+                    (?P<attr6>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
+                  | (?P<target6>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
+                )?
+                (?P<close>\s*(?:\/?)>)                                                      # Tag end
+            ''',
+            re.MULTILINE | re.DOTALL | re.VERBOSE
+        )
+        return STRIP_HTML.sub(strip_html, html)
 
     def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
@@ -410,11 +477,16 @@ class Compiler(object):
         image_convert = self.settings.get("image_path_conversion", "absolute")
         file_convert = self.settings.get("file_path_conversions", "absolute")
 
+        markdown_html = self.parser_specific_postprocess(markdown_html)
+
         if "absolute" in (image_convert, file_convert):
             markdown_html = self.postprocessor_absolute(markdown_html, image_convert, file_convert)
 
         if image_convert == "base64":
             markdown_html = self.postprocessor_base64(markdown_html)
+
+        if self.settings.get("html_simple", False):
+            markdown_html = self.postprocessor_simple(markdown_html)
 
         return markdown_html
 
@@ -437,7 +509,9 @@ class Compiler(object):
         html_template = self.settings.get('html_template')
 
         # use customized html template if given
-        if html_template and os.path.exists(html_template):
+        if self.settings.get('html_simple', False):
+            html = body
+        elif html_template and os.path.exists(html_template):
             head = u''
             if not self.settings.get('skip_default_stylesheet'):
                 head += self.get_stylesheet()
@@ -498,6 +572,55 @@ class GithubCompiler(Compiler):
             sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation. And using curl didn\'t work either')
         return None
 
+    def preprocessor_critic(self, text):
+        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
+        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+
+    def parser_specific_preprocess(self, text):
+        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
+            text = self.preprocessor_critic(text)
+        return text
+
+    def parser_specific_postprocess(self, html):
+        ''' Post-processing for github API '''
+
+        if self.settings.get("github_inject_header_ids", False):
+            html = self.postprocess_inject_header_id(html)
+        return html
+
+    def postprocess_inject_header_id(self, html):
+        ''' Insert header ids when no anchors are present '''
+        unique = {}
+
+        def header_to_id(text):
+            if text is None:
+                return ''
+            # Strip html tags and lower
+            id = RE_TAGS.sub('', text).lower()
+            # Remove non word characters or non spaces and dashes
+            # Then convert spaces to dashes
+            id = RE_WORD.sub('', id).replace(' ', '-')
+            # Encode anything that needs to be
+            return quote(id)
+
+        def inject_id(m):
+            id = header_to_id(m.group('text'))
+            if id == '':
+                return m.group(0)
+            # Append a dash and number for uniqueness if needed
+            value = unique.get(id, None)
+            if value is None:
+                unique[id] = 1
+            else:
+                unique[id] += 1
+                id += "-%d" % value
+            return m.group('open')[:-1] + (' id="%s">' % id) + m.group('text') + m.group('close')
+
+        RE_TAGS = re.compile(r'''</?[^>]*>''')
+        RE_WORD = re.compile(r'''[^\w\- ]''')
+        RE_HEADER = re.compile(r'''(?P<open><h([1-6])>)(?P<text>.*?)(?P<close></h\2>)''', re.DOTALL)
+        return RE_HEADER.sub(inject_id, html)
+
     def parser_specific_convert(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
 
@@ -544,6 +667,44 @@ class GithubCompiler(Compiler):
         return markdown_html
 
 
+class MultiMarkdownCompiler(Compiler):
+    default_css = "markdown.css"
+
+    def parser_specific_convert(self, markdown_text):
+        import subprocess
+        binary = self.settings.get("multimarkdown_binary", "")
+        if os.path.exists(binary):
+            cmd = [binary]
+            critic_mode = self.settings.get("strip_critic_marks", "accept")
+            if critic_mode in ("accept", "reject"):
+                cmd.append('-a' if critic_mode == "accept" else '-r')
+            sublime.status_message('converting markdown with multimarkdown...')
+            if sublime.platform() == "windows":
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                p = subprocess.Popen(
+                    cmd, startupinfo=startupinfo,
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                )
+            else:
+                p = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                )
+            for line in markdown_text.split('\n'):
+                p.stdin.write((line + '\n').encode('utf-8'))
+            markdown_html = p.communicate()[0].decode("utf-8")
+            if p.returncode:
+                # Log info to console
+                sublime.error_message("Could not convert file! See console for more info.")
+                print(markdown_html)
+                markdown_html = _CANNOT_CONVERT
+        else:
+            sublime.error_message("Cannot find multimarkdown binary!")
+            markdown_html = _CANNOT_CONVERT
+        return markdown_html
+
+
 class MarkdownCompiler(Compiler):
     default_css = "markdown.css"
 
@@ -555,6 +716,15 @@ class MarkdownCompiler(Compiler):
             highlight += '<style>%s</style>' % HtmlFormatter(style=self.pygments_style).get_style_defs('.codehilite pre')
 
         return highlight
+
+    def preprocessor_critic(self, text):
+        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
+        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+
+    def parser_specific_preprocess(self, text):
+        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
+            text = self.preprocessor_critic(text)
+        return text
 
     def process_extensions(self, extensions):
         re_pygments = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
@@ -625,7 +795,8 @@ class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, target='browser'):
         parsers = [
             "markdown",
-            "github"
+            "github",
+            "multimarkdown"
         ]
 
         self.target = target
@@ -674,18 +845,22 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         if parser == "github":
             compiler = GithubCompiler()
+        elif parser == "multimarkdown":
+            compiler = MultiMarkdownCompiler()
         else:
             compiler = MarkdownCompiler()
 
         html, body = compiler.run(self.view)
 
         if target in ['disk', 'browser']:
-            # check if LiveReload ST2 extension installed and add its script to the resulting HTML
-            livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
-            # build the html
-            if livereload_installed:
-                port = sublime.load_settings('LiveReload.sublime-settings').get('port', 35729)
-                html += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':%d/livereload.js?snipver=1"></\' + \'script>\')</script>' % port
+            # do not use LiveReload unless autoreload is enabled
+            if settings.get('enable_autoreload', True):
+                # check if LiveReload ST2 extension installed and add its script to the resulting HTML
+                livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
+                # build the html
+                if livereload_installed:
+                    port = sublime.load_settings('LiveReload.sublime-settings').get('port', 35729)
+                    html += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':%d/livereload.js?snipver=1"></\' + \'script>\')</script>' % port
             # update output html file
             tmp_fullpath = getTempMarkdownPreviewPath(self.view)
             save_utf8(tmp_fullpath, html)
@@ -696,14 +871,25 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             # create a new buffer and paste the output HTML
             embed_css = settings.get('embed_css_for_sublime_output', True)
             if embed_css:
-                new_scratch_view(self.view.window(), html)
+                new_view(self.view.window(), html, scratch=True)
             else:
-                new_scratch_view(self.view.window(), body)
+                new_view(self.view.window(), body, scratch=True)
             sublime.status_message('Markdown preview launched in sublime')
         elif target == 'clipboard':
             # clipboard copy the full HTML
             sublime.set_clipboard(html)
             sublime.status_message('Markdown export copied to clipboard')
+        elif target == 'save':
+            save_location = self.view.file_name()
+            if save_location is None or not os.path.exists(save_location):
+                # Save as...
+                v = new_view(self.view.window(), html)
+                if v is not None:
+                    v.run_command('save')
+            else:
+                # Save
+                htmlfile = os.path.splitext(save_location)[0] + '.html'
+                save_utf8(htmlfile, html)
 
     @classmethod
     def open_in_browser(cls, path, browser='default'):
@@ -774,22 +960,29 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         parser = settings.get('parser', 'markdown')
-        if parser == "default":
-            parser = "markdown"
+        if parser == 'default':
+            parser = 'markdown'
+
+        target = settings.get('build_action', 'build')
+        if target in ('browser', 'sublime', 'clipboard', 'save'):
+            view.run_command("markdown_preview", {"parser": parser, "target": target})
+            return
 
         show_panel_on_build = settings.get("show_panel_on_build", True)
         if show_panel_on_build:
             self.window.run_command("show_panel", {"panel": "output.markdown"})
 
         mdfile = view.file_name()
-        if mdfile is None:
-            self.puts("Can't build a unsaved markdown file.")
+        if mdfile is None or not os.path.exists(mdfile):
+            self.puts("Can't build an unsaved markdown file.")
             return
 
         self.puts("Compiling %s..." % mdfile)
 
         if parser == "github":
             compiler = GithubCompiler()
+        elif parser == "multimarkdown":
+            compiler = MultiMarkdownCompiler()
         else:
             compiler = MarkdownCompiler()
 

@@ -25,6 +25,23 @@
     "parser": "default",
 
     /*
+        By default, Markdown Preview builds the HTML in the source directory.
+        It expects the file to exist on disk.  It pops up the build output panel etc.
+
+        If you wish to override this behavior, you can change "build_action"
+
+        build - The default build behavior.
+        browser - Preview the file in your browser.
+        clipboard - Copy the HTML output to the clipboard.
+        sublime - Export the HTML to a Sublime tab.
+        save - Run the normal save command that outputs to the source directory.
+            It will also prompt for "save as" if the file does not exit on disk.
+
+        All the build options use the default parser defined above in "parser"
+    */
+    "build_action": "build",
+
+    /*
         Enable or not mathjax support.
     */
     "enable_mathjax": false,
@@ -61,13 +78,18 @@
         via the quick panel for which one to use.  If there is only one, it
         will automatically run that parser.
     */
-    "enabed_parsers": ["markdown", "github"],
+    "enabled_parsers": ["markdown", "github"],
 
     /*
         Default mode for the github Markdown parser : markdown (documents) or gfm (comments)
         see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
     */
     "github_mode": "markdown",
+
+    /*
+        Enables a post process to inject header ids to ensure hrefs to headers work
+    */
+    "github_inject_header_ids": false,
 
     /*
         Uses an OAuth token when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
@@ -116,6 +138,11 @@
     // "js": ["http://example.com/script.js", "/path/to/script.js"],
 
     /*
+        Enable or not whether parsed files will be auto-reloaded on save
+    */
+    "enable_autoreload": true,
+
+    /*
         Sets the supported filetypes for auto-reload on save
     */
     "markdown_filetypes": [".md", ".markdown", ".mdown"],
@@ -134,6 +161,21 @@
                     ..\\build            (Windows - relative path, in parent dir)
     */
     // "path_tempfile": "/tmp/my_notes",
+
+    /*
+        Absolute path to multimarkdown executable
+    */
+    "multimarkdown_binary": "",
+
+    /*
+        Sets HTML output to a simple form:
+            - No head
+            - No body tags
+            - ids, classes, and style are stripped out
+            - Just bare minimum HTML tags and attributes
+            - extension modifications included
+    */
+    "html_simple": false,
 
     /*
         Sets how image paths are handled.

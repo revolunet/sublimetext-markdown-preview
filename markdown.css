@@ -69,6 +69,8 @@ h4:hover a span.headeranchor:before { content: '\f05c'; }
 h5:hover a span.headeranchor:before { content: '\f05c'; }
 h6:hover a span.headeranchor:before { content: '\f05c'; }
 
+abbr { cursor: pointer; }
+
 /* Paragraphs */
 p { margin:1em 0; }
 
@@ -114,7 +116,7 @@ span.backtick {
 
 pre, code, kbd, samp {
   color: #000;
-  font-family: monospace;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -134,11 +136,54 @@ pre code { border: 0 }
 
 code { padding: 0 3px 0 3px; }
 
-/* Multimarkdown Critic Blocks */
-span.critic_mark { background: #ff0; }
-span.critic_delete { color: #c82829; text-decoration: line-through; }
-span.critic_insert { color: #718c00 ; text-decoration: underline; }
-span.critic_comment { color: #8e908c; font-style: italic; }
+/* Admonition */
+div.admonition {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  font-size: 0.88em;
+  padding: 0.5em 1em 0.5em 1em;
+  margin: 10px auto;
+}
+
+div.admonition p {
+  padding: 0;
+  margin: 0.5em 0 0.5em 0;
+}
+
+p.admonition-title {
+  font-weight: bold;
+}
+
+div.admonition.attention {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  border: 1px solid #4F8A10;
+}
+
+div.admonition.caution {
+  color: #9F6000;
+  background-color: #FEEFB3;
+  border: 1px solid #9F6000;
+}
+
+div.admonition.hint {
+  color: #00529B;
+  background-color: #BDE5F8;
+  border: 1px solid #00529B;
+}
+
+div.admonition.danger {
+  color: #D8000C;
+  background-color: #FFBABA;
+  border: 1px solid #D8000C;
+}
+
+div.admonition.note {
+  color: #888888;
+  background-color: #F8F8F8;
+  border: 1px solid #888888;
+}
 
 /* Inlines */
 b, strong { font-weight: bold; }
@@ -154,15 +199,15 @@ sub { bottom: -0.25em; }
 dfn { font-style: italic; }
 
 /* Lists */
-ul, ol { margin: 0.5em 0; padding: 0 0 0 2em; }
+ul, ol { padding-left: 30px; }
 li p:last-child { margin:0 }
-li.task-list-item { list-style-type: none; margin-left: -1.5em; }
-li.task-list-item input { margin-right: .5em; }
-li.task-list-item ul, li.task-list-item ol { margin-left: 1.5em; }
+li.task-list-item { list-style-type: none; }
+li.task-list-item input { float:left; margin-left: -20px; margin-top: 6px; }
+dt { font-weight: bold; font-style: italic;}
 dd { margin: 0 0 0 2em; }
 
 /* Tables */
-table { border-collapse: collapse; border: 1px solid #ddd; }
+table { border-collapse: collapse; border: 1px solid #ddd; background-color: #fefefe; }
 table tr:nth-child(2n) { background-color: #f8f8f8; }
 td, th { border: 1px solid #ddd; padding: 6px 13px; }
 

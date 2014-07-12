@@ -19,10 +19,42 @@ from ..extensions import Extension
 from ..treeprocessors import Treeprocessor
 import re
 
-RE_CHECKBOX = re.compile(r"^(?P<checkbox> *\[(?P<state>x|X| {1})\] +)(?P<line>.*)")
+RE_CHECKBOX = re.compile(r"^(?P<checkbox> *\[(?P<state>(?:x|X| ){1})\] +)(?P<line>.*)")
+
+
+def get_checkbox(state):
+    return '<input type="checkbox" disabled%s> ' % (' checked' if state.lower() == 'x' else '')
 
 
 class TasklistTreeprocessor(Treeprocessor):
+    def inline(self, li):
+        """ Search for checkbox directly in li tag """
+        found = False
+        m = RE_CHECKBOX.match(li.text)
+        if m is not None:
+            li.text = self.markdown.htmlStash.store(
+                get_checkbox(m.group('state')),
+                safe=True
+            ) + m.group('line')
+            found = True
+        return found
+
+    def sub_paragraph(self, li):
+        """ Search for checkbox in sub-paragraph """
+        found = False
+        if len(li):
+            first = list(li)[0]
+            if first.tag == "p" and first.text is not None:
+                m = RE_CHECKBOX.match(first.text)
+                if m is not None:
+                    li.text = self.markdown.htmlStash.store(
+                        get_checkbox(m.group('state')),
+                        safe=True
+                    )
+                    first.text = m.group('line')
+                    found = True
+        return found
+
     def run(self, root):
         """ Replace relative paths with absolute """
 
@@ -30,17 +62,19 @@ class TasklistTreeprocessor(Treeprocessor):
         task_items = []
         lilinks = root.getiterator('li')
         for li in lilinks:
-            if li.text is None:
+            if li.text is None or li.text == "":
+                if not self.sub_paragraph(li):
+                    continue
+            elif not self.inline(li):
                 continue
-            m = RE_CHECKBOX.match(li.text)
-            if m is not None:
-                checkbox = '<input type="checkbox" disabled%s> ' % (' checked' if m.group('state').lower() == 'x' else '')
-                li.text = self.markdown.htmlStash.store(checkbox, safe=True) + m.group('line')
-                c = li.attrib.get("class", "")
-                classes = [] if c == "" else c.split()
-                classes.append("task-list-item")
-                li.attrib["class"] = ' '.join(classes)
-                task_items.append(li)
+
+            # Checkbox found
+            c = li.attrib.get("class", "")
+            classes = [] if c == "" else c.split()
+            classes.append("task-list-item")
+            li.attrib["class"] = ' '.join(classes)
+            task_items.append(li)
+
         for li in task_items:
             parent = parent_map[li]
             c = parent.attrib.get("class", "")
