@@ -183,17 +183,18 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
 
     def on_post_save(self, view):
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
-        filetypes = settings.get('markdown_filetypes')
-        if filetypes and view.file_name().endswith(tuple(filetypes)):
-            temp_file = getTempMarkdownPreviewPath(view)
-            if os.path.isfile(temp_file):
-                # reexec markdown conversion
-                # todo : check if browser still opened and reopen it if needed
-                view.run_command('markdown_preview', {
-                    'target': 'disk',
-                    'parser': view.settings().get('parser')
-                })
-                sublime.status_message('Markdown preview file updated')
+        if settings.get('enable_autoreload', True):
+            filetypes = settings.get('markdown_filetypes')
+            if filetypes and view.file_name().endswith(tuple(filetypes)):
+                temp_file = getTempMarkdownPreviewPath(view)
+                if os.path.isfile(temp_file):
+                    # reexec markdown conversion
+                    # todo : check if browser still opened and reopen it if needed
+                    view.run_command('markdown_preview', {
+                        'target': 'disk',
+                        'parser': view.settings().get('parser')
+                    })
+                    sublime.status_message('Markdown preview file updated')
 
 
 class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
@@ -852,12 +853,14 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         html, body = compiler.run(self.view)
 
         if target in ['disk', 'browser']:
-            # check if LiveReload ST2 extension installed and add its script to the resulting HTML
-            livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
-            # build the html
-            if livereload_installed:
-                port = sublime.load_settings('LiveReload.sublime-settings').get('port', 35729)
-                html += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':%d/livereload.js?snipver=1"></\' + \'script>\')</script>' % port
+            # do not use LiveReload unless autoreload is enabled
+            if settings.get('enable_autoreload', True):
+                # check if LiveReload ST2 extension installed and add its script to the resulting HTML
+                livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
+                # build the html
+                if livereload_installed:
+                    port = sublime.load_settings('LiveReload.sublime-settings').get('port', 35729)
+                    html += '<script>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':%d/livereload.js?snipver=1"></\' + \'script>\')</script>' % port
             # update output html file
             tmp_fullpath = getTempMarkdownPreviewPath(self.view)
             save_utf8(tmp_fullpath, html)

@@ -138,6 +138,11 @@
     // "js": ["http://example.com/script.js", "/path/to/script.js"],
 
     /*
+        Enable or not whether parsed files will be auto-reloaded on save
+    */
+    "enable_autoreload": true,
+
+    /*
         Sets the supported filetypes for auto-reload on save
     */
     "markdown_filetypes": [".md", ".markdown", ".mdown"],
