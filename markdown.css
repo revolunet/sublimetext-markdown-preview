@@ -132,9 +132,8 @@ pre {
   padding: 10px;
 }
 
-pre code { border: 0 }
-
 code { padding: 0 3px 0 3px; }
+pre code { border: 0; padding: 0; }
 
 /* Admonition */
 div.admonition {
