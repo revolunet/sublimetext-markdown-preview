@@ -25,7 +25,7 @@
         - codehilite(guess_lang=False,pygments_style=github)
 ---
 test: This tests the meta extension
-title: This title will be overriden by YAML
+title: This title will be overridden by YAML
 
 !!! hint "Recommended Extentions for Testing"
     This is mainly used to test the Python Markdown parser.
