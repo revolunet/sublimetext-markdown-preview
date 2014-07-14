@@ -29,7 +29,11 @@ else:
 
 class StMarkdown(Markdown):
     def __init__(self, *args, **kwargs):
-        super(StMarkdown, self).__init__(*args, **kwargs)
+        if ST3:
+            super(StMarkdown, self).__init__(*args, **kwargs)
+        else:
+            Markdown.__init__(self, *args, **kwargs)
+        self.Meta = {}
 
     def registerExtensions(self, extensions, configs):
         """
@@ -110,22 +114,3 @@ class StMarkdown(Markdown):
                       "'%s': %s" % (ext_name, message)
             e.args = (message,) + e.args[1:]
             raise
-
-
-def markdown(text, *args, **kwargs):
-    """Convert a markdown string to HTML and return HTML as a unicode string.
-
-    This is a shortcut function for `Markdown` class to cover the most
-    basic use case.  It initializes an instance of Markdown, loads the
-    necessary extensions and runs the parser on the given text.
-
-    Keyword arguments:
-
-    * text: Markdown formatted text as Unicode or ASCII string.
-    * Any arguments accepted by the Markdown class.
-
-    Returns: An HTML document as a string.
-
-    """
-    md = StMarkdown(*args, **kwargs)
-    return md.convert(text)
