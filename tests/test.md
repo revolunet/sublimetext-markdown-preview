@@ -46,7 +46,7 @@ title: This title will be overridden by YAML
         - `sane_lists` will alter the results of the second test in [Mixed Lists](#mixed-lists). When turned off, this test will have all list items mixed and aligned proper.  With `sane_lists` on, some will not be recognized, and some items may be aligned in different lists.
         - having `guess_lang=False` allows the testing of the selective highlighting.  When omitted or set `true`, it can be expected that all of the blocks will be highlighted to some extent.
         - Most tests are spot checked at this point or a link can be clicked to verify it is working.
-        - base64 functionality isn't automatically tested because Markdown Preview is packaged as a zip and references a local image inside the zip is not possible.
+        - base64, absolute paths, and external resources require this to be in an unzipped sublime package environment.
 
 
 # Cheat Sheet and Test
@@ -180,7 +180,11 @@ Footnote, reference sources are provided in separate markdowns files specified i
 
 Footnotes[^1] have a label[^label] and a definition[^!DEF]
 
-![A Picture](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg "A Picture")
+Web image
+![Web Picture](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg "Web Picture")
+
+Local image
+![Local Picture](logo-revolunet-carre.jpg "Local Picture")
 
 contact@revolunet.com
 
@@ -202,7 +206,11 @@ With this link (https://github.com/revolunet/sublimetext-markdown-preview/), it 
 
 Footnotes[^1] have a label[^label] and a definition[^!DEF]
 
-![A Picture](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg "A Picture")
+Web image
+![Web Picture](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg "Web Picture")
+
+Local image
+![Local Picture](logo-revolunet-carre.jpg "Local Picture")
 
 www.google.com
 
