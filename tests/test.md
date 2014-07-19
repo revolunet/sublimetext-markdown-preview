@@ -5,6 +5,8 @@
         - abbreviations.md
         - footnotes.md
 
+    destination: destination.html
+
     # Meta Data
     title: Test Page
     author:
@@ -18,7 +20,7 @@
         - github
         - toc
         - headerid
-        - smarty
+        - smarty(smart_quotes=False) # smart quotes interferes with attr_list
         - meta
         - wikilinks
         - admonition

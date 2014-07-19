@@ -933,16 +933,20 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             sublime.set_clipboard(html)
             sublime.status_message('Markdown export copied to clipboard')
         elif target == 'save':
-            save_location = self.view.file_name()
-            if save_location is None or not os.path.exists(save_location):
-                # Save as...
-                v = new_view(self.view.window(), html)
-                if v is not None:
-                    v.run_command('save')
+            save_location = compiler.settings.get('builtin').get('destination', None)
+            if save_location is None:
+                save_location = self.view.file_name()
+                if save_location is None or not os.path.exists(save_location):
+                    # Save as...
+                    v = new_view(self.view.window(), html)
+                    if v is not None:
+                        v.run_command('save')
+                else:
+                    # Save
+                    htmlfile = os.path.splitext(save_location)[0] + '.html'
+                    save_utf8(htmlfile, html)
             else:
-                # Save
-                htmlfile = os.path.splitext(save_location)[0] + '.html'
-                save_utf8(htmlfile, html)
+                save_utf8(save_location, html)
 
     @classmethod
     def open_in_browser(cls, path, browser='default'):
@@ -1041,7 +1045,10 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         html, body = compiler.run(view, True)
 
-        htmlfile = os.path.splitext(mdfile)[0] + '.html'
+        htmlfile = compiler.settings.get('builtin').get('destination', None)
+
+        if htmlfile is None:
+            htmlfile = os.path.splitext(mdfile)[0] + '.html'
         self.puts("        ->" + htmlfile)
         save_utf8(htmlfile, html)
 

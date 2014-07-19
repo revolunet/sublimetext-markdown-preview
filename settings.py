@@ -3,7 +3,7 @@ import os
 import sys
 import re
 
-BUILTIN_KEYS = ('basepath', 'references')
+BUILTIN_KEYS = ('basepath', 'references', 'destination')
 
 
 class Settings(object):
@@ -119,6 +119,21 @@ class Settings(object):
                         if file_name is not None and not os.path.isdir(file_name):
                             refs.append(os.path.normpath(file_name))
                     self._overrides["builtin"][key] = refs
+                if key == "destination":
+                    if value is not None:
+                        file_name = value
+                        if file_name is not None:
+                            directory = os.path.dirname(file_name)
+                            directory = self.resolve_meta_path(directory)
+                        else:
+                            directory = None
+                        if directory is not None:
+                            file_name = os.path.join(directory, os.path.basename(file_name))
+                        if (
+                            file_name is not None and
+                            (not os.path.exists(file_name) or not os.path.isdir(file_name))
+                        ):
+                            self._overrides["builtin"][key] = file_name
             else:
                 if isinstance(value, list):
                     value = [str(v) for v in value]

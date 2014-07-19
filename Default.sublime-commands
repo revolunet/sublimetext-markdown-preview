@@ -14,7 +14,7 @@
         }
     },
     {
-        "caption": "Markdown Preview: Save to Source Directory",
+        "caption": "Markdown Preview: Save to HTML",
         "command": "markdown_preview_select",
         "args": {
             "target": "save"
