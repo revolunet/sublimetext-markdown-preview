@@ -121,10 +121,8 @@ pre, code, kbd, samp {
 }
 
 pre {
-  white-space: pre;
-  white-space: pre-wrap;
-  word-wrap: break-word;
   padding: 10px;
+  overflow: auto;
 }
 
 code { padding: 0 3px 0 3px; }
@@ -201,12 +199,13 @@ dt { font-weight: bold; font-style: italic;}
 dd { margin: 0 0 0 2em; }
 
 /* Tables */
-table { border-collapse: collapse; border: 1px solid #ddd; background-color: #fefefe; }
+table { width: 100%; border-collapse: collapse; overflow-x: auto; overflow-y: hidden; display: block;}
+table tr { background-color: #fefefe; }
 table tr:nth-child(2n) { background-color: #f8f8f8; }
 td, th { border: 1px solid #ddd; padding: 6px 13px; }
 
 /* Codehilite Tables */
-.codehilitetable { border: 0; border-spacing: 0; width: 100%; }
+.codehilitetable { border: 0; border-spacing: 0; }
 .linenos, .code, .codehilitetable td { border: 0; padding: 0; }
 td:not(.linenos) .linenodiv { padding: 0 !important; }
 .code { width: 100%; }
@@ -261,6 +260,7 @@ td:not(.linenos) .linenodiv { padding: 0 !important; }
   a[href]:after { content: " (" attr(href) ")"; }
   abbr[title]:after { content: " (" attr(title) ")"; }
   .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }
+  pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
   pre, blockquote { border: 1px solid #999; padding-right: 1em; page-break-inside: avoid; }
   tr, img { page-break-inside: avoid; }
   img { max-width: 100% !important; }
