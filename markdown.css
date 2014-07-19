@@ -109,13 +109,6 @@ blockquote {
 hr { display: block; height: 2px; border: 0; border-top: 1px solid #aaa;border-bottom: 1px solid #eee; margin: 1em 0; padding: 0; }
 
 /* Raw Blocks */
-span.backtick {
-  border:1px solid #EAEAEA;
-  border-radius:3px;
-  background:#F8F8F8;
-  padding:0 3px 0 3px;
-}
-
 pre, code, kbd, samp {
   color: #000;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
