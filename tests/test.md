@@ -523,6 +523,19 @@ da--sh
 
 elipsis...
 
+## Attribute List
+```
+Normal Text
+
+Modified Text
+{: style="font-weight:bold;" }
+```
+
+Normal Text
+
+Modified Text
+{: style="font-weight:bold;" }
+
 ## Admonition
 ```
 !!! Attention "Success!"
