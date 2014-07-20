@@ -29,10 +29,7 @@ else:
 
 class StMarkdown(Markdown):
     def __init__(self, *args, **kwargs):
-        if ST3:
-            super(StMarkdown, self).__init__(*args, **kwargs)
-        else:
-            Markdown.__init__(self, *args, **kwargs)
+        Markdown.__init__(self, *args, **kwargs)
         self.Meta = {}
 
     def registerExtensions(self, extensions, configs):
