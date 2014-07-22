@@ -84,6 +84,52 @@ If you add the codehilite extension manually in the enabled extensions, you can 
 
 See [codehilte page](https://pythonhosted.org/Markdown/extensions/code_hilite.html) for more info.
 
+### Meta Data Support
+When the `meta` extension is enabled (https://pythonhosted.org/Markdown/extensions/meta_data.html), the results will be written to the HTML head in the form `<meta name="key" content="value1,value2">`.  `title` is the one exception, and its content will be written to the title tag in the HTML head.
+
+### YAML Frontmatter Support
+YAML frontmatter can be stripped out and read when `strip_yaml_front_matter` is set to  `true` in the settings file.  In general the, the fronmatter is handled the same as [meta data](#meta-data-support), but if both exist in a file, the YAML keys will override the `meta` extension keys.  There are a few special keys names that won't be handled as html meta data.
+
+#### Special YAML Key Names
+Yaml frontmatter has a few special key names that are used that will not be handled as meta data:
+
+- **basepath**: An absolute path to configure the relative paths for images etc. (for when the markdown is supposed to reference images in a different location.)
+- **references**: Can take a file path or an array of file paths for separate markdown files containing references, footnotes, etc.  Can be an absolute path or relative path.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
+- **destination**: This is an absolute file path or relative file path for when the markdown is saved to html via the build command or the `Save to HTML` command.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
+- **settings**: This is a dictionary where you can override settings that are in the settings file.
+
+#### Example
+```yaml
+---
+    # Builtin values
+    references:
+        - references.md
+        - abbreviations.md
+        - footnotes.md
+
+    destination: destination.html
+
+    # Meta Data
+    title: Test Page
+    author:
+        - John Doe
+        - Jane Doe
+
+    # Settings overrides
+    settings:
+        enabled_extensions:
+        - extra
+        - github
+        - toc
+        - headerid
+        - smarty(smart_quotes=False) # smart quotes interferes with attr_list
+        - meta
+        - wikilinks
+        - admonition
+        - codehilite(guess_lang=False,pygments_style=github)
+---
+```
+
 ### Parsing Github Flavored Markdown :
 Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can actually handle them in a couple of ways: online and offline.
 

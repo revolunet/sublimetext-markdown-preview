@@ -10,6 +10,7 @@ import re
 import json
 import time
 import codecs
+import cgi
 
 
 def is_ST3():
@@ -18,7 +19,9 @@ def is_ST3():
 
 if is_ST3():
     from . import desktop
-    from . import markdown_wrapper as markdown
+    from . import yaml
+    from .settings import Settings
+    from .markdown_wrapper import StMarkdown as Markdown
     from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen
@@ -34,7 +37,9 @@ if is_ST3():
 
 else:
     import desktop
-    import markdown_wrapper as markdown
+    import yaml
+    from settings import Settings
+    from markdown_wrapper import StMarkdown as Markdown
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
@@ -124,6 +129,21 @@ def new_view(window, text, scratch=False):
         new_view.insert(new_edit, 0, text)
         new_view.end_edit(new_edit)
     return new_view
+
+
+def get_references(file_name, encoding="utf-8"):
+    """ Get footnote and general references from outside source """
+    text = ''
+    if file_name is not None:
+        if os.path.exists(file_name):
+            try:
+                with codecs.open(file_name, "r", encoding=encoding) as f:
+                    text = f.read()
+            except:
+                print(traceback.format_exc())
+        else:
+            print("Could not find reference file %s!", file_name)
+    return text
 
 
 class CriticDump(object):
@@ -297,11 +317,16 @@ class Compiler(object):
             if selection.strip() != '':
                 contents = selection
 
-        contents = self.parser_specific_preprocess(contents)
-
         # Remove yaml front matter
         if self.settings.get('strip_yaml_front_matter') and contents.startswith('---'):
-            contents = self.preprocessor_yaml_frontmatter(contents)
+            frontmatter, contents = self.preprocessor_yaml_frontmatter(contents)
+            self.settings.apply_frontmatter(frontmatter)
+
+        references = self.settings.get('builtin').get('references', [])
+        for ref in references:
+            contents += get_references(ref)
+
+        contents = self.parser_specific_preprocess(contents)
 
         return contents
 
@@ -309,13 +334,19 @@ class Compiler(object):
         return text
 
     def preprocessor_yaml_frontmatter(self, text):
-        title = ''
-        title_match = re.search('(?:title:)(.+)', text, flags=re.IGNORECASE)
-        if title_match:
-            stripped_title = title_match.group(1).strip()
-            title = '%s\n%s\n\n' % (stripped_title, '=' * len(stripped_title))
-        contents_without_front_matter = re.sub(r'(?s)^---.*?---\n', '', text)
-        return '%s%s' % (title, contents_without_front_matter)
+        """ Get frontmatter from string """
+        frontmatter = {}
+
+        if text.startswith("---"):
+            m = re.search(r'^(---(.*?)---\r?\n)', text, re.DOTALL)
+            if m:
+                try:
+                    frontmatter = yaml.load(m.group(2))
+                except:
+                    print(traceback.format_exc())
+                text = text[m.end(1):]
+
+        return frontmatter, text
 
     def parser_specific_postprocess(self, text):
         return text
@@ -372,10 +403,9 @@ class Compiler(object):
             import base64
             src = m.group('src')
             data = m.group('tag')
-            filename = self.view.file_name()
-            base_path = ""
-            if filename and os.path.exists(filename):
-                base_path = os.path.dirname(filename)
+            base_path = self.settings.get("basepath")
+            if base_path is None:
+                base_path = ""
 
             # Format the link
             absolute = False
@@ -491,15 +521,33 @@ class Compiler(object):
         return markdown_html
 
     def get_title(self):
-        title = self.view.name()
+        if self.meta_title is not None:
+            title = self.meta_title
+        else:
+            title = self.view.name()
         if not title:
             fn = self.view.file_name()
             title = 'untitled' if not fn else os.path.splitext(os.path.basename(fn))[0]
-        return '<title>%s</title>' % title
+        return '<title>%s</title>' % cgi.escape(title)
+
+    def get_meta(self):
+        self.meta_title = None
+        meta = []
+        for k, v in self.settings.get("meta", {}).items():
+            if k == "title":
+                self.meta_title = v
+                continue
+            if isinstance(v, list):
+                v = ','.join(v)
+            if v is not None:
+                meta.append(
+                    '<meta name="%s" content="%s">' % (cgi.escape(k, True), cgi.escape(v, True))
+                )
+        return '\n'.join(meta)
 
     def run(self, view, wholefile=False):
         ''' return full html and body html for view. '''
-        self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+        self.settings = Settings('MarkdownPreview.sublime-settings', view.file_name())
         self.view = view
 
         contents = self.get_contents(wholefile)
@@ -513,6 +561,7 @@ class Compiler(object):
             html = body
         elif html_template and os.path.exists(html_template):
             head = u''
+            head += self.get_meta()
             if not self.settings.get('skip_default_stylesheet'):
                 head += self.get_stylesheet()
             head += self.get_javascript()
@@ -526,6 +575,7 @@ class Compiler(object):
         else:
             html = u'<!DOCTYPE html>'
             html += '<html><head><meta charset="utf-8">'
+            html += self.get_meta()
             html += self.get_stylesheet()
             html += self.get_javascript()
             html += self.get_highlight()
@@ -768,10 +818,9 @@ class MarkdownCompiler(Compiler):
             self.pygments_style = "github"
 
         # Get the base path of source file if available
-        filename = self.view.file_name()
-        base_path = ""
-        if filename and os.path.exists(filename):
-            base_path = os.path.dirname(filename)
+        base_path = self.settings.get("basepath")
+        if base_path is None:
+            base_path = ""
 
         # Replace BASE_PATH keyword with the actual base_path
         return [e.replace("${BASE_PATH}", base_path) for e in extensions]
@@ -788,7 +837,11 @@ class MarkdownCompiler(Compiler):
     def parser_specific_convert(self, markdown_text):
         sublime.status_message('converting markdown with Python markdown...')
         config_extensions = self.get_config_extensions(DEFAULT_EXT)
-        return markdown.markdown(markdown_text, extensions=config_extensions)
+        md = Markdown(extensions=config_extensions)
+        html_text = md.convert(markdown_text)
+        # Retrieve the meta data returned from the "meta" extension
+        self.settings.add_meta(md.Meta)
+        return html_text
 
 
 class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
@@ -880,16 +933,20 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
             sublime.set_clipboard(html)
             sublime.status_message('Markdown export copied to clipboard')
         elif target == 'save':
-            save_location = self.view.file_name()
-            if save_location is None or not os.path.exists(save_location):
-                # Save as...
-                v = new_view(self.view.window(), html)
-                if v is not None:
-                    v.run_command('save')
+            save_location = compiler.settings.get('builtin').get('destination', None)
+            if save_location is None:
+                save_location = self.view.file_name()
+                if save_location is None or not os.path.exists(save_location):
+                    # Save as...
+                    v = new_view(self.view.window(), html)
+                    if v is not None:
+                        v.run_command('save')
+                else:
+                    # Save
+                    htmlfile = os.path.splitext(save_location)[0] + '.html'
+                    save_utf8(htmlfile, html)
             else:
-                # Save
-                htmlfile = os.path.splitext(save_location)[0] + '.html'
-                save_utf8(htmlfile, html)
+                save_utf8(save_location, html)
 
     @classmethod
     def open_in_browser(cls, path, browser='default'):
@@ -988,7 +1045,10 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         html, body = compiler.run(view, True)
 
-        htmlfile = os.path.splitext(mdfile)[0] + '.html'
+        htmlfile = compiler.settings.get('builtin').get('destination', None)
+
+        if htmlfile is None:
+            htmlfile = os.path.splitext(mdfile)[0] + '.html'
         self.puts("        ->" + htmlfile)
         save_utf8(htmlfile, html)
 
