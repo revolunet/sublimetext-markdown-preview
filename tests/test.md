@@ -20,7 +20,7 @@
         - github
         - toc
         - headerid
-        - smarty(smart_quotes=False) # smart quotes interferes with attr_list
+        - smarty
         - meta
         - wikilinks
         - admonition
