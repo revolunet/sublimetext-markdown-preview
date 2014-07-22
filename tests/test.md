@@ -20,7 +20,7 @@
         - github
         - toc
         - headerid
-        - smarty(smart_quotes=False) # smart quotes interferes with attr_list
+        - smarty
         - meta
         - wikilinks
         - admonition
@@ -45,7 +45,6 @@ title: This title will be overridden by YAML
     - codehilite(guess_lang=False,pygments_style=github)
 
     !!! Caution "Testing Note"
-        - `smart_quotes` is disabled in `smarty` becuase it conflicts with `attr_list` extension.
         - `sane_lists` will alter the results of the second test in [Mixed Lists](#mixed-lists). When turned off, this test will have all list items mixed and aligned proper.  With `sane_lists` on, some will not be recognized, and some items may be aligned in different lists.
         - having `guess_lang=False` allows the testing of the selective highlighting.  When omitted or set `true`, it can be expected that all of the blocks will be highlighted to some extent.
         - Most tests are spot checked at this point or a link can be clicked to verify it is working.
