@@ -29,7 +29,7 @@ class DeleteExtension(Extension):
 
     def extendMarkdown(self, md, md_globals):
         """Add support for <del>test</del> tags as ~~test~~"""
-
+        md.ESCAPED_CHARS.append('~')
         md.inlinePatterns.add("del", SimpleTagPattern(RE_DEL, "del"), "<not_strong")
 
 
