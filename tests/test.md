@@ -18,6 +18,8 @@
         enabled_extensions:
         - extra
         - github
+        - insert
+        - progressbar
         - toc
         - headerid
         - smarty
@@ -619,3 +621,86 @@ This is a test for emoji :smile:.  The emojis are images linked to github assets
 ### Symbols
 
 :100::1234::a::ab::abc::abcd::accept::aquarius::aries::arrow_backward::arrow_double_down::arrow_double_up::arrow_down::arrow_down_small::arrow_forward::arrow_heading_down::arrow_heading_up::arrow_left::arrow_lower_left::arrow_lower_right::arrow_right::arrow_right_hook::arrow_up::arrow_up_down::arrow_up_small::arrow_upper_left::arrow_upper_right::arrows_clockwise::arrows_counterclockwise::b::baby_symbol::back::baggage_claim::ballot_box_with_check::bangbang::black_circle::black_large_square::black_medium_small_square::black_medium_square::black_small_square::black_square_button::cancer::capital_abcd::capricorn::chart::children_crossing::cinema::cl::clock1::clock10::clock1030::clock11::clock1130::clock12::clock1230::clock130::clock2::clock230::clock3::clock330::clock4::clock430::clock5::clock530::clock6::clock630::clock7::clock730::clock8::clock830::clock9::clock930::congratulations::cool::copyright::curly_loop::currency_exchange::customs::diamond_shape_with_a_dot_inside::do_not_litter::eight::eight_pointed_black_star::eight_spoked_asterisk::end::fast_forward::five::four::free::gemini::hash::heart_decoration::heavy_check_mark::heavy_division_sign::heavy_dollar_sign::heavy_exclamation_mark::heavy_minus_sign::heavy_multiplication_x::heavy_plus_sign::id::ideograph_advantage::information_source::interrobang::keycap_ten::koko::large_blue_circle::large_blue_diamond::large_orange_diamond::left_luggage::left_right_arrow::leftwards_arrow_with_hook::leo::libra::link::m::mens::metro::mobile_phone_off::negative_squared_cross_mark::new::ng::nine::no_bicycles::no_entry::no_entry_sign::no_mobile_phones::no_pedestrians::no_smoking::non-potable_water::o::o2::ok::on::one::ophiuchus::parking::part_alternation_mark::passport_control::pisces::potable_water::put_litter_in_its_place::radio_button::recycle::red_circle::registered::repeat::repeat_one::restroom::rewind::sa::sagittarius::scorpius::secret::seven::shipit::signal_strength::six::six_pointed_star::small_blue_diamond::small_orange_diamond::small_red_triangle::small_red_triangle_down::soon::sos::symbols::taurus::three::tm::top::trident::twisted_rightwards_arrows::two::u5272::u5408::u55b6::u6307::u6708::u6709::u6e80::u7121::u7533::u7981::u7a7a::underage::up::vibration_mode::virgo::vs::wavy_dash::wc::wheelchair::white_check_mark::white_circle::white_flower::white_large_square::white_medium_small_square::white_medium_square::white_small_square::white_square_button::womens::x::zero:
+
+## Insert
+```
+^^insert^^
+
+^^*insert italic*^^  *^^insert italic 2^^*
+
+^^_insert italic_^^  _^^insert italic 2^^_
+
+^^**insert bold**^^  **^^insert bold 2^^**
+
+^^__insert bold__^^  __^^insert bold 2^^__
+
+^^***insert italic bold***^^  ***^^insert italic bold 2^^***
+
+^^___insert italic bold___^^  ___^^insert italic bold 2^^___
+
+**^^*insert italic bold*^^**  *^^**insert italic bold 2**^^*
+
+__^^_insert italic bold_^^__  _^^__insert italic bold 2__^^_
+
+**^^_insert italic bold_^^**  _^^**insert italic bold 2**^^_
+
+__^^*insert italic bold*^^__  *^^__insert italic bold 2__^^*
+```
+
+^^insert^^
+
+^^*insert italic*^^  *^^insert italic 2^^*
+
+^^_insert italic_^^  _^^insert italic 2^^_
+
+^^**insert bold**^^  **^^insert bold 2^^**
+
+^^__insert bold__^^  __^^insert bold 2^^__
+
+^^***insert italic bold***^^  ***^^insert italic bold 2^^***
+
+^^___insert italic bold___^^  ___^^insert italic bold 2^^___
+
+**^^*insert italic bold*^^**  *^^**insert italic bold 2**^^*
+
+__^^_insert italic bold_^^__  _^^__insert italic bold 2__^^_
+
+**^^_insert italic bold_^^**  _^^**insert italic bold 2**^^_
+
+__^^*insert italic bold*^^__  *^^__insert italic bold 2__^^*
+
+# Progress
+Progress bars are block elements and it is recommened to put a newline before and after.  But they will be recognized inline like in a table, but they will be on their own line.
+
+Normally you would just globally set your additional classes: `progressbar(addclasses=candystripe-animate)`, but here we want to test the inline class adding and inline control of level classes.
+
+To turn off level classes (which are used to decide special colors for certain percentages) you could just use `progressbar(levelclass=False)`.
+```
+| Test                      | Result                                          |
+|---------------------------|-------------------------------------------------|
+|Animated Color Levels: 0%  |[==0% "0%"]{addclasses="candystripe-animate"}    |
+|Animated Color Levels: 5%  |[==5% "5%"]{addclasses="candystripe-animate"}    |
+|Animated Color Levels: 25% |[==25% "25%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 45% |[==45% "45%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 65% |[==65% "65%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 85% |[==85% "85%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 100%|[==100% "100%"]{addclasses="candystripe-animate"}|
+|Division Percentage        |[== 212.2/537 "212.2/537 Testing division"]      |
+|No Label                   |[== 50%]                                         |
+|Inline                     |Before[== 50% I'm a block!]After                 |
+|No Levels and Gloss        |[== 50%]{levelclass="false" addclasses="gloss"}  |
+```
+
+| Test                      | Result                                          |
+|---------------------------|-------------------------------------------------|
+|Animated Color Levels: 0%  |[==0% "0%"]{addclasses="candystripe-animate"}    |
+|Animated Color Levels: 5%  |[==5% "5%"]{addclasses="candystripe-animate"}    |
+|Animated Color Levels: 25% |[==25% "25%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 45% |[==45% "45%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 65% |[==65% "65%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 85% |[==85% "85%"]{addclasses="candystripe-animate"}  |
+|Animated Color Levels: 100%|[==100% "100%"]{addclasses="candystripe-animate"}|
+|Division Percentage        |[== 212.2/537 "212.2/537 Testing division"]      |
+|No Label                   |[== 50%]                                         |
+|Inline                     |Before[== 50% I'm a block!]After                 |
+|No Levels and Gloss        |[== 50%]{levelclass="false" addclasses="gloss"}  |
