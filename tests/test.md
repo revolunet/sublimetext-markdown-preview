@@ -670,7 +670,7 @@ __^^_insert italic bold_^^__  _^^__insert italic bold 2__^^_
 __^^*insert italic bold*^^__  *^^__insert italic bold 2__^^*
 
 # Progress
-Progress bars are block elements and it is recommened to put a newline before and after.  But they will be recognized inline like in a table, but they will be on their own line.
+Progress bars are block elements and it is recommened to put a newline before and after.  But they will be recognized inline, but they will be on their own line.
 
 Normally you would just globally set your additional classes: `progressbar(addclasses=candystripe-animate)`, but here we want to test the inline class adding and inline control of level classes.
 
