@@ -266,7 +266,7 @@ pre code { border: 0; padding: 0; }
     inset -1px 1px 0px rgba(255, 255, 255, .5),
     inset 0 -4px 12px rgba(255, 255, 255, .7),
     inset 0 4px 12px rgba(255, 255, 255, .7),
-    inset 0 -12px 0px rgba(0, 0, 0, .025),
+    inset 0 -12px 0px rgba(0, 0, 0, .05),
     inset 1px -1px 0px rgba(255, 255, 255, .2);
 }
 
