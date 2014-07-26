@@ -1,9 +1,16 @@
+from __future__ import unicode_literals
 import sublime
 import os
 import sys
 import re
 
 BUILTIN_KEYS = ('basepath', 'references', 'destination')
+
+ST3 = int(sublime.version()) >= 3000
+if ST3:
+    unicode_str = str
+else:
+    unicode_str = unicode
 
 
 class Settings(object):
@@ -136,7 +143,7 @@ class Settings(object):
                             self._overrides["builtin"][key] = file_name
             else:
                 if isinstance(value, list):
-                    value = [str(v) for v in value]
+                    value = [unicode_str(v) for v in value]
                 else:
-                    value = str(value)
-                self._overrides["meta"][str(key)] = value
+                    value = unicode_str(value)
+                self._overrides["meta"][unicode_str(key)] = value
