@@ -535,7 +535,12 @@ class Compiler(object):
         meta = []
         for k, v in self.settings.get("meta", {}).items():
             if k == "title":
-                self.meta_title = v
+                if isinstance(v, list):
+                    if len(v) == 0:
+                        v = ""
+                    else:
+                        v = v[0]
+                self.meta_title = unicode_str(v)
                 continue
             if isinstance(v, list):
                 v = ','.join(v)
