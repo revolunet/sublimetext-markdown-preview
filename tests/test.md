@@ -26,6 +26,7 @@
         - meta
         - wikilinks
         - admonition
+        - admonitionicon
         - codehilite(guess_lang=False,pygments_style=github)
 ---
 test: This tests the meta extension
@@ -39,11 +40,12 @@ title: This title will be overridden by YAML
     - insert
     - toc
     - headerid
-    - smarty(smart_quotes=False)
+    - smarty
     - meta
-    - footnotes
     - wikilinks
+    - footnotes
     - admonition
+    - admonitionicon
     - codehilite(guess_lang=False,pygments_style=github)
 
     !!! Caution "Testing Note"
@@ -554,8 +556,11 @@ Modified Text
 !!! Danger "Alert!"
     You really need to read [this](#admonition)!
 
-!!! Note ""
-    This one has no `title`.
+!!! Question "Question?"
+    Are you serious?
+
+!!! Note "Note"
+    :smile:
 
     > Not all markup can be placed in these boxes, but you can fit all sorts of things in them. But you will notice that the styles don't always play nice with each other.  Additional CSS could fix this though.
 
@@ -566,6 +571,9 @@ Modified Text
     | Red           | *Apple*         | Pepper       |
     | ~~Orange~~    | Oranges         | **Carrot**   |
     | Green         | ~~***Pears***~~ | Spinach      |
+
+!!! Unknown "Title"
+    Default class style
 ```
 
 !!! Attention "Success!"
@@ -582,8 +590,11 @@ Modified Text
 !!! Danger "Alert!"
     You really need to read [this](#admonition)!
 
-!!! Note ""
-    This one has no `title` :smile:.
+!!! Question "Question?"
+    Are you serious?
+
+!!! Note "Note"
+    :smile:
 
     > Not all markup can be placed in these boxes, but you can fit all sorts of things in them. But you will notice that the styles don't always play nice with each other.  Additional CSS could fix this though.
 
@@ -594,6 +605,9 @@ Modified Text
     | Red           | *Apple*         | Pepper       |
     | ~~Orange~~    | Oranges         | **Carrot**   |
     | Green         | ~~***Pears***~~ | Spinach      |
+
+!!! Unknown "Title"
+    Default class style
 
 ## Github Emoji
 ```
