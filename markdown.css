@@ -222,11 +222,11 @@ pre code { border: 0; padding: 0; }
   box-shadow: inset 0 1px 0px rgba(255, 255, 255, .5);
   background-size: 30px 30px;
   background-image: -webkit-linear-gradient(
-    135deg, rgba(255, 255, 255, .4) 27%,
-    transparent 27%,
+    135deg,
+    rgba(255, 255, 255, .4) 27%, transparent 27%,
     transparent 53%, rgba(255, 255, 255, .4) 53%,
-    rgba(255, 255, 255, .4) 77%,
-    transparent 77%, transparent
+    rgba(255, 255, 255, .4) 77%, transparent 77%,
+    transparent
   );
   background-image: -moz-linear-gradient(
     135deg,
