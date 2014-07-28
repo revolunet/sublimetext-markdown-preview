@@ -124,7 +124,7 @@ class ProgressBarPattern(Pattern):
         classes = list(
             set(
                 ["progress"] +
-                self.config.get('add_classes', '').split() +
+                self.config.get('addclasses', '').split() +
                 add_classes
             )
         )
