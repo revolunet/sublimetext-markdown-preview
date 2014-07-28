@@ -25,7 +25,7 @@ class AdmonitionIconTreeprocessor(Treeprocessor):
 
     def run(self, root):
         """ Add admontion icon """
-        for tag in root.iter("div"):
+        for tag in root.getiterator("div"):
             classes = tag.attrib.get("class", "").split()
             if "admonition" in classes:
                 span = etree.Element('span')
