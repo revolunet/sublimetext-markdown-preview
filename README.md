@@ -25,12 +25,15 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - Strip out multimarkdown critic marks (see [settings][settings] file for more info)
  - 3rd party extensions for the Python Markdown parser:
  	- **magiclink**: Automatic conversion of http or ftp links to html links.
- 	- **delete**: Surround inline text with double `~~word~~` show text ~~crossed out~~.
+ 	- **delete**: Surround inline text with `~~crossed out~~` to get del tags ~~crossed out~~.
+    - **insert**: Surround inline text with `^^underlined^^` to get ins tags <ins>underlined</ins>
  	- **tasklist**: Support for github like tasklists using the following notation: `- [X] Completed Task`.
  	- **githubemoji**: Support for github emojis (`:smile:` --> :smile:). Converts to HTML images that use github's actual emoji assets.
  	- **b64**: Convert and embed images in the HTML as base64 by adding the extension as `b64(base_path=${BASE_PATH})` (recently a global b64 that works on all parsers was added; see [settings][settings] file for more info).
  	- **headeranchor**: Adds support for github style anchor links preceding headers.
  	- **github**: A convenience extension to add: `magiclink`, `delete`, `tasklist`, `githubemoji`, `headeranchor`, and `nl2br` to parse and display GFM in a github-ish way.  It is recommed to pair `github` with `extra` and `codehilite` (with language guessing off) to parse close to github's way.
+    - **admonitionicon**: Add font icon to admonition blocks.  Default CSS uses [font awesome](http://fortawesome.github.io/Font-Awesome/)
+    - **progressbar**: Create progress bars.  See [Using Progress Bars](#using-progress-bars) for more info.
 
 ## Installation :
 
@@ -129,6 +132,28 @@ Yaml frontmatter has a few special key names that are used that will not be hand
         - codehilite(guess_lang=False,pygments_style=github)
 ---
 ```
+
+### Using Progress Bars
+Create a progress bar with the following notations:
+
+- Percentage: `[== 35% optional label]`
+- Division: `[== 37.5/500 optional label]`
+
+Though progress bars will be recognized inline, they should be displayed as block; they should be used as block items except were not possible (tables etc.).  In general it is best to have an empty line before and after a progress bar.
+
+```
+Some text
+
+[== 25% progress bar]
+
+Some more text
+```
+
+Default styling is a flat candy-striped  bar, but there is included CSS for animated candy-stripping and a glossy bar.  You can access one or more of these additional stylings by adding the classes when enabling the extension `progressbar(addclasses=candystripe-animate gloss)`.
+
+Also by default, the progress bar extension adds classes to allow for different stylings of percent levels: 0-20%, 21-40%, 41-60%, 61-80%, 80-99%, 100%.  This can be turned off by defining the extension as `progressbar(levelclass=False)`.  When level classes are disabled, the default color is blue.
+
+Additionally, you can change the settings with this inline notation as well `[==50%  MyLabel]{addclasses="additional classes" levelclass="false"}`.
 
 ### Parsing Github Flavored Markdown :
 Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can actually handle them in a couple of ways: online and offline.
