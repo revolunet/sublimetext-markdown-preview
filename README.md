@@ -133,7 +133,7 @@ Yaml frontmatter has a few special key names that are used that will not be hand
 ---
 ```
 
-### Using Progress Bars :
+### Using Progress Bars
 Create a progress bar with the following notations:
 
 - Percentage: `[== 35% optional label]`
