@@ -20,7 +20,7 @@ def is_ST3():
 if is_ST3():
     from . import desktop
     from . import yaml
-    from .settings import Settings
+    from .markdown_settings import Settings
     from .markdown_wrapper import StMarkdown as Markdown
     from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
@@ -38,7 +38,7 @@ if is_ST3():
 else:
     import desktop
     import yaml
-    from settings import Settings
+    from markdown_settings import Settings
     from markdown_wrapper import StMarkdown as Markdown
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
