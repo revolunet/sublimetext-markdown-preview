@@ -98,6 +98,8 @@ New paragraph.
 ```
 `inline block`
 
+<kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>del</kbd>
+
 **bold 1** and __bold 2__
 
 *italic 1*  and _italic 2_
@@ -139,6 +141,8 @@ __~~*strike italic 1 bold 2*~~__ and *~~__strike italic 1 bold 2__~~*
 ```
 
 `inline block`
+
+<kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>del</kbd>
 
 **bold 1** and __bold 2__
 

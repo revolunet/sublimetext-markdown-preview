@@ -587,7 +587,9 @@ class Compiler(object):
             html += self.get_mathjax()
             html += self.get_title()
             html += '</head><body>'
+            html += '<article class="markdown-body">'
             html += body
+            html += '</article>'
             html += '</body>'
             html += '</html>'
 
