@@ -26,7 +26,6 @@
         - meta
         - wikilinks
         - admonition
-        - admonitionicon
         - codehilite(guess_lang=False,pygments_style=github)
 ---
 test: This tests the meta extension
@@ -45,7 +44,6 @@ title: This title will be overridden by YAML
     - wikilinks
     - footnotes
     - admonition
-    - admonitionicon
     - codehilite(guess_lang=False,pygments_style=github)
 
     !!! Caution "Testing Note"
