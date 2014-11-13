@@ -688,35 +688,35 @@ __^^*insert italic bold*^^__  *^^__insert italic bold 2__^^*
 # Progress
 Progress bars are block elements and it is recommened to put a newline before and after.  But they will be recognized inline, but they will be on their own line.
 
-Normally you would just globally set your additional classes: `progressbar(addclasses=candystripe-animate)`, but here we want to test the inline class adding and inline control of level classes.
+Normally you would just globally set your additional classes: `progressbar(add_classes=candystripe-animate)`, but here we will demonstrate that it works with the `attr_list` extension.  It will take inline style.
 
-To turn off level classes (which are used to decide special colors for certain percentages) you could just use `progressbar(levelclass=False)`.
+To turn off level classes (which are used to decide special colors for certain percentages) you could just use `progressbar(level_class=False)`.
 ```
-| Test                      | Result                                          |
-|---------------------------|-------------------------------------------------|
-|Animated Color Levels: 0%  |[==0% "0%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 5%  |[==5% "5%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 25% |[==25% "25%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 45% |[==45% "45%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 65% |[==65% "65%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 85% |[==85% "85%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 100%|[==100% "100%"]{addclasses="candystripe-animate"}|
-|Division Percentage        |[== 212.2/537 "212.2/537 Testing division"]      |
-|No Label                   |[== 50%]                                         |
-|Inline                     |Before[== 50% I'm a block!]After                 |
-|No Levels and Gloss        |[== 50%]{levelclass="false" addclasses="gloss"}  |
+| Test               | Result                                        |
+|--------------------|-----------------------------------------------|
+|Animated: 0%        |[=0% "0%"]{: .candystripe-animate}             |
+|Animated: 5%        |[=5% "5%"]{: .candystripe-animate}             |
+|Animated: 25%       |[=25% "25%"]{: .candystripe-animate}           |
+|Animated: 45%       |[=45% "45%"]{: .candystripe-animate}           |
+|Animated: 65%       |[=65% "65%"]{: .candystripe-animate}           |
+|Animated: 85%       |[=85% "85%"]{: .candystripe-animate}           |
+|Animated: 100%      |[=100% "100%"]{: .candystripe-animate}         |
+|Division Percentage |[= 212.2/537 "212.2/537 Testing division"]     |
+|No Label            |[= 50%]                                        |
+|Inline              |Before[= 50% "I'm a block!"]After              |
+|Gloss and Animated  |[= 50% "Gloss"]{: .candystripe-animate .gloss} |
 ```
 
-| Test                      | Result                                          |
-|---------------------------|-------------------------------------------------|
-|Animated Color Levels: 0%  |[==0% "0%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 5%  |[==5% "5%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 25% |[==25% "25%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 45% |[==45% "45%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 65% |[==65% "65%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 85% |[==85% "85%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 100%|[==100% "100%"]{addclasses="candystripe-animate"}|
-|Division Percentage        |[== 212.2/537 "212.2/537 Testing division"]      |
-|No Label                   |[== 50%]                                         |
-|Inline                     |Before[== 50% I'm a block!]After                 |
-|No Levels and Gloss        |[== 50%]{levelclass="false" addclasses="gloss"}  |
+| Test               | Result                                        |
+|--------------------|-----------------------------------------------|
+|Animated: 0%        |[=0% "0%"]{: .candystripe-animate}             |
+|Animated: 5%        |[=5% "5%"]{: .candystripe-animate}             |
+|Animated: 25%       |[=25% "25%"]{: .candystripe-animate}           |
+|Animated: 45%       |[=45% "45%"]{: .candystripe-animate}           |
+|Animated: 65%       |[=65% "65%"]{: .candystripe-animate}           |
+|Animated: 85%       |[=85% "85%"]{: .candystripe-animate}           |
+|Animated: 100%      |[=100% "100%"]{: .candystripe-animate}         |
+|Division Percentage |[= 212.2/537 "212.2/537 Testing division"]     |
+|No Label            |[= 50%]                                        |
+|Inline              |Before[= 50% "I'm a block!"]After              |
+|Gloss and Animated  |[= 50% "Gloss"]{: .candystripe-animate .gloss} |
