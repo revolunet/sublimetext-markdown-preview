@@ -26,7 +26,7 @@ if is_ST3():
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
-    from urllib.parse import quote
+    from urllib.parse import quote, unquote
 
     def Request(url, data, headers):
         ''' Adapter for urllib2 used in ST2 '''
@@ -43,7 +43,7 @@ else:
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
-    from urllib import quote
+    from urllib import quote, unquote
 
     unicode_str = unicode
 
@@ -388,10 +388,9 @@ class Compiler(object):
         ''' convert resources (currently images only) to base64 '''
 
         file_types = {
-            ".png": "image/png",
-            ".jpg": "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".gif": "image/gif"
+            (".png",): "image/png",
+            (".jpg", ".jpeg"): "image/jpeg",
+            (".gif",): "image/gif"
         }
 
         exclusion_list = tuple(
@@ -401,8 +400,8 @@ class Compiler(object):
 
         def b64(m):
             import base64
-            src = m.group('src')
-            data = m.group('tag')
+            src = unquote(m.group('path')[1:-1])
+            data = m.group(0)
             base_path = self.settings.get("basepath")
             if base_path is None:
                 base_path = ""
@@ -426,78 +425,89 @@ class Compiler(object):
 
                 if os.path.exists(src):
                     ext = os.path.splitext(src)[1].lower()
-                    if ext in file_types:
-                        try:
-                            with open(src, "rb") as f:
-                                data = m.group('begin') + "data:%s;base64,%s" % (
-                                    file_types[ext],
-                                    base64.b64encode(f.read()).decode('ascii')
-                                ) + m.group('end')
-                        except Exception:
-                            pass
+                    for b64_ext in file_types:
+                        if ext in b64_ext:
+                            try:
+                                with open(src, "rb") as f:
+                                    data = " src=\"data:%s;base64,%s\"" % (
+                                        file_types[b64_ext],
+                                        base64.b64encode(f.read()).decode('ascii')
+                                    )
+                            except Exception:
+                                pass
+                            break
             return data
+
+        def repl(m):
+            if m.group('comments'):
+                tag = m.group('comments')
+            else:
+                tag = m.group('open')
+                tag += RE_TAG_LINK_ATTR.sub(lambda m2: b64(m2), m.group('attr'))
+                tag += m.group('close')
+            return tag
+
         RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
-        RE_SOURCES = re.compile(r"""(?P<tag>(?P<begin><(?:img)[^>]+(?:src)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""")
-        return RE_SOURCES.sub(b64, html)
+        RE_TAG_HTML = re.compile(
+            r'''(?xus)
+            (?:
+                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+                (?P<open><(?P<tag>img))
+                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+                (?P<close>\s*(?:\/?)>)
+            )
+            '''
+        )
+        RE_TAG_LINK_ATTR = re.compile(
+            r'''(?xus)
+            (?P<attr>
+                (?:
+                    (?P<name>\s+src\s*=\s*)
+                    (?P<path>"[^"]*"|'[^']*')
+                )
+            )
+            '''
+        )
+        return RE_TAG_HTML.sub(repl, html)
 
     def postprocessor_simple(self, html):
         ''' Strip out ids and classes for a simplified HTML output '''
-        def strip_html(m):
-            tag = m.group('open')
-            if m.group('attr1'):
-                tag += m.group('attr1')
-            if m.group('attr2'):
-                tag += m.group('attr2')
-            if m.group('attr3'):
-                tag += m.group('attr3')
-            if m.group('attr4'):
-                tag += m.group('attr4')
-            if m.group('attr5'):
-                tag += m.group('attr5')
-            if m.group('attr6'):
-                tag += m.group('attr6')
-            tag += m.group('close')
+
+        def repl(m):
+            if m.group('comments'):
+                tag = ''
+            else:
+                tag = m.group('open')
+                tag += RE_TAG_BAD_ATTR.sub('', m.group('attr'))
+                tag += m.group('close')
             return tag
 
-        # Strip out id, class and style attributes for a simple html output
-        # Since we are stripping out two attributes, we need to set up the groups in such
-        # a way so we can retrieve the data we don't want to throw away
-        # up to these worst case scenarios:
-        #
-        # <tag attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""...>
-        # <tag (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""...>
-        STRIP_HTML = re.compile(
-            r'''
-                (?P<open><[\w\:\.\-]+)                                                      # Tag open
-                (?:
-                    (?P<attr1>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target1>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )
-                (?:
-                    (?P<attr2>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target2>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr3>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target3>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr4>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target4>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr5>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target5>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr6>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target6>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?P<close>\s*(?:\/?)>)                                                      # Tag end
+        # Strip out id, class, on<word>, and style attributes for a simple html output
+        RE_TAG_HTML = re.compile(
+            r'''(?x)
+            (?:
+                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+                (?P<open><[\w\:\.\-]+)
+                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+                (?P<close>\s*(?:\/?)>)
+            )
             ''',
-            re.MULTILINE | re.DOTALL | re.VERBOSE
+            re.DOTALL | re.UNICODE
         )
-        return STRIP_HTML.sub(strip_html, html)
+
+        RE_TAG_BAD_ATTR = re.compile(
+            r'''(?x)
+            (?P<attr>
+                (?:
+                    \s+(?:id|class|style|on[\w]+)
+                    (?:\s*=\s*(?:"[^"]*"|'[^']*'))
+                )*
+            )
+            ''',
+            re.DOTALL | re.UNICODE
+        )
+
+        return RE_TAG_HTML.sub(repl, html)
 
     def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
