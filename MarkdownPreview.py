@@ -304,6 +304,14 @@ class Compiler(object):
             return load_resource('mathjax.html')
         return ''
 
+    def get_uml(self):
+        ''' return the uml scripts if enabled '''
+
+        if self.settings.get('enable_uml') is True:
+            flow = load_resource('flowchart-min.js')
+            return load_resource('uml.html').replace('{{ flowchart }}', flow, 1)
+        return ''
+
     def get_highlight(self):
         return ''
 
@@ -582,6 +590,7 @@ class Compiler(object):
             head += self.get_javascript()
             head += self.get_highlight()
             head += self.get_mathjax()
+            head += self.get_uml()
             head += self.get_title()
 
             html = load_utf8(html_template)
@@ -595,6 +604,7 @@ class Compiler(object):
             html += self.get_javascript()
             html += self.get_highlight()
             html += self.get_mathjax()
+            html += self.get_uml()
             html += self.get_title()
             html += '</head><body>'
             html += '<article class="markdown-body">'

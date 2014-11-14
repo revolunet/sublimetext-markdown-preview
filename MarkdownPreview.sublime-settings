@@ -47,6 +47,11 @@
     "enable_mathjax": false,
 
     /*
+        Enable uml support scripts: flowchart.js and sequence-diagram.js.
+    */
+    "enable_uml": false,
+
+    /*
         Pygments support for syntax highlighting.
     */
     "enable_highlight": false,
