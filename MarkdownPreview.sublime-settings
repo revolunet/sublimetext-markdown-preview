@@ -52,9 +52,16 @@
     "enable_uml": false,
 
     /*
-        Pygments support for syntax highlighting.
+        Enable highlighting. This enables codehilite extension if not already enabled.
     */
     "enable_highlight": false,
+
+    /*
+        Pygments support for syntax highlighting.  Controls whether codehilite extension
+        will use Pygments.  If disabled, code blocks will be formatted for javascript
+        highighters such as highlight.js.
+    */
+    "enable_pygments": true,
 
     /*
         List of enabled extensions of the selected markdown parser.

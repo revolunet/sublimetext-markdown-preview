@@ -17,6 +17,7 @@ def is_ST3():
     ''' check if ST3 based on python version '''
     return sys.version_info >= (3, 0)
 
+
 if is_ST3():
     from . import desktop
     from . import yaml
@@ -27,6 +28,12 @@ if is_ST3():
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
     from urllib.parse import quote, unquote
+    from .markdown.extensions import codehilite
+    try:
+        # from pygments.styles import get_style_by_name
+        PYGMENTS_AVAILABLE = codehilite.pygments
+    except:
+        PYGMENTS_AVAILABLE = False
 
     def Request(url, data, headers):
         ''' Adapter for urllib2 used in ST2 '''
@@ -44,6 +51,12 @@ else:
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
     from urllib import quote, unquote
+    import markdown.extensions.codehilite as codehilite
+    try:
+        # from pygments.styles import get_style_by_name
+        PYGMENTS_AVAILABLE = codehilite.pygments
+    except:
+        PYGMENTS_AVAILABLE = False
 
     unicode_str = unicode
 
@@ -811,6 +824,15 @@ class MarkdownCompiler(Compiler):
         # and if so, read what the desired color scheme to use is
         self.pygments_style = None
         self.noclasses = False
+
+        use_pygments = self.settings.get('enable_pygments', True)
+        if use_pygments and not PYGMENTS_AVAILABLE:
+            use_pygments = False
+        if use_pygments:
+            codehilite.pygments = True
+        else:
+            codehilite.pygments = False
+
         count = 0
         for e in extensions:
             if e.startswith("codehilite"):
@@ -843,6 +865,9 @@ class MarkdownCompiler(Compiler):
             guess_lang = str(bool(self.settings.get("guess_language", True)))
             extensions.append("codehilite(guess_lang=%s,pygments_style=github)" % guess_lang)
             self.pygments_style = "github"
+
+        if not use_pygments:
+            self.pygments_style = None
 
         # Get the base path of source file if available
         base_path = self.settings.get("basepath")
