@@ -25,9 +25,9 @@ if is_ST3():
     from .markdown_wrapper import StMarkdown as Markdown
     from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
-    from urllib.request import urlopen
+    from urllib.request import urlopen, url2pathname, pathname2url
     from urllib.error import HTTPError, URLError
-    from urllib.parse import quote, unquote
+    from urllib.parse import quote
     from .markdown.extensions import codehilite
     try:
         # from pygments.styles import get_style_by_name
@@ -50,7 +50,7 @@ else:
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
-    from urllib import quote, unquote
+    from urllib import quote, url2pathname, pathname2url
     import markdown.extensions.codehilite as codehilite
     try:
         # from pygments.styles import get_style_by_name
@@ -61,12 +61,20 @@ else:
     unicode_str = unicode
 
 _CANNOT_CONVERT = u'cannot convert markdown'
-ABS_EXCLUDE = tuple(
+
+PATH_EXCLUDE = tuple(
     [
         'file://', 'https://', 'http://', '/', '#',
         "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
     ] + ['\\'] if sys.platform.startswith('win') else []
 )
+
+ABS_EXCLUDE = tuple(
+    [
+        'file://', '/'
+    ] + (['\\'] if sys.platform.startswith('win') else [])
+)
+
 DEFAULT_EXT = [
     "extra", "github", "toc", "headerid",
     "meta", "sane_lists", "smarty", "wikilinks",
@@ -372,38 +380,167 @@ class Compiler(object):
     def parser_specific_postprocess(self, text):
         return text
 
-    def postprocessor_absolute(self, html, image_convert, file_convert):
-        ''' fix relative paths in images, scripts, and links for the internal parser '''
-        def tag_fix(m):
-            tag = m.group('tag')
-            src = m.group('src')
-            filename = self.view.file_name()
-            if filename:
-                if (
-                    not src.startswith(ABS_EXCLUDE) and
-                    not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None)
-                ):
-                    # Don't explicitly add file:// prefix,
-                    # But don't remove them either
-                    abs_path = u'%s/%s' % (os.path.dirname(filename), src)
-                    # Don't replace just the first instance,
-                    # but explicitly place it where it was before
-                    # to ensure a file name 'img' dosen't replace
-                    # the tag name etc.
-                    if os.path.exists(abs_path):
-                        tag = m.group('begin') + abs_path + m.group('end')
-            return tag
-        # Compile the appropriate regex to find images and/or files
+    def postprocessor_relative(self, html, image_convert, file_convert):
         RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+        RE_TAG_HTML = r'''(?xus)
+            (?:
+                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+                (?P<open><(?P<tag>(?:%s)))
+                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+                (?P<close>\s*(?:\/?)>)
+            )
+            '''
+
+        RE_TAG_LINK_ATTR = re.compile(
+            r'''(?xus)
+            (?P<attr>
+                (?:
+                    (?P<name>\s+(?:href|src)\s*=\s*)
+                    (?P<path>"[^"]*"|'[^']*')
+                )
+            )
+            '''
+        )
         RE_SOURCES = re.compile(
-            r"""(?P<tag>(?P<begin><(?:%s%s%s)[^>]+(?:src%s)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""" % (
-                r"img" if image_convert else "",
-                r"|" if image_convert and file_convert else "",
-                r"script|a" if file_convert else "",
-                r"|href" if file_convert else ""
+            RE_TAG_HTML % (
+                (r"img" if image_convert else "") +
+                (r"|" if image_convert and file_convert else "") +
+                (r"script|a|link" if file_convert else "")
             )
         )
-        return RE_SOURCES.sub(tag_fix, html)
+
+        def repl_relative(m, base_path, relative_path):
+            """ Replace path with relative path """
+
+            path = url2pathname(m.group('path')[1:-1])
+            link = m.group(0)
+            convert = False
+            abs_path = None
+
+            if (not path.startswith(PATH_EXCLUDE)):
+                abs_path = path
+                if (
+                    not path.startswith(ABS_EXCLUDE) and
+                    not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(path) is not None)
+                ):
+                    # Convert current relative path to absolute
+                    absolute = os.path.normpath(os.path.join(base_path, path))
+                    if os.path.exists(absolute):
+                        abs_path = absolute.replace("\\", "/")
+                    else:
+                        return link
+                else:
+                    # Strip 'file://'
+                    if path.startswith('file://'):
+                        abs_path = path.replace('file://', '', 1)
+                    else:
+                        abs_path = path
+                if (sublime.platform() == "windows"):
+                    # Make sure basepath starts with same drive location as target
+                    # If they don't match, we will stay with absolute path.
+                    if (base_path.startswith('//') and base_path.startswith('//')):
+                        convert = True
+                    else:
+                        base_drive = RE_WIN_DRIVE.match(base_path)
+                        path_drive = RE_WIN_DRIVE.match(abs_path)
+                        if (
+                            (base_drive and path_drive) and
+                            base_drive.group('drive').lower() == path_drive.group('drive').lower()
+                        ):
+                            convert = True
+                else:
+                    # OSX and Linux
+                    convert = True
+
+                if convert:
+                    # Convert path relative to the base path
+                    link = m.group('name') + "\"" + pathname2url(os.path.relpath(abs_path, relative_path).replace('\\', '/')) + "\""
+                else:
+                    # We have an absolute path, but we can't make it relative
+                    # to base path, so we will just use the absolute.
+                    link = m.group('name') + "\"" + pathname2url(abs_path) + "\""
+
+            return link
+
+        def repl(m, base_path, rel_path=None):
+            if m.group('comments'):
+                tag = m.group('comments')
+            else:
+                tag = m.group('open')
+                tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_relative(m2, base_path, rel_path), m.group('attr'))
+                tag += m.group('close')
+            return tag
+
+        basepath = self.settings.get('builtin').get("basepath")
+        if basepath is None:
+            basepath = ""
+        # TODO - This must be calculated
+        # May require re-working of other parts of the code
+        relativepath = ''
+
+        return RE_SOURCES.sub(lambda m: repl(m, basepath, relativepath), html)
+
+    def postprocessor_absolute(self, html, image_convert, file_convert):
+        ''' fix relative paths in images, scripts, and links for the internal parser '''
+
+        # Compile the appropriate regex to find images and/or files
+        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+        RE_TAG_HTML = r'''(?xus)
+            (?:
+                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+                (?P<open><(?P<tag>(?:%s)))
+                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+                (?P<close>\s*(?:\/?)>)
+            )
+            '''
+
+        RE_TAG_LINK_ATTR = re.compile(
+            r'''(?xus)
+            (?P<attr>
+                (?:
+                    (?P<name>\s+(?:href|src)\s*=\s*)
+                    (?P<path>"[^"]*"|'[^']*')
+                )
+            )
+            '''
+        )
+        RE_SOURCES = re.compile(
+            RE_TAG_HTML % (
+                (r"img" if image_convert else "") +
+                (r"|" if image_convert and file_convert else "") +
+                (r"script|a|link" if file_convert else "")
+            )
+        )
+
+        def repl_absolute(m, base_path):
+            """ Replace path with absolute path """
+
+            path = url2pathname(m.group('path')[1:-1])
+            link = m.group(0)
+
+            if (
+                not path.startswith(PATH_EXCLUDE) and
+                not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(path) is not None)
+            ):
+                absolute = os.path.normpath(os.path.join(base_path, path))
+                if os.path.exists(absolute):
+                    link = m.group('name') + "\"" + pathname2url(absolute.replace("\\", "/")) + "\""
+            return link
+
+        def repl(m, base_path):
+            if m.group('comments'):
+                tag = m.group('comments')
+            else:
+                tag = m.group('open')
+                tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_absolute(m2, base_path), m.group('attr'))
+                tag += m.group('close')
+            return tag
+
+        basepath = self.settings.get('builtin').get("basepath")
+        if basepath is None:
+            basepath = ""
+
+        return RE_SOURCES.sub(lambda m: repl(m, basepath), html)
 
     def postprocessor_base64(self, html):
         ''' convert resources (currently images only) to base64 '''
@@ -419,11 +556,33 @@ class Compiler(object):
             ["data:%s;base64," % ft for ft in file_types.values()]
         )
 
+        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+        RE_TAG_HTML = re.compile(
+            r'''(?xus)
+            (?:
+                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+                (?P<open><(?P<tag>img))
+                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+                (?P<close>\s*(?:\/?)>)
+            )
+            '''
+        )
+        RE_TAG_LINK_ATTR = re.compile(
+            r'''(?xus)
+            (?P<attr>
+                (?:
+                    (?P<name>\s+src\s*=\s*)
+                    (?P<path>"[^"]*"|'[^']*')
+                )
+            )
+            '''
+        )
+
         def b64(m):
             import base64
             src = unquote(m.group('path')[1:-1])
             data = m.group(0)
-            base_path = self.settings.get("basepath")
+            base_path = self.settings.get('builtin').get("basepath")
             if base_path is None:
                 base_path = ""
 
@@ -468,27 +627,6 @@ class Compiler(object):
                 tag += m.group('close')
             return tag
 
-        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
-        RE_TAG_HTML = re.compile(
-            r'''(?xus)
-            (?:
-                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
-                (?P<open><(?P<tag>img))
-                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
-                (?P<close>\s*(?:\/?)>)
-            )
-            '''
-        )
-        RE_TAG_LINK_ATTR = re.compile(
-            r'''(?xus)
-            (?P<attr>
-                (?:
-                    (?P<name>\s+src\s*=\s*)
-                    (?P<path>"[^"]*"|'[^']*')
-                )
-            )
-            '''
-        )
         return RE_TAG_HTML.sub(repl, html)
 
     def postprocessor_simple(self, html):
@@ -542,6 +680,9 @@ class Compiler(object):
 
         if "absolute" in (image_convert, file_convert):
             markdown_html = self.postprocessor_absolute(markdown_html, image_convert, file_convert)
+
+        if "relative" in (image_convert, file_convert):
+            markdown_html = self.postprocessor_relative(markdown_html, image_convert, file_convert)
 
         if image_convert == "base64":
             markdown_html = self.postprocessor_base64(markdown_html)
@@ -870,7 +1011,7 @@ class MarkdownCompiler(Compiler):
             self.pygments_style = None
 
         # Get the base path of source file if available
-        base_path = self.settings.get("basepath")
+        base_path = self.settings.get('builtin').get("basepath")
         if base_path is None:
             base_path = ""
 
