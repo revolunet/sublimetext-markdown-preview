@@ -580,7 +580,7 @@ class Compiler(object):
 
         def b64(m):
             import base64
-            src = unquote(m.group('path')[1:-1])
+            src = url2pathname(m.group('path')[1:-1])
             data = m.group(0)
             base_path = self.settings.get('builtin').get("basepath")
             if base_path is None:
