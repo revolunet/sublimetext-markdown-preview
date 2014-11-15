@@ -474,11 +474,22 @@ class Compiler(object):
         basepath = self.settings.get('builtin').get("basepath")
         if basepath is None:
             basepath = ""
-        # TODO - This must be calculated
-        # May require re-working of other parts of the code
-        relativepath = ''
 
-        return RE_SOURCES.sub(lambda m: repl(m, basepath, relativepath), html)
+        if self.preview:
+            relativepath = getTempMarkdownPreviewPath(self.view)
+        else:
+            relativepath = self.settings.get('builtin').get("destination")
+            if not relativepath:
+                mdfile = self.view.file_name()
+                if mdfile is not None and os.path.exists(mdfile):
+                    relativepath = os.path.splitext(mdfile)[0] + '.html'
+
+        if relativepath:
+            relativepath = os.path.dirname(relativepath)
+
+        if basepath and relativepath:
+            return RE_SOURCES.sub(lambda m: repl(m, basepath, relativepath), html)
+        return html
 
     def postprocessor_absolute(self, html, image_convert, file_convert):
         ''' fix relative paths in images, scripts, and links for the internal parser '''
@@ -540,7 +551,9 @@ class Compiler(object):
         if basepath is None:
             basepath = ""
 
-        return RE_SOURCES.sub(lambda m: repl(m, basepath), html)
+        if basepath:
+            return RE_SOURCES.sub(lambda m: repl(m, basepath), html)
+        return html
 
     def postprocessor_base64(self, html):
         ''' convert resources (currently images only) to base64 '''
@@ -676,6 +689,7 @@ class Compiler(object):
         image_convert = self.settings.get("image_path_conversion", "absolute")
         file_convert = self.settings.get("file_path_conversions", "absolute")
 
+        print(image_convert)
         markdown_html = self.parser_specific_postprocess(markdown_html)
 
         if "absolute" in (image_convert, file_convert):
@@ -722,9 +736,10 @@ class Compiler(object):
                 )
         return '\n'.join(meta)
 
-    def run(self, view, wholefile=False):
+    def run(self, view, wholefile=False, preview=False):
         ''' return full html and body html for view. '''
         self.settings = Settings('MarkdownPreview.sublime-settings', view.file_name())
+        self.preview = preview
         self.view = view
 
         contents = self.get_contents(wholefile)
@@ -1096,7 +1111,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         else:
             compiler = MarkdownCompiler()
 
-        html, body = compiler.run(self.view)
+        html, body = compiler.run(self.view, preview=(target in ['disk', 'browser']))
 
         if target in ['disk', 'browser']:
             # do not use LiveReload unless autoreload is enabled
@@ -1236,7 +1251,7 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
         else:
             compiler = MarkdownCompiler()
 
-        html, body = compiler.run(view, True)
+        html, body = compiler.run(view, True, preview=False)
 
         htmlfile = compiler.settings.get('builtin').get('destination', None)
 
