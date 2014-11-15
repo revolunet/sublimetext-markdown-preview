@@ -15,6 +15,7 @@
 
     # Settings overrides
     settings:
+        enable_uml: true
         enabled_extensions:
         - extra
         - github
@@ -26,6 +27,7 @@
         - meta
         - wikilinks
         - admonition
+        - superfences
         - codehilite(guess_lang=False,pygments_style=github)
 ---
 test: This tests the meta extension
@@ -720,3 +722,118 @@ To turn off level classes (which are used to decide special colors for certain p
 |No Label            |[= 50%]                                        |
 |Inline              |Before[= 50% "I'm a block!"]After              |
 |Gloss and Animated  |[= 50% "Gloss"]{: .candystripe-animate .gloss} |
+
+## Neseted Fences:
+````
+    ```
+    This will still be parsed
+    as a normal indented code block.
+    ```
+
+```
+This will still be parsed
+as a fenced code block.
+```
+
+- This is a list that contains multiple code blocks.
+
+    - Here is an indented block
+
+            ```
+            This will still be parsed
+            as a normal indented code block.
+            ```
+
+    - Here is a fenced code block:
+
+        ```
+        This will still be parsed
+        as a fenced code block.
+        ```
+
+        > ```
+        > Blockquotes?
+        > Not a problem!
+        > ```
+````
+
+    ```
+    This will still be parsed
+    as a normal indented code block.
+    ```
+
+```
+This will still be parsed
+as a fenced code block.
+```
+
+- This is a list that contains multiple code blocks.
+
+    - Here is an indented block
+
+            ```
+            This will still be parsed
+            as a normal indented code block.
+            ```
+
+    - Here is a fenced code block:
+
+        ```
+        This will still be parsed
+        as a fenced code block.
+        ```
+
+        > ```
+        > Blockquotes?
+        > Not a problem!
+        > ```
+
+## UML Flow Charts
+````
+```flow
+st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+
+st->op1->cond
+cond(yes)->io->e
+cond(no)->sub1(right)->op1
+```
+````
+
+```flow
+st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+
+st->op1->cond
+cond(yes)->io->e
+cond(no)->sub1(right)->op1
+```
+
+## UML Sequence Diagrams
+````
+```sequence
+Title: Here is a title
+A->B: Normal line
+B-->C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow
+```
+````
+
+```sequence
+Title: Here is a title
+A->B: Normal line
+B-->C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow
+```
