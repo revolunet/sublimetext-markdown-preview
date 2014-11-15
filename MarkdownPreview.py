@@ -689,7 +689,6 @@ class Compiler(object):
         image_convert = self.settings.get("image_path_conversion", "absolute")
         file_convert = self.settings.get("file_path_conversions", "absolute")
 
-        print(image_convert)
         markdown_html = self.parser_specific_postprocess(markdown_html)
 
         if "absolute" in (image_convert, file_convert):
