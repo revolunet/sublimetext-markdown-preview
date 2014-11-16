@@ -26,6 +26,7 @@ if is_ST3():
     from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen, url2pathname, pathname2url
+    from urllib.parse import urlparse, urlunparse
     from urllib.error import HTTPError, URLError
     from urllib.parse import quote
     from .markdown.extensions import codehilite
@@ -51,6 +52,7 @@ else:
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
     from urllib import quote, url2pathname, pathname2url
+    from urlparse import urlparse, urlunparse
     import markdown.extensions.codehilite as codehilite
     try:
         # from pygments.styles import get_style_by_name
@@ -165,6 +167,128 @@ def get_references(file_name, encoding="utf-8"):
         else:
             print("Could not find reference file %s!", file_name)
     return text
+
+
+def parse_url(url):
+    """
+    Parse the url and
+    try to determine if the following is a file path or
+    (as we will call anything else) a url
+    """
+
+    RE_PATH = re.compile(r'file|[A-Za-z]')
+    RE_WIN_DRIVE = re.compile(r"[A-Za-z]:?")
+    RE_URL = re.compile('(http|ftp)s?|data|mailto|tel|news')
+    is_url = False
+    is_absolute = False
+    scheme, netloc, path, params, query, fragment = urlparse(url)
+
+    if RE_URL.match(scheme):
+        # Clearly a url
+        is_url = True
+    elif scheme == '' and netloc == '' and path == '':
+        # Maybe just a url fragment
+        is_url = True
+    elif scheme == '' or RE_PATH.match(scheme):
+        if sublime.platform() == "windows":
+            if scheme == 'file' and RE_WIN_DRIVE.match(netloc):
+                # file://c:/path
+                path = netloc + path
+                netloc = ''
+                scheme = ''
+                is_absolute = True
+            elif RE_WIN_DRIVE.match(scheme):
+                # c:/path
+                path = '%s:%s' % (scheme, path)
+                scheme = ''
+                is_absolute = True
+            elif scheme != '' or netloc != '':
+                # Unknown url scheme
+                is_url = True
+            elif path.startswith('//'):
+                # //Some/Network/location
+                is_absolute = True
+        else:
+            if scheme not in ('', 'file') and netloc != '':
+                # A non-nix filepath or strange url
+                is_url = True
+            else:
+                # Check if nix path is absolute or not
+                if path.startswith('/'):
+                    is_absolute = True
+                scheme = ''
+    return (scheme, netloc, path, params, query, fragment, is_url, is_absolute)
+
+
+def repl_relative(m, base_path, relative_path):
+    """ Replace path with relative path """
+
+    RE_WIN_DRIVE_PATH = re.compile(r"(^(?P<drive>[A-Za-z]{1}):(?:\\|/))")
+    link = m.group(0)
+    try:
+        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
+    except:
+        # Parsing crashed an burned; no need to continue.
+        return link
+
+    if not is_url:
+        # Get the absolute path of the file or return
+        # if we can't resolve the path
+        path = url2pathname(path)
+        abs_path = None
+        if (not is_absolute):
+            # Convert current relative path to absolute
+            temp = os.path.normpath(os.path.join(base_path, path))
+            if os.path.exists(temp):
+                abs_path = temp.replace("\\", "/")
+        else:
+            abs_path = path
+
+        if abs_path is not None:
+            convert = False
+            # Determine if we should convert the relative path
+            # (or see if we can realistically convert the path)
+            if (sublime.platform() == "windows"):
+                # Make sure basepath starts with same drive location as target
+                # If they don't match, we will stay with absolute path.
+                if (base_path.startswith('//') and base_path.startswith('//')):
+                    convert = True
+                else:
+                    base_drive = RE_WIN_DRIVE_PATH.match(base_path)
+                    path_drive = RE_WIN_DRIVE_PATH.match(abs_path)
+                    if (
+                        (base_drive and path_drive) and
+                        base_drive.group('drive').lower() == path_drive.group('drive').lower()
+                    ):
+                        convert = True
+            else:
+                # OSX and Linux
+                convert = True
+
+            # Convert the path, url encode it, and format it as a link
+            if convert:
+                path = pathname2url(os.path.relpath(abs_path, relative_path).replace('\\', '/'))
+            else:
+                path = pathname2url(abs_path)
+            link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
+
+    return link
+
+
+def repl_absolute(m, base_path):
+    """ Replace path with absolute path """
+    link = m.group(0)
+    scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
+
+    path = url2pathname(path)
+
+    if (not is_absolute and not is_url):
+        temp = os.path.normpath(os.path.join(base_path, path))
+        if os.path.exists(temp):
+            path = pathname2url(temp.replace("\\", "/"))
+            link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
+
+    return link
 
 
 class CriticDump(object):
@@ -380,16 +504,16 @@ class Compiler(object):
     def parser_specific_postprocess(self, text):
         return text
 
-    def postprocessor_relative(self, html, image_convert, file_convert):
-        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+    def postprocessor_pathconverter(self, html, image_convert, file_convert, absolute=False):
+
         RE_TAG_HTML = r'''(?xus)
-            (?:
-                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
-                (?P<open><(?P<tag>(?:%s)))
-                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
-                (?P<close>\s*(?:\/?)>)
-            )
-            '''
+        (?:
+            (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+            (?P<open><(?P<tag>(?:%s)))
+            (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+            (?P<close>\s*(?:\/?)>)
+        )
+        '''
 
         RE_TAG_LINK_ATTR = re.compile(
             r'''(?xus)
@@ -401,6 +525,7 @@ class Compiler(object):
             )
             '''
         )
+
         RE_SOURCES = re.compile(
             RE_TAG_HTML % (
                 (r"img" if image_convert else "") +
@@ -408,66 +533,16 @@ class Compiler(object):
                 (r"script|a|link" if file_convert else "")
             )
         )
-
-        def repl_relative(m, base_path, relative_path):
-            """ Replace path with relative path """
-
-            path = url2pathname(m.group('path')[1:-1])
-            link = m.group(0)
-            convert = False
-            abs_path = None
-
-            if (not path.startswith(PATH_EXCLUDE)):
-                abs_path = path
-                if (
-                    not path.startswith(ABS_EXCLUDE) and
-                    not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(path) is not None)
-                ):
-                    # Convert current relative path to absolute
-                    absolute = os.path.normpath(os.path.join(base_path, path))
-                    if os.path.exists(absolute):
-                        abs_path = absolute.replace("\\", "/")
-                    else:
-                        return link
-                else:
-                    # Strip 'file://'
-                    if path.startswith('file://'):
-                        abs_path = path.replace('file://', '', 1)
-                    else:
-                        abs_path = path
-                if (sublime.platform() == "windows"):
-                    # Make sure basepath starts with same drive location as target
-                    # If they don't match, we will stay with absolute path.
-                    if (base_path.startswith('//') and base_path.startswith('//')):
-                        convert = True
-                    else:
-                        base_drive = RE_WIN_DRIVE.match(base_path)
-                        path_drive = RE_WIN_DRIVE.match(abs_path)
-                        if (
-                            (base_drive and path_drive) and
-                            base_drive.group('drive').lower() == path_drive.group('drive').lower()
-                        ):
-                            convert = True
-                else:
-                    # OSX and Linux
-                    convert = True
-
-                if convert:
-                    # Convert path relative to the base path
-                    link = m.group('name') + "\"" + pathname2url(os.path.relpath(abs_path, relative_path).replace('\\', '/')) + "\""
-                else:
-                    # We have an absolute path, but we can't make it relative
-                    # to base path, so we will just use the absolute.
-                    link = m.group('name') + "\"" + pathname2url(abs_path) + "\""
-
-            return link
 
         def repl(m, base_path, rel_path=None):
             if m.group('comments'):
                 tag = m.group('comments')
             else:
                 tag = m.group('open')
-                tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_relative(m2, base_path, rel_path), m.group('attr'))
+                if rel_path is None:
+                    tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_absolute(m2, base_path), m.group('attr'))
+                else:
+                    tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_relative(m2, base_path, rel_path), m.group('attr'))
                 tag += m.group('close')
             return tag
 
@@ -475,84 +550,24 @@ class Compiler(object):
         if basepath is None:
             basepath = ""
 
-        if self.preview:
-            relativepath = getTempMarkdownPreviewPath(self.view)
+        if absolute:
+            if basepath:
+                return RE_SOURCES.sub(lambda m: repl(m, basepath), html)
         else:
-            relativepath = self.settings.get('builtin').get("destination")
-            if not relativepath:
-                mdfile = self.view.file_name()
-                if mdfile is not None and os.path.exists(mdfile):
-                    relativepath = os.path.splitext(mdfile)[0] + '.html'
-
-        if relativepath:
-            relativepath = os.path.dirname(relativepath)
-
-        if basepath and relativepath:
-            return RE_SOURCES.sub(lambda m: repl(m, basepath, relativepath), html)
-        return html
-
-    def postprocessor_absolute(self, html, image_convert, file_convert):
-        ''' fix relative paths in images, scripts, and links for the internal parser '''
-
-        # Compile the appropriate regex to find images and/or files
-        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
-        RE_TAG_HTML = r'''(?xus)
-            (?:
-                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
-                (?P<open><(?P<tag>(?:%s)))
-                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
-                (?P<close>\s*(?:\/?)>)
-            )
-            '''
-
-        RE_TAG_LINK_ATTR = re.compile(
-            r'''(?xus)
-            (?P<attr>
-                (?:
-                    (?P<name>\s+(?:href|src)\s*=\s*)
-                    (?P<path>"[^"]*"|'[^']*')
-                )
-            )
-            '''
-        )
-        RE_SOURCES = re.compile(
-            RE_TAG_HTML % (
-                (r"img" if image_convert else "") +
-                (r"|" if image_convert and file_convert else "") +
-                (r"script|a|link" if file_convert else "")
-            )
-        )
-
-        def repl_absolute(m, base_path):
-            """ Replace path with absolute path """
-
-            path = url2pathname(m.group('path')[1:-1])
-            link = m.group(0)
-
-            if (
-                not path.startswith(PATH_EXCLUDE) and
-                not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(path) is not None)
-            ):
-                absolute = os.path.normpath(os.path.join(base_path, path))
-                if os.path.exists(absolute):
-                    link = m.group('name') + "\"" + pathname2url(absolute.replace("\\", "/")) + "\""
-            return link
-
-        def repl(m, base_path):
-            if m.group('comments'):
-                tag = m.group('comments')
+            if self.preview:
+                relativepath = getTempMarkdownPreviewPath(self.view)
             else:
-                tag = m.group('open')
-                tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_absolute(m2, base_path), m.group('attr'))
-                tag += m.group('close')
-            return tag
+                relativepath = self.settings.get('builtin').get("destination")
+                if not relativepath:
+                    mdfile = self.view.file_name()
+                    if mdfile is not None and os.path.exists(mdfile):
+                        relativepath = os.path.splitext(mdfile)[0] + '.html'
 
-        basepath = self.settings.get('builtin').get("basepath")
-        if basepath is None:
-            basepath = ""
+            if relativepath:
+                relativepath = os.path.dirname(relativepath)
 
-        if basepath:
-            return RE_SOURCES.sub(lambda m: repl(m, basepath), html)
+            if basepath and relativepath:
+                return RE_SOURCES.sub(lambda m: repl(m, basepath, relativepath), html)
         return html
 
     def postprocessor_base64(self, html):
@@ -692,10 +707,10 @@ class Compiler(object):
         markdown_html = self.parser_specific_postprocess(markdown_html)
 
         if "absolute" in (image_convert, file_convert):
-            markdown_html = self.postprocessor_absolute(markdown_html, image_convert, file_convert)
+            markdown_html = self.postprocessor_pathconverter(markdown_html, image_convert, file_convert, True)
 
         if "relative" in (image_convert, file_convert):
-            markdown_html = self.postprocessor_relative(markdown_html, image_convert, file_convert)
+            markdown_html = self.postprocessor_pathconverter(markdown_html, image_convert, file_convert, False)
 
         if image_convert == "base64":
             markdown_html = self.postprocessor_base64(markdown_html)
