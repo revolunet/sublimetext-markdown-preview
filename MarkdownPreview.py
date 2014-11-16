@@ -17,6 +17,7 @@ def is_ST3():
     ''' check if ST3 based on python version '''
     return sys.version_info >= (3, 0)
 
+
 if is_ST3():
     from . import desktop
     from . import yaml
@@ -24,9 +25,16 @@ if is_ST3():
     from .markdown_wrapper import StMarkdown as Markdown
     from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from .helper import INSTALLED_DIRECTORY
-    from urllib.request import urlopen
+    from urllib.request import urlopen, url2pathname, pathname2url
+    from urllib.parse import urlparse, urlunparse
     from urllib.error import HTTPError, URLError
     from urllib.parse import quote
+    from .markdown.extensions import codehilite
+    try:
+        # from pygments.styles import get_style_by_name
+        PYGMENTS_AVAILABLE = codehilite.pygments
+    except:
+        PYGMENTS_AVAILABLE = False
 
     def Request(url, data, headers):
         ''' Adapter for urllib2 used in ST2 '''
@@ -43,17 +51,32 @@ else:
     from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
-    from urllib import quote
+    from urllib import quote, url2pathname, pathname2url
+    from urlparse import urlparse, urlunparse
+    import markdown.extensions.codehilite as codehilite
+    try:
+        # from pygments.styles import get_style_by_name
+        PYGMENTS_AVAILABLE = codehilite.pygments
+    except:
+        PYGMENTS_AVAILABLE = False
 
     unicode_str = unicode
 
 _CANNOT_CONVERT = u'cannot convert markdown'
-ABS_EXCLUDE = tuple(
+
+PATH_EXCLUDE = tuple(
     [
         'file://', 'https://', 'http://', '/', '#',
         "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64,"
     ] + ['\\'] if sys.platform.startswith('win') else []
 )
+
+ABS_EXCLUDE = tuple(
+    [
+        'file://', '/'
+    ] + (['\\'] if sys.platform.startswith('win') else [])
+)
+
 DEFAULT_EXT = [
     "extra", "github", "toc", "headerid",
     "meta", "sane_lists", "smarty", "wikilinks",
@@ -144,6 +167,128 @@ def get_references(file_name, encoding="utf-8"):
         else:
             print("Could not find reference file %s!", file_name)
     return text
+
+
+def parse_url(url):
+    """
+    Parse the url and
+    try to determine if the following is a file path or
+    (as we will call anything else) a url
+    """
+
+    RE_PATH = re.compile(r'file|[A-Za-z]')
+    RE_WIN_DRIVE = re.compile(r"[A-Za-z]:?")
+    RE_URL = re.compile('(http|ftp)s?|data|mailto|tel|news')
+    is_url = False
+    is_absolute = False
+    scheme, netloc, path, params, query, fragment = urlparse(url)
+
+    if RE_URL.match(scheme):
+        # Clearly a url
+        is_url = True
+    elif scheme == '' and netloc == '' and path == '':
+        # Maybe just a url fragment
+        is_url = True
+    elif scheme == '' or RE_PATH.match(scheme):
+        if sublime.platform() == "windows":
+            if scheme == 'file' and RE_WIN_DRIVE.match(netloc):
+                # file://c:/path
+                path = netloc + path
+                netloc = ''
+                scheme = ''
+                is_absolute = True
+            elif RE_WIN_DRIVE.match(scheme):
+                # c:/path
+                path = '%s:%s' % (scheme, path)
+                scheme = ''
+                is_absolute = True
+            elif scheme != '' or netloc != '':
+                # Unknown url scheme
+                is_url = True
+            elif path.startswith('//'):
+                # //Some/Network/location
+                is_absolute = True
+        else:
+            if scheme not in ('', 'file') and netloc != '':
+                # A non-nix filepath or strange url
+                is_url = True
+            else:
+                # Check if nix path is absolute or not
+                if path.startswith('/'):
+                    is_absolute = True
+                scheme = ''
+    return (scheme, netloc, path, params, query, fragment, is_url, is_absolute)
+
+
+def repl_relative(m, base_path, relative_path):
+    """ Replace path with relative path """
+
+    RE_WIN_DRIVE_PATH = re.compile(r"(^(?P<drive>[A-Za-z]{1}):(?:\\|/))")
+    link = m.group(0)
+    try:
+        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
+    except:
+        # Parsing crashed an burned; no need to continue.
+        return link
+
+    if not is_url:
+        # Get the absolute path of the file or return
+        # if we can't resolve the path
+        path = url2pathname(path)
+        abs_path = None
+        if (not is_absolute):
+            # Convert current relative path to absolute
+            temp = os.path.normpath(os.path.join(base_path, path))
+            if os.path.exists(temp):
+                abs_path = temp.replace("\\", "/")
+        elif os.path.exists(path):
+            abs_path = path
+
+        if abs_path is not None:
+            convert = False
+            # Determine if we should convert the relative path
+            # (or see if we can realistically convert the path)
+            if (sublime.platform() == "windows"):
+                # Make sure basepath starts with same drive location as target
+                # If they don't match, we will stay with absolute path.
+                if (base_path.startswith('//') and base_path.startswith('//')):
+                    convert = True
+                else:
+                    base_drive = RE_WIN_DRIVE_PATH.match(base_path)
+                    path_drive = RE_WIN_DRIVE_PATH.match(abs_path)
+                    if (
+                        (base_drive and path_drive) and
+                        base_drive.group('drive').lower() == path_drive.group('drive').lower()
+                    ):
+                        convert = True
+            else:
+                # OSX and Linux
+                convert = True
+
+            # Convert the path, url encode it, and format it as a link
+            if convert:
+                path = pathname2url(os.path.relpath(abs_path, relative_path).replace('\\', '/'))
+            else:
+                path = pathname2url(abs_path)
+            link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
+
+    return link
+
+
+def repl_absolute(m, base_path):
+    """ Replace path with absolute path """
+    link = m.group(0)
+    scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
+
+    path = url2pathname(path)
+
+    if (not is_absolute and not is_url):
+        temp = os.path.normpath(os.path.join(base_path, path))
+        if os.path.exists(temp):
+            path = pathname2url(temp.replace("\\", "/"))
+            link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
+
+    return link
 
 
 class CriticDump(object):
@@ -304,6 +449,14 @@ class Compiler(object):
             return load_resource('mathjax.html')
         return ''
 
+    def get_uml(self):
+        ''' return the uml scripts if enabled '''
+
+        if self.settings.get('enable_uml') is True:
+            flow = load_resource('flowchart-min.js')
+            return load_resource('uml.html').replace('{{ flowchart }}', flow, 1)
+        return ''
+
     def get_highlight(self):
         return ''
 
@@ -351,47 +504,79 @@ class Compiler(object):
     def parser_specific_postprocess(self, text):
         return text
 
-    def postprocessor_absolute(self, html, image_convert, file_convert):
-        ''' fix relative paths in images, scripts, and links for the internal parser '''
-        def tag_fix(m):
-            tag = m.group('tag')
-            src = m.group('src')
-            filename = self.view.file_name()
-            if filename:
-                if (
-                    not src.startswith(ABS_EXCLUDE) and
-                    not (sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None)
-                ):
-                    # Don't explicitly add file:// prefix,
-                    # But don't remove them either
-                    abs_path = u'%s/%s' % (os.path.dirname(filename), src)
-                    # Don't replace just the first instance,
-                    # but explicitly place it where it was before
-                    # to ensure a file name 'img' dosen't replace
-                    # the tag name etc.
-                    if os.path.exists(abs_path):
-                        tag = m.group('begin') + abs_path + m.group('end')
-            return tag
-        # Compile the appropriate regex to find images and/or files
-        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+    def postprocessor_pathconverter(self, html, image_convert, file_convert, absolute=False):
+
+        RE_TAG_HTML = r'''(?xus)
+        (?:
+            (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+            (?P<open><(?P<tag>(?:%s)))
+            (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+            (?P<close>\s*(?:\/?)>)
+        )
+        '''
+
+        RE_TAG_LINK_ATTR = re.compile(
+            r'''(?xus)
+            (?P<attr>
+                (?:
+                    (?P<name>\s+(?:href|src)\s*=\s*)
+                    (?P<path>"[^"]*"|'[^']*')
+                )
+            )
+            '''
+        )
+
         RE_SOURCES = re.compile(
-            r"""(?P<tag>(?P<begin><(?:%s%s%s)[^>]+(?:src%s)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""" % (
-                r"img" if image_convert else "",
-                r"|" if image_convert and file_convert else "",
-                r"script|a" if file_convert else "",
-                r"|href" if file_convert else ""
+            RE_TAG_HTML % (
+                (r"img" if image_convert else "") +
+                (r"|" if image_convert and file_convert else "") +
+                (r"script|a|link" if file_convert else "")
             )
         )
-        return RE_SOURCES.sub(tag_fix, html)
+
+        def repl(m, base_path, rel_path=None):
+            if m.group('comments'):
+                tag = m.group('comments')
+            else:
+                tag = m.group('open')
+                if rel_path is None:
+                    tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_absolute(m2, base_path), m.group('attr'))
+                else:
+                    tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_relative(m2, base_path, rel_path), m.group('attr'))
+                tag += m.group('close')
+            return tag
+
+        basepath = self.settings.get('builtin').get("basepath")
+        if basepath is None:
+            basepath = ""
+
+        if absolute:
+            if basepath:
+                return RE_SOURCES.sub(lambda m: repl(m, basepath), html)
+        else:
+            if self.preview:
+                relativepath = getTempMarkdownPreviewPath(self.view)
+            else:
+                relativepath = self.settings.get('builtin').get("destination")
+                if not relativepath:
+                    mdfile = self.view.file_name()
+                    if mdfile is not None and os.path.exists(mdfile):
+                        relativepath = os.path.splitext(mdfile)[0] + '.html'
+
+            if relativepath:
+                relativepath = os.path.dirname(relativepath)
+
+            if basepath and relativepath:
+                return RE_SOURCES.sub(lambda m: repl(m, basepath, relativepath), html)
+        return html
 
     def postprocessor_base64(self, html):
         ''' convert resources (currently images only) to base64 '''
 
         file_types = {
-            ".png": "image/png",
-            ".jpg": "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".gif": "image/gif"
+            (".png",): "image/png",
+            (".jpg", ".jpeg"): "image/jpeg",
+            (".gif",): "image/gif"
         }
 
         exclusion_list = tuple(
@@ -399,11 +584,33 @@ class Compiler(object):
             ["data:%s;base64," % ft for ft in file_types.values()]
         )
 
+        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
+        RE_TAG_HTML = re.compile(
+            r'''(?xus)
+            (?:
+                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+                (?P<open><(?P<tag>img))
+                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+                (?P<close>\s*(?:\/?)>)
+            )
+            '''
+        )
+        RE_TAG_LINK_ATTR = re.compile(
+            r'''(?xus)
+            (?P<attr>
+                (?:
+                    (?P<name>\s+src\s*=\s*)
+                    (?P<path>"[^"]*"|'[^']*')
+                )
+            )
+            '''
+        )
+
         def b64(m):
             import base64
-            src = m.group('src')
-            data = m.group('tag')
-            base_path = self.settings.get("basepath")
+            src = url2pathname(m.group('path')[1:-1])
+            data = m.group(0)
+            base_path = self.settings.get('builtin').get("basepath")
             if base_path is None:
                 base_path = ""
 
@@ -426,78 +633,68 @@ class Compiler(object):
 
                 if os.path.exists(src):
                     ext = os.path.splitext(src)[1].lower()
-                    if ext in file_types:
-                        try:
-                            with open(src, "rb") as f:
-                                data = m.group('begin') + "data:%s;base64,%s" % (
-                                    file_types[ext],
-                                    base64.b64encode(f.read()).decode('ascii')
-                                ) + m.group('end')
-                        except Exception:
-                            pass
+                    for b64_ext in file_types:
+                        if ext in b64_ext:
+                            try:
+                                with open(src, "rb") as f:
+                                    data = " src=\"data:%s;base64,%s\"" % (
+                                        file_types[b64_ext],
+                                        base64.b64encode(f.read()).decode('ascii')
+                                    )
+                            except Exception:
+                                pass
+                            break
             return data
-        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
-        RE_SOURCES = re.compile(r"""(?P<tag>(?P<begin><(?:img)[^>]+(?:src)=["'])(?P<src>[^"']+)(?P<end>[^>]*>))""")
-        return RE_SOURCES.sub(b64, html)
+
+        def repl(m):
+            if m.group('comments'):
+                tag = m.group('comments')
+            else:
+                tag = m.group('open')
+                tag += RE_TAG_LINK_ATTR.sub(lambda m2: b64(m2), m.group('attr'))
+                tag += m.group('close')
+            return tag
+
+        return RE_TAG_HTML.sub(repl, html)
 
     def postprocessor_simple(self, html):
         ''' Strip out ids and classes for a simplified HTML output '''
-        def strip_html(m):
-            tag = m.group('open')
-            if m.group('attr1'):
-                tag += m.group('attr1')
-            if m.group('attr2'):
-                tag += m.group('attr2')
-            if m.group('attr3'):
-                tag += m.group('attr3')
-            if m.group('attr4'):
-                tag += m.group('attr4')
-            if m.group('attr5'):
-                tag += m.group('attr5')
-            if m.group('attr6'):
-                tag += m.group('attr6')
-            tag += m.group('close')
+
+        def repl(m):
+            if m.group('comments'):
+                tag = ''
+            else:
+                tag = m.group('open')
+                tag += RE_TAG_BAD_ATTR.sub('', m.group('attr'))
+                tag += m.group('close')
             return tag
 
-        # Strip out id, class and style attributes for a simple html output
-        # Since we are stripping out two attributes, we need to set up the groups in such
-        # a way so we can retrieve the data we don't want to throw away
-        # up to these worst case scenarios:
-        #
-        # <tag attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""...>
-        # <tag (id|class|style)=""... attr=""... (id|class|style)=""... attr=""... (id|class|style)=""... attr=""...>
-        STRIP_HTML = re.compile(
-            r'''
-                (?P<open><[\w\:\.\-]+)                                                      # Tag open
-                (?:
-                    (?P<attr1>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target1>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )
-                (?:
-                    (?P<attr2>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target2>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr3>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target3>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr4>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target4>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr5>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target5>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?:
-                    (?P<attr6>(?:\s+(?!id|class|style)[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)  # Attributes to keep
-                  | (?P<target6>\s+(?:id|class|style)(?:\s*=\s*(?:"[^"]*"|'[^']*'))*)             # Attributes to delte
-                )?
-                (?P<close>\s*(?:\/?)>)                                                      # Tag end
+        # Strip out id, class, on<word>, and style attributes for a simple html output
+        RE_TAG_HTML = re.compile(
+            r'''(?x)
+            (?:
+                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
+                (?P<open><[\w\:\.\-]+)
+                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
+                (?P<close>\s*(?:\/?)>)
+            )
             ''',
-            re.MULTILINE | re.DOTALL | re.VERBOSE
+            re.DOTALL | re.UNICODE
         )
-        return STRIP_HTML.sub(strip_html, html)
+
+        RE_TAG_BAD_ATTR = re.compile(
+            r'''(?x)
+            (?P<attr>
+                (?:
+                    \s+(?:id|class|style|on[\w]+)
+                    (?:\s*=\s*(?:"[^"]*"|'[^']*'))
+                )*
+            )
+            ''',
+            re.DOTALL | re.UNICODE
+        )
+
+        return RE_TAG_HTML.sub(repl, html)
 
     def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
@@ -510,7 +707,10 @@ class Compiler(object):
         markdown_html = self.parser_specific_postprocess(markdown_html)
 
         if "absolute" in (image_convert, file_convert):
-            markdown_html = self.postprocessor_absolute(markdown_html, image_convert, file_convert)
+            markdown_html = self.postprocessor_pathconverter(markdown_html, image_convert, file_convert, True)
+
+        if "relative" in (image_convert, file_convert):
+            markdown_html = self.postprocessor_pathconverter(markdown_html, image_convert, file_convert, False)
 
         if image_convert == "base64":
             markdown_html = self.postprocessor_base64(markdown_html)
@@ -550,9 +750,10 @@ class Compiler(object):
                 )
         return '\n'.join(meta)
 
-    def run(self, view, wholefile=False):
+    def run(self, view, wholefile=False, preview=False):
         ''' return full html and body html for view. '''
         self.settings = Settings('MarkdownPreview.sublime-settings', view.file_name())
+        self.preview = preview
         self.view = view
 
         contents = self.get_contents(wholefile)
@@ -572,6 +773,7 @@ class Compiler(object):
             head += self.get_javascript()
             head += self.get_highlight()
             head += self.get_mathjax()
+            head += self.get_uml()
             head += self.get_title()
 
             html = load_utf8(html_template)
@@ -585,6 +787,7 @@ class Compiler(object):
             html += self.get_javascript()
             html += self.get_highlight()
             html += self.get_mathjax()
+            html += self.get_uml()
             html += self.get_title()
             html += '</head><body>'
             html += '<article class="markdown-body">'
@@ -791,6 +994,15 @@ class MarkdownCompiler(Compiler):
         # and if so, read what the desired color scheme to use is
         self.pygments_style = None
         self.noclasses = False
+
+        use_pygments = self.settings.get('enable_pygments', True)
+        if use_pygments and not PYGMENTS_AVAILABLE:
+            use_pygments = False
+        if use_pygments:
+            codehilite.pygments = True
+        else:
+            codehilite.pygments = False
+
         count = 0
         for e in extensions:
             if e.startswith("codehilite"):
@@ -824,8 +1036,11 @@ class MarkdownCompiler(Compiler):
             extensions.append("codehilite(guess_lang=%s,pygments_style=github)" % guess_lang)
             self.pygments_style = "github"
 
+        if not use_pygments:
+            self.pygments_style = None
+
         # Get the base path of source file if available
-        base_path = self.settings.get("basepath")
+        base_path = self.settings.get('builtin').get("basepath")
         if base_path is None:
             base_path = ""
 
@@ -910,7 +1125,7 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         else:
             compiler = MarkdownCompiler()
 
-        html, body = compiler.run(self.view)
+        html, body = compiler.run(self.view, preview=(target in ['disk', 'browser']))
 
         if target in ['disk', 'browser']:
             # do not use LiveReload unless autoreload is enabled
@@ -1050,7 +1265,7 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
         else:
             compiler = MarkdownCompiler()
 
-        html, body = compiler.run(view, True)
+        html, body = compiler.run(view, True, preview=False)
 
         htmlfile = compiler.settings.get('builtin').get('destination', None)
 

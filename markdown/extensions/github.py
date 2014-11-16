@@ -7,6 +7,7 @@ extensions = [
     'magiclink',
     'tasklist',
     'headeranchor',
+    'superfences',
     'nl2br'
 ]
 

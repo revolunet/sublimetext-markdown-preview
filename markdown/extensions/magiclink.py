@@ -1,7 +1,7 @@
 """
-Mdownx.magiclink
+PyMdown.magiclink
 An extension for Python Markdown.
-Find http|ftp links and turn them to actual links
+Find http|ftp links and email address and turn them to actual links
 
 MIT license.
 
@@ -21,17 +21,24 @@ from ..extensions import Extension
 from ..inlinepatterns import LinkPattern
 from .. import util
 
-RE_MAIL = r'''(?i)((?:[\-+\w]([\w\-+]|\.(?!\.))+)@(?:[\w\-]+\.)(([\w\-]|(?<!\.)\.(?!\.))*)[a-z](?![\d.\-+_]))'''
+RE_MAIL = r'''(?x)(?i)
+(
+    (?:[\-+\w]([\w\-+]|\.(?!\.))+)    # Local part
+    @(?:[\w\-]+\.)                    # @domain part start
+    (([\w\-]|(?<!\.)\.(?!\.))*)[a-z]  # @domain.end (allow multiple dot names)
+    (?![\d\-_@])                      # Don't allow last char to be followed by these
+)
+'''
 
 RE_LINK = r'''(?x)(?i)
+(
     (
-        (
-            (ht|f)tp(s?)://(([a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)|localhost)|  # (HTTP|FTP)://
-            (?P<www>w{3})(\.[a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)               # WWW.
-        )
-        (/?)([a-zA-Z0-9\-.?,'/+&%$#_]*)([\d\w./%+-=&?:"',|~;]*)
-        [A-Za-z\d\-_~:/?#@!$*+=]
+        (ht|f)tp(s?)://(([a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)|localhost)|  # (HTTP|FTP)://
+        (?P<www>w{3})(\.[a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)               # WWW.
     )
+    (/?)([a-zA-Z0-9\-.?,'/+&%$#_]*)([\d\w./%+-=&?:"',|~;]*)
+    [A-Za-z\d\-_~:/?#@!$*+=]
+)
 '''
 
 
@@ -64,8 +71,8 @@ class MagiclinkExtension(Extension):
     def extendMarkdown(self, md, md_globals):
         """Adds support for turning html links to link tags"""
 
-        md.inlinePatterns.add("magiclink", MagiclinkPattern(RE_LINK, md), "<not_strong")
-        md.inlinePatterns.add("magicmail", MagicMailPattern(RE_MAIL, md), "<not_strong")
+        md.inlinePatterns.add("magic-link", MagiclinkPattern(RE_LINK, md), "<not_strong")
+        md.inlinePatterns.add("magic-mail", MagicMailPattern(RE_MAIL, md), "<not_strong")
 
 
 def makeExtension(configs={}):

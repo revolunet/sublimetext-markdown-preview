@@ -47,9 +47,21 @@
     "enable_mathjax": false,
 
     /*
-        Pygments support for syntax highlighting.
+        Enable uml support scripts: flowchart.js and sequence-diagram.js.
+    */
+    "enable_uml": false,
+
+    /*
+        Enable highlighting. This enables codehilite extension if not already enabled.
     */
     "enable_highlight": false,
+
+    /*
+        Pygments support for syntax highlighting.  Controls whether codehilite extension
+        will use Pygments.  If disabled, code blocks will be formatted for javascript
+        highighters such as highlight.js.
+    */
+    "enable_pygments": true,
 
     /*
         List of enabled extensions of the selected markdown parser.
@@ -179,8 +191,10 @@
 
     /*
         Sets how image paths are handled.
-        Setting is a string value: (absolute | base64 | none)
+        Setting is a string value: (absolute | relative | base64 | none)
             absolute: converts relative local paths to absolute
+            relative: converts relative local paths to a path relative to the
+                      HTML output
             base64: coverts the local file to base64 and embeds it in the HTML
             none: does nothing
     */
@@ -188,8 +202,10 @@
 
     /*
         Sets how file paths are handled.
-        Setting is a string value: (absolute | none)
+        Setting is a string value: (absolute | relative | none)
             absolute: converts relative local paths to absolute
+            relative: converts relative local paths to a path relative to the
+                      HTML output
             none: does nothing
     */
     "file_path_conversions": "absolute",

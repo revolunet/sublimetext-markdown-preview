@@ -233,11 +233,7 @@ class TocExtension(Extension):
         # by the header id extension) if both are used. Same goes for 
         # attr_list extension. This must come last because we don't want
         # to redefine ids after toc is created. But we do want toc prettified.
-        if 'headeranchor' in md.treeprocessors.keys():
-            insertion = "<headeranchor"
-        else:
-            insertion = "_end"
-        md.treeprocessors.add("toc", tocext, insertion)
+        md.treeprocessors.add("toc", tocext, "_end")
 
 
 def makeExtension(configs={}):

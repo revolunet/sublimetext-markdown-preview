@@ -15,6 +15,7 @@
 
     # Settings overrides
     settings:
+        enable_uml: true
         enabled_extensions:
         - extra
         - github
@@ -26,7 +27,6 @@
         - meta
         - wikilinks
         - admonition
-        - admonitionicon
         - codehilite(guess_lang=False,pygments_style=github)
 ---
 test: This tests the meta extension
@@ -38,21 +38,20 @@ title: This title will be overridden by YAML
     - extra
     - github
     - insert
+    - progressbar
     - toc
     - headerid
     - smarty
     - meta
     - wikilinks
-    - footnotes
     - admonition
-    - admonitionicon
     - codehilite(guess_lang=False,pygments_style=github)
 
     !!! Caution "Testing Note"
         - `sane_lists` will alter the results of the second test in [Mixed Lists](#mixed-lists). When turned off, this test will have all list items mixed and aligned proper.  With `sane_lists` on, some will not be recognized, and some items may be aligned in different lists.
         - having `guess_lang=False` allows the testing of the selective highlighting.  When omitted or set `true`, it can be expected that all of the blocks will be highlighted to some extent.
         - Most tests are spot checked at this point or a link can be clicked to verify it is working.
-        - base64, absolute paths, and external resources require this to be in an unzipped sublime package environment.
+        - base64, absolute paths, and external resources require this to be in an unzipped sublime package environment when converting.
 
 
 # Cheat Sheet and Test
@@ -690,35 +689,150 @@ __^^*insert italic bold*^^__  *^^__insert italic bold 2__^^*
 # Progress
 Progress bars are block elements and it is recommened to put a newline before and after.  But they will be recognized inline, but they will be on their own line.
 
-Normally you would just globally set your additional classes: `progressbar(addclasses=candystripe-animate)`, but here we want to test the inline class adding and inline control of level classes.
+Normally you would just globally set your additional classes: `progressbar(add_classes=candystripe-animate)`, but here we will demonstrate that it works with the `attr_list` extension.  It will take inline style.
 
-To turn off level classes (which are used to decide special colors for certain percentages) you could just use `progressbar(levelclass=False)`.
+To turn off level classes (which are used to decide special colors for certain percentages) you could just use `progressbar(level_class=False)`.
 ```
-| Test                      | Result                                          |
-|---------------------------|-------------------------------------------------|
-|Animated Color Levels: 0%  |[==0% "0%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 5%  |[==5% "5%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 25% |[==25% "25%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 45% |[==45% "45%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 65% |[==65% "65%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 85% |[==85% "85%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 100%|[==100% "100%"]{addclasses="candystripe-animate"}|
-|Division Percentage        |[== 212.2/537 "212.2/537 Testing division"]      |
-|No Label                   |[== 50%]                                         |
-|Inline                     |Before[== 50% I'm a block!]After                 |
-|No Levels and Gloss        |[== 50%]{levelclass="false" addclasses="gloss"}  |
+| Test               | Result                                        |
+|--------------------|-----------------------------------------------|
+|Animated: 0%        |[=0% "0%"]{: .candystripe-animate}             |
+|Animated: 5%        |[=5% "5%"]{: .candystripe-animate}             |
+|Animated: 25%       |[=25% "25%"]{: .candystripe-animate}           |
+|Animated: 45%       |[=45% "45%"]{: .candystripe-animate}           |
+|Animated: 65%       |[=65% "65%"]{: .candystripe-animate}           |
+|Animated: 85%       |[=85% "85%"]{: .candystripe-animate}           |
+|Animated: 100%      |[=100% "100%"]{: .candystripe-animate}         |
+|Division Percentage |[= 212.2/537 "212.2/537 Testing division"]     |
+|No Label            |[= 50%]                                        |
+|Inline              |Before[= 50% "I'm a block!"]After              |
+|Gloss and Animated  |[= 50% "Gloss"]{: .candystripe-animate .gloss} |
 ```
 
-| Test                      | Result                                          |
-|---------------------------|-------------------------------------------------|
-|Animated Color Levels: 0%  |[==0% "0%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 5%  |[==5% "5%"]{addclasses="candystripe-animate"}    |
-|Animated Color Levels: 25% |[==25% "25%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 45% |[==45% "45%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 65% |[==65% "65%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 85% |[==85% "85%"]{addclasses="candystripe-animate"}  |
-|Animated Color Levels: 100%|[==100% "100%"]{addclasses="candystripe-animate"}|
-|Division Percentage        |[== 212.2/537 "212.2/537 Testing division"]      |
-|No Label                   |[== 50%]                                         |
-|Inline                     |Before[== 50% I'm a block!]After                 |
-|No Levels and Gloss        |[== 50%]{levelclass="false" addclasses="gloss"}  |
+| Test               | Result                                        |
+|--------------------|-----------------------------------------------|
+|Animated: 0%        |[=0% "0%"]{: .candystripe-animate}             |
+|Animated: 5%        |[=5% "5%"]{: .candystripe-animate}             |
+|Animated: 25%       |[=25% "25%"]{: .candystripe-animate}           |
+|Animated: 45%       |[=45% "45%"]{: .candystripe-animate}           |
+|Animated: 65%       |[=65% "65%"]{: .candystripe-animate}           |
+|Animated: 85%       |[=85% "85%"]{: .candystripe-animate}           |
+|Animated: 100%      |[=100% "100%"]{: .candystripe-animate}         |
+|Division Percentage |[= 212.2/537 "212.2/537 Testing division"]     |
+|No Label            |[= 50%]                                        |
+|Inline              |Before[= 50% "I'm a block!"]After              |
+|Gloss and Animated  |[= 50% "Gloss"]{: .candystripe-animate .gloss} |
+
+## Neseted Fences:
+````
+    ```
+    This will still be parsed
+    as a normal indented code block.
+    ```
+
+```
+This will still be parsed
+as a fenced code block.
+```
+
+- This is a list that contains multiple code blocks.
+
+    - Here is an indented block
+
+            ```
+            This will still be parsed
+            as a normal indented code block.
+            ```
+
+    - Here is a fenced code block:
+
+        ```
+        This will still be parsed
+        as a fenced code block.
+        ```
+
+        > ```
+        > Blockquotes?
+        > Not a problem!
+        > ```
+````
+
+    ```
+    This will still be parsed
+    as a normal indented code block.
+    ```
+
+```
+This will still be parsed
+as a fenced code block.
+```
+
+- This is a list that contains multiple code blocks.
+
+    - Here is an indented block
+
+            ```
+            This will still be parsed
+            as a normal indented code block.
+            ```
+
+    - Here is a fenced code block:
+
+        ```
+        This will still be parsed
+        as a fenced code block.
+        ```
+
+        > ```
+        > Blockquotes?
+        > Not a problem!
+        > ```
+
+## UML Flow Charts
+````
+```flow
+st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+
+st->op1->cond
+cond(yes)->io->e
+cond(no)->sub1(right)->op1
+```
+````
+
+```flow
+st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+
+st->op1->cond
+cond(yes)->io->e
+cond(no)->sub1(right)->op1
+```
+
+## UML Sequence Diagrams
+````
+```sequence
+Title: Here is a title
+A->B: Normal line
+B-->C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow
+```
+````
+
+```sequence
+Title: Here is a title
+A->B: Normal line
+B-->C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow
+```
