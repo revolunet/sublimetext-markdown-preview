@@ -27,7 +27,6 @@
         - meta
         - wikilinks
         - admonition
-        - superfences
         - codehilite(guess_lang=False,pygments_style=github)
 ---
 test: This tests the meta extension
@@ -39,12 +38,12 @@ title: This title will be overridden by YAML
     - extra
     - github
     - insert
+    - progressbar
     - toc
     - headerid
     - smarty
     - meta
     - wikilinks
-    - footnotes
     - admonition
     - codehilite(guess_lang=False,pygments_style=github)
 
@@ -52,7 +51,7 @@ title: This title will be overridden by YAML
         - `sane_lists` will alter the results of the second test in [Mixed Lists](#mixed-lists). When turned off, this test will have all list items mixed and aligned proper.  With `sane_lists` on, some will not be recognized, and some items may be aligned in different lists.
         - having `guess_lang=False` allows the testing of the selective highlighting.  When omitted or set `true`, it can be expected that all of the blocks will be highlighted to some extent.
         - Most tests are spot checked at this point or a link can be clicked to verify it is working.
-        - base64, absolute paths, and external resources require this to be in an unzipped sublime package environment.
+        - base64, absolute paths, and external resources require this to be in an unzipped sublime package environment when converting.
 
 
 # Cheat Sheet and Test
