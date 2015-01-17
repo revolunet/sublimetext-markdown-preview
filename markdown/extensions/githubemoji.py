@@ -1,5 +1,5 @@
 """
-pymdown.githubemoji
+pymdownx.githubemoji
 Really simple plugin to add support for
 github emojis
 
@@ -65,5 +65,5 @@ class GithubEmojiExtension(Extension):
         md.inlinePatterns.add("github-emoji-symbols", SimpleEmojiPattern(RE_EMOJI_SYMBOLS), "<not_strong")
 
 
-def makeExtension(configs={}):
-    return GithubEmojiExtension(configs=dict(configs))
+def makeExtension(*args, **kwargs):
+    return GithubEmojiExtension(*args, **kwargs)

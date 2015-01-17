@@ -33,5 +33,5 @@ class DeleteExtension(Extension):
         md.inlinePatterns.add("del", SimpleTagPattern(RE_DEL, "del"), "<not_strong")
 
 
-def makeExtension(configs={}):
-    return DeleteExtension(configs=dict(configs))
+def makeExtension(*args, **kwargs):
+    return DeleteExtension(*args, **kwargs)

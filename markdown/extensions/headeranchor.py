@@ -1,5 +1,5 @@
 """
-pymdown.headeranchor
+pymdownx.headeranchor
 An extension for Python Markdown.
 Github header anchors
 
@@ -55,15 +55,13 @@ class HeaderAnchorTreeprocessor(Treeprocessor):
 
 
 class HeaderAnchorExtension(Extension):
-    def __init__(self, configs):
+    def __init__(self, *args, **kwargs):
         self.config = {
             'sep': ['-', "Separator to use when creating header ids - Default: '-'"],
             'slugify': [slugify, 'Callable to generate anchors']
         }
-
         self.configured = False
-        for key, value in configs:
-            self.setConfig(key, value)
+        super(HeaderAnchorExtension, self).__init__(*args, **kwargs)
 
     def extendMarkdown(self, md, md_globals):
         """Add HeaderAnchorTreeprocessor to Markdown instance"""
@@ -83,5 +81,6 @@ class HeaderAnchorExtension(Extension):
             del self.md.treeprocessors["header-anchor"]
             self.md.treeprocessors.add("header-anchor", processor, ">toc")
 
-def makeExtension(configs={}):
-    return HeaderAnchorExtension(configs=configs)
+
+def makeExtension(*args, **kwargs):
+    return HeaderAnchorExtension(*args, **kwargs)
