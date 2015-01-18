@@ -17,18 +17,19 @@ split_path_re = re.compile(r'[/\\ ]')
 doctype_lookup_re = re.compile(r'''(?smx)
     (<\?.*?\?>)?\s*
     <!DOCTYPE\s+(
+     [a-zA-Z_][a-zA-Z0-9]*
+     (?: \s+      # optional in HTML5
      [a-zA-Z_][a-zA-Z0-9]*\s+
-     [a-zA-Z_][a-zA-Z0-9]*\s+
-     "[^"]*")
+     "[^"]*")?
+     )
      [^>]*>
 ''')
 tag_re = re.compile(r'<(.+?)(\s.*?)?>.*?</.+?>(?uism)')
+xml_decl_re = re.compile(r'\s*<\?xml[^>]*\?>', re.I)
 
 
 class ClassNotFound(ValueError):
-    """
-    If one of the get_*_by_* functions didn't find a matching class.
-    """
+    """Raised if one of the lookup functions didn't find a matching class."""
 
 
 class OptionError(Exception):
@@ -104,10 +105,7 @@ def docstring_headline(obj):
 
 
 def make_analysator(f):
-    """
-    Return a static text analysation function that
-    returns float values.
-    """
+    """Return a static text analyser function that returns float values."""
     def text_analyse(text):
         try:
             rv = f(text)
@@ -124,8 +122,7 @@ def make_analysator(f):
 
 
 def shebang_matches(text, regex):
-    """
-    Check if the given regular expression matches the last part of the
+    """Check if the given regular expression matches the last part of the
     shebang if one exists.
 
         >>> from pygments.util import shebang_matches
@@ -170,8 +167,8 @@ def shebang_matches(text, regex):
 
 
 def doctype_matches(text, regex):
-    """
-    Check if the doctype matches a regular expression (if present).
+    """Check if the doctype matches a regular expression (if present).
+
     Note that this method only checks the first part of a DOCTYPE.
     eg: 'html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"'
     """
@@ -179,21 +176,19 @@ def doctype_matches(text, regex):
     if m is None:
         return False
     doctype = m.group(2)
-    return re.compile(regex).match(doctype.strip()) is not None
+    return re.compile(regex, re.I).match(doctype.strip()) is not None
 
 
 def html_doctype_matches(text):
-    """
-    Check if the file looks like it has a html doctype.
-    """
-    return doctype_matches(text, r'html\s+PUBLIC\s+"-//W3C//DTD X?HTML.*')
+    """Check if the file looks like it has a html doctype."""
+    return doctype_matches(text, r'html')
 
 
 _looks_like_xml_cache = {}
 def looks_like_xml(text):
-    """
-    Check if a doctype exists or if we have some tags.
-    """
+    """Check if a doctype exists or if we have some tags."""
+    if xml_decl_re.match(text):
+        return True
     key = hash(text)
     try:
         return _looks_like_xml_cache[key]
@@ -216,9 +211,7 @@ def _surrogatepair(c):
     return (0xd7c0 + (c >> 10), (0xdc00 + (c & 0x3ff)))
 
 def unirange(a, b):
-    """
-    Returns a regular expression string to match the given non-BMP range.
-    """
+    """Returns a regular expression string to match the given non-BMP range."""
     if b < a:
         raise ValueError("Bad character range")
     if a < 0x10000 or b < 0x10000:
@@ -255,6 +248,98 @@ def unirange(a, b):
 
             return u'(?:' + u'|'.join(buf) + u')'
 
+
+def format_lines(var_name, seq, raw=False, indent_level=0):
+    """Formats a sequence of strings for output."""
+    lines = []
+    base_indent = ' ' * indent_level * 4
+    inner_indent = ' ' * (indent_level + 1) * 4
+    lines.append(base_indent + var_name + ' = (')
+    if raw:
+        # These should be preformatted reprs of, say, tuples.
+        for i in seq:
+            lines.append(inner_indent + i + ',')
+    else:
+        for i in seq:
+            # Force use of single quotes
+            r = repr(i + '"')
+            lines.append(inner_indent + r[:-2] + r[-1] + ',')
+    lines.append(base_indent + ')')
+    return '\n'.join(lines)
+
+
+def duplicates_removed(it, already_seen=()):
+    """
+    Returns a list with duplicates removed from the iterable `it`.
+
+    Order is preserved.
+    """
+    lst = []
+    seen = set()
+    for i in it:
+        if i in seen or i in already_seen:
+            continue
+        lst.append(i)
+        seen.add(i)
+    return lst
+
+
+class Future(object):
+    """Generic class to defer some work.
+
+    Handled specially in RegexLexerMeta, to support regex string construction at
+    first use.
+    """
+    def get(self):
+        raise NotImplementedError
+
+
+def guess_decode(text):
+    """Decode *text* with guessed encoding.
+
+    First try UTF-8; this should fail for non-UTF-8 encodings.
+    Then try the preferred locale encoding.
+    Fall back to latin-1, which always works.
+    """
+    try:
+        text = text.decode('utf-8')
+        return text, 'utf-8'
+    except UnicodeDecodeError:
+        try:
+            import locale
+            prefencoding = locale.getpreferredencoding()
+            text = text.decode()
+            return text, prefencoding
+        except (UnicodeDecodeError, LookupError):
+            text = text.decode('latin1')
+            return text, 'latin1'
+
+
+def guess_decode_from_terminal(text, term):
+    """Decode *text* coming from terminal *term*.
+
+    First try the terminal encoding, if given.
+    Then try UTF-8.  Then try the preferred locale encoding.
+    Fall back to latin-1, which always works.
+    """
+    if getattr(term, 'encoding', None):
+        try:
+            text = text.decode(term.encoding)
+        except UnicodeDecodeError:
+            pass
+        else:
+            return text, term.encoding
+    return guess_decode(text)
+
+
+def terminal_encoding(term):
+    """Return our best guess of encoding for the given *term*."""
+    if getattr(term, 'encoding', None):
+        return term.encoding
+    import locale
+    return locale.getpreferredencoding()
+
+
 # Python 2/3 compatibility
 
 if sys.version_info < (3, 0):
@@ -278,6 +363,7 @@ else:
     iteritems = dict.items
     itervalues = dict.values
     from io import StringIO, BytesIO
+
 
 def add_metaclass(metaclass):
     """Class decorator for creating a class with a metaclass."""

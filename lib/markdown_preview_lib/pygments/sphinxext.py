@@ -92,13 +92,7 @@ class PygmentsDoc(Directive):
         moduledocstrings = {}
         for classname, data in sorted(LEXERS.items(), key=lambda x: x[0]):
             module = data[0]
-            import sublime
-            if int(sublime.version()) >= 3000:
-                import importlib
-                from ....helper import INSTALLED_DIRECTORY
-                mod = importlib.import_module(INSTALLED_DIRECTORY + '.lib.markdown_preview_lib.%s' % module)
-            else:
-                mod = __import__("lib.markdown_preview_lib." + module, None, None, [classname])
+            mod = __import__(module, None, None, [classname])
             self.filenames.add(mod.__file__)
             cls = getattr(mod, classname)
             if not cls.__doc__:
@@ -130,9 +124,11 @@ class PygmentsDoc(Directive):
         from .formatters import FORMATTERS
 
         out = []
-        for cls, data in sorted(FORMATTERS.items(),
-                                key=lambda x: x[0].__name__):
-            self.filenames.add(sys.modules[cls.__module__].__file__)
+        for classname, data in sorted(FORMATTERS.items(), key=lambda x: x[0]):
+            module = data[0]
+            mod = __import__(module, None, None, [classname])
+            self.filenames.add(mod.__file__)
+            cls = getattr(mod, classname)
             docstring = cls.__doc__
             if isinstance(docstring, bytes):
                 docstring = docstring.decode('utf8')

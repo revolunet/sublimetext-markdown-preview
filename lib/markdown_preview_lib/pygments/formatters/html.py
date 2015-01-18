@@ -628,24 +628,24 @@ class HtmlFormatter(Formatter):
                         style = 'background-color: #ffffc0; padding: 0 5px 0 5px'
                     else:
                         style = 'background-color: #f0f0f0; padding: 0 5px 0 5px'
-                    yield 1, '<span style="%s">%*s</span> ' % (
+                    yield 1, '<span style="%s">%*s </span>' % (
                         style, mw, (num%st and ' ' or num)) + line
                     num += 1
             else:
                 for t, line in lines:
                     yield 1, ('<span style="background-color: #f0f0f0; '
-                              'padding: 0 5px 0 5px">%*s</span> ' % (
+                              'padding: 0 5px 0 5px">%*s </span>' % (
                               mw, (num%st and ' ' or num)) + line)
                     num += 1
         elif sp:
             for t, line in lines:
-                yield 1, '<span class="lineno%s">%*s</span> ' % (
+                yield 1, '<span class="lineno%s">%*s </span>' % (
                     num%sp == 0 and ' special' or '', mw,
                     (num%st and ' ' or num)) + line
                 num += 1
         else:
             for t, line in lines:
-                yield 1, '<span class="lineno">%*s</span> ' % (
+                yield 1, '<span class="lineno">%*s </span>' % (
                     mw, (num%st and ' ' or num)) + line
                 num += 1
 

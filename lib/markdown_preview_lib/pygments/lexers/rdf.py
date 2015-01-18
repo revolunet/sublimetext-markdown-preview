@@ -40,12 +40,12 @@ class SparqlLexer(RegexLexer):
              r'insert\s+data|delete\s+data|delete\s+where|delete|insert|'
              r'using named|using|graph|default|named|all|optional|service|'
              r'silent|bind|union|not in|in|as|a)', Keyword),
-            (r'(prefix|base)(\s+)([a-z][a-z\d_\-]*)(\s*)(\:)',
+            (r'(prefix|base)(\s+)([a-z][\w-]*)(\s*)(\:)',
              bygroups(Keyword, Whitespace, Name.Namespace, Whitespace,
                       Punctuation)),
-            (r'\?[a-z_][a-z\d_]*', Name.Variable),
+            (r'\?[a-z_]\w*', Name.Variable),
             (r'<[^>]+>', Name.Label),
-            (r'([a-z][a-z\d_\-]*)(\:)([a-z][a-z\d_\-]*)',
+            (r'([a-z][\w-]*)(\:)([a-z][\w-]*)',
              bygroups(Name.Namespace, Punctuation, Name.Tag)),
             (r'(str|lang|langmatches|datatype|bound|iri|uri|bnode|rand|abs|'
              r'ceil|floor|round|concat|strlen|ucase|lcase|encode_for_uri|'
@@ -57,7 +57,7 @@ class SparqlLexer(RegexLexer):
              Name.Function),
             (r'(true|false)', Literal),
             (r'[+\-]?\d*\.\d+', Number.Float),
-            (r'[+\-]?\d*(:?\.\d+)?[eE][+\-]?\d+', Number.Float),
+            (r'[+\-]?\d*(:?\.\d+)?E[+\-]?\d+', Number.Float),
             (r'[+\-]?\d+', Number.Integer),
             (r'(\|\||&&|=|\*|\-|\+|/)', Operator),
             (r'[(){}.;,:^]', Punctuation),

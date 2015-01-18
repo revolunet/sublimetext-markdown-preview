@@ -9,63 +9,122 @@
     :license: BSD, see LICENSE for details.
 """
 from __future__ import absolute_import
-import os.path
-import fnmatch
 import re
+import sys
+import types
+import fnmatch
+from os.path import basename
+import sublime
 
 from ..formatters._mapping import FORMATTERS
 from ..plugin import find_plugin_formatters
-from ..util import ClassNotFound
-
-ns = globals()
-for fcls in FORMATTERS:
-    ns[fcls.__name__] = fcls
-del fcls
+from ..util import ClassNotFound, itervalues
 
 __all__ = ['get_formatter_by_name', 'get_formatter_for_filename',
-           'get_all_formatters'] + [cls.__name__ for cls in FORMATTERS]
+           'get_all_formatters'] + list(FORMATTERS)
+
+_formatter_cache = {}  # classes by name
+_pattern_cache = {}
 
 
-_formatter_alias_cache = {}
-_formatter_filename_cache = []
-
-def _init_formatter_cache():
-    if _formatter_alias_cache:
-        return
-    for cls in get_all_formatters():
-        for alias in cls.aliases:
-            _formatter_alias_cache[alias] = cls
-        for fn in cls.filenames:
-            _formatter_filename_cache.append((
-                re.compile(fnmatch.translate(fn)), cls))
+def _fn_matches(fn, glob):
+    """Return whether the supplied file name fn matches pattern filename."""
+    if glob not in _pattern_cache:
+        pattern = _pattern_cache[glob] = re.compile(fnmatch.translate(glob))
+        return pattern.match(fn)
+    return _pattern_cache[glob].match(fn)
 
 
-def find_formatter_class(name):
-    _init_formatter_cache()
-    cls = _formatter_alias_cache.get(name, None)
-    return cls
+def _load_formatters(module_name):
+    """Load a formatter (and all others in the module too)."""
+    if int(sublime.version()) >= 3000:
+        import importlib
+        from .....helper import INSTALLED_DIRECTORY
+        mod = importlib.import_module(INSTALLED_DIRECTORY + '.lib.markdown_preview_lib.%s' % module_name)
+    else:
+        mod = __import__("lib.markdown_preview_lib." + module_name, None, None, ['__all__'])
+    for formatter_name in mod.__all__:
+        cls = getattr(mod, formatter_name)
+        _formatter_cache[cls.name] = cls
 
 
-def get_formatter_by_name(name, **options):
-    _init_formatter_cache()
-    cls = _formatter_alias_cache.get(name, None)
-    if not cls:
-        raise ClassNotFound("No formatter found for name %r" % name)
+def get_all_formatters():
+    """Return a generator for all formatter classes."""
+    # NB: this returns formatter classes, not info like get_all_lexers().
+    for info in itervalues(FORMATTERS):
+        if info[1] not in _formatter_cache:
+            _load_formatters(info[0])
+        yield _formatter_cache[info[1]]
+    for _, formatter in find_plugin_formatters():
+        yield formatter
+
+
+def find_formatter_class(alias):
+    """Lookup a formatter by alias.
+
+    Returns None if not found.
+    """
+    for module_name, name, aliases, _, _ in itervalues(FORMATTERS):
+        if alias in aliases:
+            if name not in _formatter_cache:
+                _load_formatters(module_name)
+            return _formatter_cache[name]
+    for _, cls in find_plugin_formatters():
+        if alias in cls.aliases:
+            return cls
+
+
+def get_formatter_by_name(_alias, **options):
+    """Lookup and instantiate a formatter by alias.
+
+    Raises ClassNotFound if not found.
+    """
+    cls = find_formatter_class(_alias)
+    if cls is None:
+        raise ClassNotFound("No formatter found for name %r" % _alias)
     return cls(**options)
 
 
 def get_formatter_for_filename(fn, **options):
-    _init_formatter_cache()
-    fn = os.path.basename(fn)
-    for pattern, cls in _formatter_filename_cache:
-        if pattern.match(fn):
-            return cls(**options)
+    """Lookup and instantiate a formatter by filename pattern.
+
+    Raises ClassNotFound if not found.
+    """
+    fn = basename(fn)
+    for modname, name, _, filenames, _ in itervalues(FORMATTERS):
+        for filename in filenames:
+            if _fn_matches(fn, filename):
+                if name not in _formatter_cache:
+                    _load_formatters(modname)
+                return _formatter_cache[name](**options)
+    for cls in find_plugin_formatters():
+        for filename in cls.filenames:
+            if _fn_matches(fn, filename):
+                return cls(**options)
     raise ClassNotFound("No formatter found for file name %r" % fn)
 
 
-def get_all_formatters():
-    """Return a generator for all formatters."""
-    for formatter in FORMATTERS:
-        yield formatter
-    for _, formatter in find_plugin_formatters():
-        yield formatter
+class _automodule(types.ModuleType):
+    """Automatically import formatters."""
+
+    def __getattr__(self, name):
+        info = FORMATTERS.get(name)
+        if info:
+            _load_formatters(info[0])
+            cls = _formatter_cache[info[1]]
+            setattr(self, name, cls)
+            return cls
+        raise AttributeError(name)
+
+if int(sublime.version()) >= 3000:
+    from .....helper import INSTALLED_DIRECTORY
+    oldmod = sys.modules['%s.pygments.formatters' % (INSTALLED_DIRECTORY + ".lib.markdown_preview_lib")]
+    newmod = _automodule('%s.pygments.formatters' % (INSTALLED_DIRECTORY + ".lib.markdown_preview_lib"))
+    newmod.__dict__.update(oldmod.__dict__)
+    sys.modules['%s.pygments.formatters' % (INSTALLED_DIRECTORY + ".lib.markdown_preview_lib")] = newmod
+else:
+    oldmod = sys.modules['lib.markdown_preview_lib.pygments.formatters']
+    newmod = _automodule('lib.markdown_preview_lib.pygments.formatters')
+    newmod.__dict__.update(oldmod.__dict__)
+    sys.modules['lib.markdown_preview_lib.pygments.formatters'] = newmod
+del newmod.newmod, newmod.oldmod, newmod.sys, newmod.types

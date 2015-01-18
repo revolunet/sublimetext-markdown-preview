@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    pygments.lexers._robotframeworklexer
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    pygments.lexers.robotframework
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Lexer for Robot Framework.
 
@@ -28,6 +28,8 @@ import re
 from ..lexer import Lexer
 from ..token import Token
 from ..util import text_type
+
+__all__ = ['RobotFrameworkLexer']
 
 
 HEADING = Token.Generic.Heading

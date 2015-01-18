@@ -1,4 +1,4 @@
-from __future__ import absolute_import# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
     pygments.formatters.other
     ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,9 +62,9 @@ class RawTokenFormatter(Formatter):
 
     def __init__(self, **options):
         Formatter.__init__(self, **options)
-        if self.encoding:
-            raise OptionError('the raw formatter does not support the '
-                              'encoding option')
+        # We ignore self.encoding if it is set, since it gets set for lexer
+        # and formatter if given with -Oencoding on the command line.
+        # The RawTokenFormatter outputs only ASCII. Override here.
         self.encoding = 'ascii'  # let pygments.format() do the right thing
         self.compress = get_choice_opt(options, 'compress',
                                        ['', 'none', 'gz', 'bz2'], '')
@@ -137,10 +137,8 @@ class TestcaseFormatter(Formatter):
 
     def __init__(self, **options):
         Formatter.__init__(self, **options)
-        #if self.encoding != 'utf-8':
-        #    print >>sys.stderr, "NOTICE: Forcing encoding to utf-8, as all Pygments source is"
         if self.encoding is not None and self.encoding != 'utf-8':
-            raise ValueError("Only None and utf-u are allowed encodings.")
+            raise ValueError("Only None and utf-8 are allowed encodings.")
 
     def format(self, tokensource, outfile):
         indentation = ' ' * 12

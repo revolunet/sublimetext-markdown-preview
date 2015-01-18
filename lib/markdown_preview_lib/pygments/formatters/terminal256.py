@@ -67,6 +67,7 @@ class EscapeSequence:
             attrs.append("00")
         return self.escape(attrs)
 
+
 class Terminal256Formatter(Formatter):
     r"""
     Format tokens with ANSI color sequences, for output in a 256-color
@@ -99,28 +100,28 @@ class Terminal256Formatter(Formatter):
         self.usebold = 'nobold' not in options
         self.useunderline = 'nounderline' not in options
 
-        self._build_color_table() # build an RGB-to-256 color conversion table
-        self._setup_styles() # convert selected style's colors to term. colors
+        self._build_color_table()  # build an RGB-to-256 color conversion table
+        self._setup_styles()  # convert selected style's colors to term. colors
 
     def _build_color_table(self):
         # colors 0..15: 16 basic colors
 
-        self.xterm_colors.append((0x00, 0x00, 0x00)) # 0
-        self.xterm_colors.append((0xcd, 0x00, 0x00)) # 1
-        self.xterm_colors.append((0x00, 0xcd, 0x00)) # 2
-        self.xterm_colors.append((0xcd, 0xcd, 0x00)) # 3
-        self.xterm_colors.append((0x00, 0x00, 0xee)) # 4
-        self.xterm_colors.append((0xcd, 0x00, 0xcd)) # 5
-        self.xterm_colors.append((0x00, 0xcd, 0xcd)) # 6
-        self.xterm_colors.append((0xe5, 0xe5, 0xe5)) # 7
-        self.xterm_colors.append((0x7f, 0x7f, 0x7f)) # 8
-        self.xterm_colors.append((0xff, 0x00, 0x00)) # 9
-        self.xterm_colors.append((0x00, 0xff, 0x00)) # 10
-        self.xterm_colors.append((0xff, 0xff, 0x00)) # 11
-        self.xterm_colors.append((0x5c, 0x5c, 0xff)) # 12
-        self.xterm_colors.append((0xff, 0x00, 0xff)) # 13
-        self.xterm_colors.append((0x00, 0xff, 0xff)) # 14
-        self.xterm_colors.append((0xff, 0xff, 0xff)) # 15
+        self.xterm_colors.append((0x00, 0x00, 0x00))  # 0
+        self.xterm_colors.append((0xcd, 0x00, 0x00))  # 1
+        self.xterm_colors.append((0x00, 0xcd, 0x00))  # 2
+        self.xterm_colors.append((0xcd, 0xcd, 0x00))  # 3
+        self.xterm_colors.append((0x00, 0x00, 0xee))  # 4
+        self.xterm_colors.append((0xcd, 0x00, 0xcd))  # 5
+        self.xterm_colors.append((0x00, 0xcd, 0xcd))  # 6
+        self.xterm_colors.append((0xe5, 0xe5, 0xe5))  # 7
+        self.xterm_colors.append((0x7f, 0x7f, 0x7f))  # 8
+        self.xterm_colors.append((0xff, 0x00, 0x00))  # 9
+        self.xterm_colors.append((0x00, 0xff, 0x00))  # 10
+        self.xterm_colors.append((0xff, 0xff, 0x00))  # 11
+        self.xterm_colors.append((0x5c, 0x5c, 0xff))  # 12
+        self.xterm_colors.append((0xff, 0x00, 0xff))  # 13
+        self.xterm_colors.append((0x00, 0xff, 0xff))  # 14
+        self.xterm_colors.append((0xff, 0xff, 0xff))  # 15
 
         # colors 16..232: the 6x6x6 color cube
 
@@ -139,7 +140,7 @@ class Terminal256Formatter(Formatter):
             self.xterm_colors.append((v, v, v))
 
     def _closest_color(self, r, g, b):
-        distance = 257*257*3 # "infinity" (>distance from #000000 to #ffffff)
+        distance = 257*257*3  # "infinity" (>distance from #000000 to #ffffff)
         match = 0
 
         for i in range(0, 254):
@@ -198,7 +199,7 @@ class Terminal256Formatter(Formatter):
             not_found = True
             while ttype and not_found:
                 try:
-                    #outfile.write( "<" + str(ttype) + ">" )
+                    # outfile.write( "<" + str(ttype) + ">" )
                     on, off = self.style_string[str(ttype)]
 
                     # Like TerminalFormatter, add "reset colors" escape sequence
@@ -212,12 +213,12 @@ class Terminal256Formatter(Formatter):
                         outfile.write(on + spl[-1] + off)
 
                     not_found = False
-                    #outfile.write( '#' + str(ttype) + '#' )
+                    # outfile.write( '#' + str(ttype) + '#' )
 
                 except KeyError:
-                    #ottype = ttype
+                    # ottype = ttype
                     ttype = ttype[:-1]
-                    #outfile.write( '!' + str(ottype) + '->' + str(ttype) + '!' )
+                    # outfile.write( '!' + str(ottype) + '->' + str(ttype) + '!' )
 
             if not_found:
                 outfile.write(value)
