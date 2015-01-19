@@ -35,9 +35,11 @@ from __future__ import unicode_literals
 from .__version__ import version, version_info
 import codecs
 import sys
+PY3 = sys.version_info >= (3, 0)
 import logging
 import warnings
-import importlib
+if PY3:
+    import importlib
 from . import util
 from .preprocessors import build_preprocessors
 from .blockprocessors import build_block_parser
@@ -50,7 +52,12 @@ from .serializers import to_html_string, to_xhtml_string
 __all__ = ['Markdown', 'markdown', 'markdownFromFile']
 
 logger = logging.getLogger('MARKDOWN')
-logging.captureWarnings(True)
+
+try:
+    logging.captureWarnings(True)
+except AttributeError:
+    # Python 2.6 does not contain `captureWarnings`, ignore for now.
+    pass
 
 
 class Markdown(object):
@@ -219,7 +226,10 @@ class Markdown(object):
         # Try loading the extension first from one place, then another
         try: 
             # Assume string uses dot syntax (`path.to.some.module`)
-            module = importlib.import_module(ext_name)
+            if PY3:
+                module = importlib.import_module(ext_name)
+            else:
+                module = __import__(module_name, {}, {}, [module_name.rpartition('.')[0]])
             logger.debug('Successfuly imported extension module "%s".' % ext_name)
             # For backward compat (until deprecation) check that this is an extension
             if '.' not in ext_name and not (hasattr(module, 'extendMarkdown') or (class_name and hasattr(module, class_name))):
@@ -229,7 +239,10 @@ class Markdown(object):
             # Preppend `markdown.extensions.` to name
             module_name = '.'.join(['markdown.extensions', ext_name])
             try: 
-                module = importlib.import_module(module_name)
+                if PY3:
+                    module = importlib.import_module(module_name)
+                else:
+                    module = __import__(module_name, {}, {}, [module_name.rpartition('.')[0]])
                 logger.debug('Successfuly imported extension module "%s".' % module_name)
                 warnings.warn('Using short names for Markdown\'s builtin extensions is pending deprecation. '
                               'Use the full path to the extension with Python\'s dot notation '
@@ -241,7 +254,10 @@ class Markdown(object):
                 # Preppend `mdx_` to name
                 module_name_old_style = '_'.join(['mdx', ext_name])
                 try: 
-                    module = importlib.import_module(module_name_old_style)
+                    if PY3:
+                        module = importlib.import_module(module_name_old_style)
+                    else:
+                        module = __import__(module_name, {}, {}, [module_name.rpartition('.')[0]])
                     logger.debug('Successfuly imported extension module "%s".' % module_name_old_style)
                     warnings.warn('Markdown\'s behavuor of appending "mdx_" to an extension name '
                                   'is pending deprecation. Use the full path to the extension with '
@@ -497,4 +513,3 @@ def markdownFromFile(*args, **kwargs):
     md.convertFile(kwargs.get('input', None),
                    kwargs.get('output', None),
                    kwargs.get('encoding', None))
-
