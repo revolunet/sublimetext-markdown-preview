@@ -30,12 +30,12 @@ RE_MAIL = r'''(?x)(?i)
 
 RE_LINK = r'''(?x)(?i)
 (
-    (
-        (ht|f)tp(s?)://(([a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)|localhost)|  # (HTTP|FTP)://
-        (?P<www>w{3})(\.[a-zA-Z0-9\-._]+(\.[a-zA-Z0-9\-._]+)+)               # WWW.
+    \b(?:
+        (?:ht|f)tps?://(?:(?:[a-z\d\-_]+(?:\.[a-z\d\-._]+)+)|localhost)|  # (http|ftp)://
+        (?P<www>w{3}\.)[a-z\d\-_]+(?:\.[a-z\d\-._]+)+                     # www.
     )
-    (/?)([a-zA-Z0-9\-.?,'/+&%$#_]*)([\d\w./%+-=&?:"',|~;]*)
-    [A-Za-z\d\-_~:/?#@!$*+=]
+    /?[a-z\d\-._?,!'(){}\[\]/+&@%$#=:"|~;]*                               # url path, fragments, and query stuff
+    [a-z\d\-_~:/#@$*+=]                                                   # allowed end chars
 )
 '''
 
