@@ -489,7 +489,7 @@ class Compiler(object):
         frontmatter = {}
 
         if text.startswith("---"):
-            m = re.search(r'^(---(.*?)---\r?\n)', text, re.DOTALL)
+            m = re.search(r'^(---(.*?)---[ \t]*\r?\n)', text, re.DOTALL)
             if m:
                 try:
                     frontmatter = yaml.load(m.group(2))
