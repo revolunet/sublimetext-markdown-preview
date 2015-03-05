@@ -78,7 +78,6 @@ class SvgFormatter(Formatter):
     filenames = ['*.svg']
 
     def __init__(self, **options):
-        # XXX outencoding
         Formatter.__init__(self, **options)
         self.nowrap = get_bool_opt(options, 'nowrap', False)
         self.fontfamily = options.get('fontfamily', 'monospace')

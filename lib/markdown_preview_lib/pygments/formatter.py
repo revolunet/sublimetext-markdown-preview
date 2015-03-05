@@ -68,10 +68,10 @@ class Formatter(object):
         self.full  = get_bool_opt(options, 'full', False)
         self.title = options.get('title', '')
         self.encoding = options.get('encoding', None) or None
-        if self.encoding == 'guess':
-            # can happen for pygmentize -O encoding=guess
+        if self.encoding in ('guess', 'chardet'):
+            # can happen for e.g. pygmentize -O encoding=guess
             self.encoding = 'utf-8'
-        self.encoding = options.get('outencoding', None) or self.encoding
+        self.encoding = options.get('outencoding') or self.encoding
         self.options = options
 
     def get_style_defs(self, arg=''):

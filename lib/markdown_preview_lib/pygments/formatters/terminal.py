@@ -108,8 +108,8 @@ class TerminalFormatter(Formatter):
 
         for ttype, value in tokensource:
             if value.endswith("\n"):
-               self._write_lineno(outfile)
-               value = value[:-1]
+                self._write_lineno(outfile)
+                value = value[:-1]
             color = self.colorscheme.get(ttype)
             while color is None:
                 ttype = ttype[:-1]

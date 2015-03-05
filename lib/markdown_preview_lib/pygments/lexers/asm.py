@@ -12,12 +12,14 @@ from __future__ import absolute_import
 import re
 
 from ..lexer import RegexLexer, include, bygroups, using, DelegatingLexer
-from ..lexers.compiled import DLexer, CppLexer, CLexer
+from ..lexers.c_cpp import CppLexer, CLexer
+from ..lexers.d import DLexer
 from ..token import Text, Name, Number, String, Comment, Punctuation, \
-     Other, Keyword, Operator
+    Other, Keyword, Operator
 
-__all__ = ['GasLexer', 'ObjdumpLexer','DObjdumpLexer', 'CppObjdumpLexer',
-           'CObjdumpLexer', 'LlvmLexer', 'NasmLexer', 'NasmObjdumpLexer', 'Ca65Lexer']
+__all__ = ['GasLexer', 'ObjdumpLexer', 'DObjdumpLexer', 'CppObjdumpLexer',
+           'CObjdumpLexer', 'LlvmLexer', 'NasmLexer', 'NasmObjdumpLexer',
+           'Ca65Lexer']
 
 
 class GasLexer(RegexLexer):
@@ -31,7 +33,7 @@ class GasLexer(RegexLexer):
 
     #: optional Comment or Whitespace
     string = r'"(\\"|[^"])*"'
-    char = r'[a-zA-Z$._0-9@-]'
+    char = r'[\w$.@-]'
     identifier = r'(?:[a-zA-Z$_]' + char + '*|\.' + char + '+)'
     number = r'(?:0[xX][a-zA-Z0-9]+|\d+)'
 
@@ -154,9 +156,7 @@ class ObjdumpLexer(RegexLexer):
     filenames = ['*.objdump']
     mimetypes = ['text/x-objdump']
 
-
     tokens = _objdump_lexer_tokens(GasLexer)
-
 
 
 class DObjdumpLexer(DelegatingLexer):
@@ -209,7 +209,7 @@ class LlvmLexer(RegexLexer):
 
     #: optional Comment or Whitespace
     string = r'"[^"]*?"'
-    identifier = r'([-a-zA-Z$._][-a-zA-Z$._0-9]*|' + string + ')'
+    identifier = r'([-a-zA-Z$._][\w\-$.]*|' + string + ')'
 
     tokens = {
         'root': [
@@ -220,11 +220,11 @@ class LlvmLexer(RegexLexer):
 
             include('keyword'),
 
-            (r'%' + identifier, Name.Variable),#Name.Identifier.Local),
-            (r'@' + identifier, Name.Variable.Global),#Name.Identifier.Global),
-            (r'%\d+', Name.Variable.Anonymous),#Name.Identifier.Anonymous),
-            (r'@\d+', Name.Variable.Global),#Name.Identifier.Anonymous),
-            (r'#\d+', Name.Variable.Global),#Name.Identifier.Global),
+            (r'%' + identifier, Name.Variable),
+            (r'@' + identifier, Name.Variable.Global),
+            (r'%\d+', Name.Variable.Anonymous),
+            (r'@\d+', Name.Variable.Global),
+            (r'#\d+', Name.Variable.Global),
             (r'!' + identifier, Name.Variable),
             (r'!\d+', Name.Variable.Anonymous),
             (r'c?' + string, String),
@@ -319,7 +319,7 @@ class NasmLexer(RegexLexer):
     mimetypes = ['text/x-nasm']
 
     identifier = r'[a-z$._?][\w$.?#@~]*'
-    hexn = r'(?:0[xX][0-9a-f]+|$0[0-9a-f]*|[0-9]+[0-9a-f]*h)'
+    hexn = r'(?:0x[0-9a-f]+|$0[0-9a-f]*|[0-9]+[0-9a-f]*h)'
     octn = r'[0-7]+q'
     binn = r'[01]+b'
     decn = r'[0-9]+'
@@ -338,8 +338,8 @@ class NasmLexer(RegexLexer):
     flags = re.IGNORECASE | re.MULTILINE
     tokens = {
         'root': [
-            include('whitespace'),
             (r'^\s*%', Comment.Preproc, 'preproc'),
+            include('whitespace'),
             (identifier + ':', Name.Label),
             (r'(%s)(\s+)(equ)' % identifier,
                 bygroups(Name.Constant, Keyword.Declaration, Keyword.Declaration),
@@ -402,7 +402,7 @@ class Ca65Lexer(RegexLexer):
 
     .. versionadded:: 1.6
     """
-    name = 'ca65'
+    name = 'ca65 assembler'
     aliases = ['ca65']
     filenames = ['*.s']
 
@@ -424,7 +424,7 @@ class Ca65Lexer(RegexLexer):
             (r'\$[0-9a-f]+|[0-9a-f]+h\b', Number.Hex),
             (r'\d+', Number.Integer),
             (r'%[01]+', Number.Bin),
-            (r'[#,.:()=]', Punctuation),
+            (r'[#,.:()=\[\]]', Punctuation),
             (r'[a-z_.@$][\w.@$]*', Name),
         ]
     }

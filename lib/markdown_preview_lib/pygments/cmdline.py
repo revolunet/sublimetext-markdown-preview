@@ -29,7 +29,7 @@ from .styles import get_all_styles, get_style_by_name
 
 USAGE = """\
 Usage: %s [-l <lexer> | -g] [-F <filter>[:<options>]] [-f <formatter>]
-          [-O <options>] [-P <option=value>] [-o <outfile>] [<infile>]
+          [-O <options>] [-P <option=value>] [-s] [-o <outfile>] [<infile>]
 
        %s -S <style> -f <formatter> [-a <arg>] [-O <options>] [-P <option=value>]
        %s -L [<which> ...]
@@ -40,6 +40,10 @@ Usage: %s [-l <lexer> | -g] [-F <filter>[:<options>]] [-f <formatter>]
 Highlight the input file and write the result to <outfile>.
 
 If no input file is given, use stdin, if -o is not given, use stdout.
+
+If -s is passed, lexing will be done in "streaming" mode, reading and
+highlighting one line at a time.  This will only work properly with
+lexers that have no constructs spanning multiple lines!
 
 <lexer> is a lexer name (query all lexer names with -L). If -l is not
 given, the lexer is guessed from the extension of the input file name
@@ -79,6 +83,11 @@ If no specific lexer can be determined "text" is returned.
 
 The -H option prints detailed help for the object <name> of type <type>,
 where <type> is one of "lexer", "formatter" or "filter".
+
+The -s option processes lines one at a time until EOF, rather than
+waiting to process the entire file.  This only works for stdin, and
+is intended for streaming input such as you get from 'tail -f'.
+Example usage: "tail -f sql.log | pygmentize -s -l sql"
 
 The -h option prints this help.
 The -V option prints the package version.
@@ -196,16 +205,8 @@ def main(args=sys.argv):
 
     usage = USAGE % ((args[0],) * 6)
 
-    if sys.platform in ['win32', 'cygwin']:
-        try:
-            # Provide coloring under Windows, if possible
-            import colorama
-            colorama.init()
-        except ImportError:
-            pass
-
     try:
-        popts, args = getopt.getopt(args[1:], "l:f:F:o:O:P:LS:a:N:hVHg")
+        popts, args = getopt.getopt(args[1:], "l:f:F:o:O:P:LS:a:N:hVHgs")
     except getopt.GetoptError:
         print(usage, file=sys.stderr)
         return 2
@@ -221,10 +222,6 @@ def main(args=sys.argv):
         elif opt == '-F':
             F_opts.append(arg)
         opts[opt] = arg
-
-    if not opts and not args:
-        print(usage)
-        return 0
 
     if opts.pop('-h', None) is not None:
         print(usage)
@@ -278,6 +275,10 @@ def main(args=sys.argv):
             parsed_opts[name] = value
     opts.pop('-P', None)
 
+    # encodings
+    inencoding  = parsed_opts.get('inencoding', parsed_opts.get('encoding'))
+    outencoding = parsed_opts.get('outencoding', parsed_opts.get('encoding'))
+
     # handle ``pygmentize -N``
     infn = opts.pop('-N', None)
     if infn is not None:
@@ -328,6 +329,72 @@ def main(args=sys.argv):
     F_opts = _parse_filters(F_opts)
     opts.pop('-F', None)
 
+    # select lexer
+    lexer = opts.pop('-l', None)
+    if lexer:
+        try:
+            lexer = get_lexer_by_name(lexer, **parsed_opts)
+        except (OptionError, ClassNotFound) as err:
+            print('Error:', err, file=sys.stderr)
+            return 1
+
+    # read input code
+    code = None
+
+    if args:
+        if len(args) > 1:
+            print(usage, file=sys.stderr)
+            return 2
+
+        if '-s' in opts:
+            print('Error: -s option not usable when input file specified',
+                  file=sys.stderr)
+            return 1
+
+        infn = args[0]
+        try:
+            with open(infn, 'rb') as infp:
+                code = infp.read()
+        except Exception as err:
+            print('Error: cannot read infile:', err, file=sys.stderr)
+            return 1
+        if not inencoding:
+            code, inencoding = guess_decode(code)
+
+        # do we have to guess the lexer?
+        if not lexer:
+            try:
+                lexer = get_lexer_for_filename(infn, code, **parsed_opts)
+            except ClassNotFound as err:
+                if '-g' in opts:
+                    try:
+                        lexer = guess_lexer(code, **parsed_opts)
+                    except ClassNotFound:
+                        lexer = TextLexer(**parsed_opts)
+                else:
+                    print('Error:', err, file=sys.stderr)
+                    return 1
+            except OptionError as err:
+                print('Error:', err, file=sys.stderr)
+                return 1
+
+    elif '-s' not in opts:  # treat stdin as full file (-s support is later)
+        # read code from terminal, always in binary mode since we want to
+        # decode ourselves and be tolerant with it
+        if sys.version_info > (3,):
+            # Python 3: we have to use .buffer to get a binary stream
+            code = sys.stdin.buffer.read()
+        else:
+            code = sys.stdin.read()
+        if not inencoding:
+            code, inencoding = guess_decode_from_terminal(code, sys.stdin)
+            # else the lexer will do the decoding
+        if not lexer:
+            try:
+                lexer = guess_lexer(code, **parsed_opts)
+            except ClassNotFound:
+                lexer = TextLexer(**parsed_opts)
+
     # select formatter
     outfn = opts.pop('-o', None)
     fmter = opts.pop('-f', None)
@@ -353,58 +420,36 @@ def main(args=sys.argv):
     else:
         if not fmter:
             fmter = TerminalFormatter(**parsed_opts)
-        outfile = sys.stdout
-
-    # select lexer
-    lexer = opts.pop('-l', None)
-    if lexer:
-        try:
-            lexer = get_lexer_by_name(lexer, **parsed_opts)
-        except (OptionError, ClassNotFound) as err:
-            print('Error:', err, file=sys.stderr)
-            return 1
-
-    if args:
-        if len(args) > 1:
-            print(usage, file=sys.stderr)
-            return 2
-
-        infn = args[0]
-        try:
-            code = open(infn, 'rb').read()
-        except Exception as err:
-            print('Error: cannot read infile:', err, file=sys.stderr)
-            return 1
-
-        if not lexer:
-            try:
-                lexer = get_lexer_for_filename(infn, code, **parsed_opts)
-            except ClassNotFound as err:
-                if '-g' in opts:
-                    try:
-                        lexer = guess_lexer(code, **parsed_opts)
-                    except ClassNotFound:
-                        lexer = TextLexer(**parsed_opts)
-                else:
-                    print('Error:', err, file=sys.stderr)
-                    return 1
-            except OptionError as err:
-                print('Error:', err, file=sys.stderr)
-                return 1
-
-    else:
-        if '-g' in opts:
-            code = sys.stdin.read()
-            try:
-                lexer = guess_lexer(code, **parsed_opts)
-            except ClassNotFound:
-                lexer = TextLexer(**parsed_opts)
-        elif not lexer:
-            print('Error: no lexer name given and reading ' + \
-                                'from stdin (try using -g or -l <lexer>)', file=sys.stderr)
-            return 2
+        if sys.version_info > (3,):
+            # Python 3: we have to use .buffer to get a binary stream
+            outfile = sys.stdout.buffer
         else:
-            code = sys.stdin.read()
+            outfile = sys.stdout
+
+    # determine output encoding if not explicitly selected
+    if not outencoding:
+        if outfn:
+            # output file? use lexer encoding for now (can still be None)
+            fmter.encoding = inencoding
+        else:
+            # else use terminal encoding
+            fmter.encoding = terminal_encoding(sys.stdout)
+
+    # provide coloring under Windows, if possible
+    if not outfn and sys.platform in ('win32', 'cygwin') and \
+       fmter.name in ('Terminal', 'Terminal256'):
+        # unfortunately colorama doesn't support binary streams on Py3
+        if sys.version_info > (3,):
+            import io
+            outfile = io.TextIOWrapper(outfile, encoding=fmter.encoding)
+            fmter.encoding = None
+        try:
+            import colorama.initialise
+        except ImportError:
+            pass
+        else:
+            outfile = colorama.initialise.wrap_stream(
+                outfile, convert=None, strip=None, autoreset=False, wrap=True)
 
     # When using the LaTeX formatter and the option `escapeinside` is
     # specified, we need a special lexer which collects escaped text
@@ -415,31 +460,40 @@ def main(args=sys.argv):
         right = escapeinside[1]
         lexer = LatexEmbeddedLexer(left, right, lexer)
 
-    # No encoding given? Use latin1 if output file given,
-    # stdin/stdout encoding otherwise.
-    # (This is a compromise, I'm not too happy with it...)
-    if 'encoding' not in parsed_opts and 'outencoding' not in parsed_opts:
-        if outfn:
-            # encoding pass-through
-            fmter.encoding = 'latin1'
-        else:
-            if sys.version_info < (3,):
-                # use terminal encoding; Python 3's terminals already do that
-                lexer.encoding = getattr(sys.stdin, 'encoding',
-                                         None) or 'ascii'
-                fmter.encoding = getattr(sys.stdout, 'encoding',
-                                         None) or 'ascii'
-    elif not outfn and sys.version_info > (3,):
-        # output to terminal with encoding -> use .buffer
-        outfile = sys.stdout.buffer
-
     # ... and do it!
     try:
         # process filters
         for fname, fopts in F_opts:
             lexer.add_filter(fname, **fopts)
-        highlight(code, lexer, fmter, outfile)
+
+        if '-s' not in opts:
+            # process whole input as per normal...
+            highlight(code, lexer, fmter, outfile)
+        else:
+            if not lexer:
+                print('Error: when using -s a lexer has to be selected with -l',
+                      file=sys.stderr)
+                return 1
+            # line by line processing of stdin (eg: for 'tail -f')...
+            try:
+                while 1:
+                    if sys.version_info > (3,):
+                        # Python 3: we have to use .buffer to get a binary stream
+                        line = sys.stdin.buffer.readline()
+                    else:
+                        line = sys.stdin.readline()
+                    if not line:
+                        break
+                    if not inencoding:
+                        line = guess_decode_from_terminal(line, sys.stdin)[0]
+                    highlight(line, lexer, fmter, outfile)
+                    if hasattr(outfile, 'flush'):
+                        outfile.flush()
+            except KeyboardInterrupt:
+                return 0
+
     except Exception:
+        raise
         import traceback
         info = traceback.format_exception(*sys.exc_info())
         msg = info[-1].strip()

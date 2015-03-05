@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    pygments.lexers._luabuiltins
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    pygments.lexers._lua_builtins
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file contains the names and modules of lua functions
     It is able to re-generate itself, but for adding new functions you
@@ -16,7 +16,7 @@
 from __future__ import print_function
 
 
-MODULES = {'basic': ['_G',
+MODULES = {'basic': ('_G',
            '_VERSION',
            'assert',
            'collectgarbage',
@@ -42,14 +42,14 @@ MODULES = {'basic': ['_G',
            'tostring',
            'type',
            'unpack',
-           'xpcall'],
- 'coroutine': ['coroutine.create',
+           'xpcall'),
+ 'coroutine': ('coroutine.create',
                'coroutine.resume',
                'coroutine.running',
                'coroutine.status',
                'coroutine.wrap',
-               'coroutine.yield'],
- 'debug': ['debug.debug',
+               'coroutine.yield'),
+ 'debug': ('debug.debug',
            'debug.getfenv',
            'debug.gethook',
            'debug.getinfo',
@@ -62,8 +62,8 @@ MODULES = {'basic': ['_G',
            'debug.setlocal',
            'debug.setmetatable',
            'debug.setupvalue',
-           'debug.traceback'],
- 'io': ['io.close',
+           'debug.traceback'),
+ 'io': ('io.close',
         'io.flush',
         'io.input',
         'io.lines',
@@ -73,8 +73,8 @@ MODULES = {'basic': ['_G',
         'io.read',
         'io.tmpfile',
         'io.type',
-        'io.write'],
- 'math': ['math.abs',
+        'io.write'),
+ 'math': ('math.abs',
           'math.acos',
           'math.asin',
           'math.atan2',
@@ -103,16 +103,16 @@ MODULES = {'basic': ['_G',
           'math.sin',
           'math.sqrt',
           'math.tanh',
-          'math.tan'],
- 'modules': ['module',
+          'math.tan'),
+ 'modules': ('module',
              'require',
              'package.cpath',
              'package.loaded',
              'package.loadlib',
              'package.path',
              'package.preload',
-             'package.seeall'],
- 'os': ['os.clock',
+             'package.seeall'),
+ 'os': ('os.clock',
         'os.date',
         'os.difftime',
         'os.execute',
@@ -122,8 +122,8 @@ MODULES = {'basic': ['_G',
         'os.rename',
         'os.setlocale',
         'os.time',
-        'os.tmpname'],
- 'string': ['string.byte',
+        'os.tmpname'),
+ 'string': ('string.byte',
             'string.char',
             'string.dump',
             'string.find',
@@ -136,12 +136,12 @@ MODULES = {'basic': ['_G',
             'string.rep',
             'string.reverse',
             'string.sub',
-            'string.upper'],
- 'table': ['table.concat',
+            'string.upper'),
+ 'table': ('table.concat',
            'table.insert',
            'table.maxn',
            'table.remove',
-           'table.sort']}
+           'table.sort')}
 
 if __name__ == '__main__':
     import re
@@ -221,21 +221,17 @@ if __name__ == '__main__':
             return 'basic'
 
     def regenerate(filename, modules):
-        f = open(filename)
-        try:
-            content = f.read()
-        finally:
-            f.close()
+        with open(filename) as fp:
+            content = fp.read()
 
         header = content[:content.find('MODULES = {')]
         footer = content[content.find("if __name__ == '__main__':"):]
 
 
-        f = open(filename, 'w')
-        f.write(header)
-        f.write('MODULES = %s\n\n' % pprint.pformat(modules))
-        f.write(footer)
-        f.close()
+        with open(filename, 'w') as fp:
+            fp.write(header)
+            fp.write('MODULES = %s\n\n' % pprint.pformat(modules))
+            fp.write(footer)
 
     def run():
         version = get_newest_version()
@@ -250,6 +246,5 @@ if __name__ == '__main__':
             modules.setdefault(m, []).append(full_function_name)
 
         regenerate(__file__, modules)
-
 
     run()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    pygments.lexers._asybuiltins
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    pygments.lexers._asy_builtins
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file contains the asy-function names and asy-variable names of
     Asymptote.
@@ -14,7 +14,7 @@
     :license: BSD, see LICENSE for details.
 """
 
-ASYFUNCNAME = set([
+ASYFUNCNAME = set((
     'AND',
     'Arc',
     'ArcArrow',
@@ -1038,9 +1038,9 @@ ASYFUNCNAME = set([
     'ztick',
     'ztick3',
     'ztrans'
-])
+))
 
-ASYVARNAME = set([
+ASYVARNAME = set((
     'AliceBlue',
     'Align',
     'Allow',
@@ -1642,4 +1642,4 @@ ASYVARNAME = set([
     'ylabelwidth',
     'zerotickfuzz',
     'zerowinding'
-])
+))

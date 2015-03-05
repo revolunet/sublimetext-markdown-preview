@@ -12,8 +12,8 @@ from __future__ import absolute_import
 import re
 
 from ..lexer import RegexLexer, include, bygroups, using, this
-from ..token import Keyword, Punctuation, Text, Comment, Operator, Name,\
-    String, Number, Generic, Whitespace
+from ..token import Keyword, Punctuation, Comment, Operator, Name,\
+    String, Number, Whitespace
 
 
 __all__ = ['CypherLexer']
@@ -30,7 +30,7 @@ class CypherLexer(RegexLexer):
     """
     name = 'Cypher'
     aliases = ['cypher']
-    filenames = ['*.cyp','*.cypher']
+    filenames = ['*.cyp', '*.cypher']
 
     flags = re.MULTILINE | re.IGNORECASE
 
@@ -43,7 +43,7 @@ class CypherLexer(RegexLexer):
             include('strings'),
             include('whitespace'),
             include('barewords'),
-            ],
+        ],
         'comment': [
             (r'^.*//.*\n', Comment.Single),
         ],
@@ -66,7 +66,7 @@ class CypherLexer(RegexLexer):
             (r'[.*{}]', Punctuation),
         ],
         'strings': [
-            (r'"(?:\\[tbnrf\'\"\\]|[^\\"])*"', String),
+            (r'"(?:\\[tbnrf\'"\\]|[^\\"])*"', String),
             (r'`(?:``|[^`])+`', Name.Variable),
         ],
         'whitespace': [

@@ -18,7 +18,7 @@
   win.convertUML = function(className, converter, settings) {
     var charts = doc.querySelectorAll("pre." + className),
         arr = [],
-        i, maxItem, diagaram, text, curNode;
+        i, j, maxItem, diagaram, text, curNode;
 
     // Is there a settings object?
     if (settings === void 0) {
@@ -33,8 +33,8 @@
         childEl = arr[i].firstChild;
         parentEl = childEl.parentNode;
         text = "";
-        for (var i = 0; i < childEl.childNodes.length; i++) {
-            curNode = childEl.childNodes[i];
+        for (j = 0; j < childEl.childNodes.length; j++) {
+            curNode = childEl.childNodes[j];
             whitespace = /^\s*$/;
             if (curNode.nodeName === "#text" && !(whitespace.test(curNode.nodeValue))) {
                 text = curNode.nodeValue;

@@ -1,6 +1,6 @@
 """
 ---
-pymdown.superfences
+pymdownx.superfences
 Neseted Fenced Code Blocks
 
 This is a modification of the original Fenced Code Extension.
@@ -365,14 +365,21 @@ class SuperFencesBlockPreprocessor(Preprocessor):
         # Save the fenced blocks to add once we are done iterating the lines
         placeholder = self.markdown.htmlStash.store(code, safe=True)
         self.stack.append(('%s%s' % (self.ws, placeholder), start, end))
-        # If an indented block consumes this placeholder, we can unback the original source
-        obj["stash"].store(placeholder[1:-1], "%s\n%s%s" % (self.first, source, self.last), self.ws_len)
+        if not self.disabled_indented:
+            # If an indented block consumes this placeholder,
+            # we can restore the original source
+            obj["stash"].store(
+                placeholder[1:-1],
+                "%s\n%s%s" % (self.first, source, self.last),
+                self.ws_len
+            )
 
     def run(self, lines):
         """ Search for fenced blocks """
         self.check_codehilite()
         self.clear()
         self.stack = []
+        self.disabled_indented = self.config.get("disable_indented_code_blocks", False)
         self.uml_flow = self.config.get("uml_flow", True)
         self.uml_sequence = self.config.get("uml_sequence", True)
 
@@ -444,5 +451,5 @@ class SuperFencesCodeBlockProcessor(CodeBlockProcessor):
         return handled
 
 
-def makeExtension(configs={}):
-    return SuperFencesCodeExtension(configs=dict(configs))
+def makeExtension(*args, **kwargs):
+    return SuperFencesCodeExtension(*args, **kwargs)

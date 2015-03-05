@@ -11,7 +11,7 @@
 from __future__ import absolute_import
 import re
 
-from ..lexer import RegexLexer, include, bygroups
+from ..lexer import RegexLexer, include, bygroups, default
 from ..token import Punctuation, Text, Comment, Operator, Keyword, \
     Name, String, Number
 
@@ -74,7 +74,7 @@ class LimboLexer(RegexLexer):
         ],
         'root': [
             include('whitespace'),
-            ('', Text, 'statement'),
+            default('statement'),
         ],
     }
 

@@ -30,5 +30,5 @@ class InsertExtension(Extension):
         md.inlinePatterns.add("ins", SimpleTagPattern(RE_INS, "ins"), "<not_strong")
 
 
-def makeExtension(configs={}):
-    return InsertExtension(configs=dict(configs))
+def makeExtension(*args, **kwargs):
+    return InsertExtension(*args, **kwargs)

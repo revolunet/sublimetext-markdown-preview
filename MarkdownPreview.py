@@ -23,7 +23,7 @@ if is_ST3():
     from . import yaml
     from .markdown_settings import Settings
     from .markdown_wrapper import StMarkdown as Markdown
-    from .lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
+    from .lib.markdown_preview_lib.pygments.formatters import get_formatter_by_name
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen, url2pathname, pathname2url
     from urllib.parse import urlparse, urlunparse
@@ -31,7 +31,6 @@ if is_ST3():
     from urllib.parse import quote
     from .markdown.extensions import codehilite
     try:
-        # from pygments.styles import get_style_by_name
         PYGMENTS_AVAILABLE = codehilite.pygments
     except:
         PYGMENTS_AVAILABLE = False
@@ -48,14 +47,13 @@ else:
     import yaml
     from markdown_settings import Settings
     from markdown_wrapper import StMarkdown as Markdown
-    from lib.markdown_preview_lib.pygments.formatters import HtmlFormatter
+    from lib.markdown_preview_lib.pygments.formatters import get_formatter_by_name
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
     from urllib import quote, url2pathname, pathname2url
     from urlparse import urlparse, urlunparse
     import markdown.extensions.codehilite as codehilite
     try:
-        # from pygments.styles import get_style_by_name
         PYGMENTS_AVAILABLE = codehilite.pygments
     except:
         PYGMENTS_AVAILABLE = False
@@ -491,7 +489,7 @@ class Compiler(object):
         frontmatter = {}
 
         if text.startswith("---"):
-            m = re.search(r'^(---(.*?)---\r?\n)', text, re.DOTALL)
+            m = re.search(r'^(---(.*?)---[ \t]*\r?\n)', text, re.DOTALL)
             if m:
                 try:
                     frontmatter = yaml.load(m.group(2))
@@ -973,7 +971,7 @@ class MarkdownCompiler(Compiler):
 
         highlight = ''
         if self.pygments_style and not self.noclasses:
-            highlight += '<style>%s</style>' % HtmlFormatter(style=self.pygments_style).get_style_defs('.codehilite pre')
+            highlight += '<style>%s</style>' % get_formatter_by_name('html', style=self.pygments_style).get_style_defs('.codehilite pre')
 
         return highlight
 

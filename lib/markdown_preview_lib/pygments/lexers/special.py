@@ -36,6 +36,7 @@ _ttype_cache = {}
 
 line_re = re.compile(b'.*?\n')
 
+
 class RawTokenLexer(Lexer):
     """
     Recreate a token stream formatted with the `RawTokenFormatter`.  This
@@ -82,7 +83,7 @@ class RawTokenLexer(Lexer):
             try:
                 ttypestr, val = match.group().split(b'\t', 1)
             except ValueError:
-                val = match.group().decode(self.encoding)
+                val = match.group().decode('ascii', 'replace')
                 ttype = Error
             else:
                 ttype = _ttype_cache.get(ttypestr)
