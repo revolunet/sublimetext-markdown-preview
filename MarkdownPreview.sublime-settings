@@ -60,8 +60,29 @@
         Pygments support for syntax highlighting.  Controls whether codehilite extension
         will use Pygments.  If disabled, code blocks will be formatted for javascript
         highighters such as highlight.js.
+
+        If you manually set codehilite as an included extension in "enabled_extensions",
+        your settings will override this one.  To configure using pygments manually:
+            "enabled_extensions": [
+                "codehilite(use_pygments=False)" // <-Turn off pygments usage
+            ]
     */
     "enable_pygments": true,
+
+    /*
+        Sets whether highlight JS will auto-guess raw block's syntax.
+        Alternative is to to only highlight blocks where a language has
+        been defined.
+
+        Default is True (guess).
+
+        If you manually set codehilite as an included extension in "enabled_extensions",
+        your settings will override this one.  To configure language guessing manually:
+            "enabled_extensions": [
+                "codehilite(guess_lang=False)" // <-Turn off language guessing
+            ]
+    */
+    "guess_language": true,
 
     /*
         List of enabled extensions of the selected markdown parser.
@@ -73,11 +94,11 @@
         default - use the default set of extensions, see table later.
         [ "default", "def_list", ... ] - a list of extensions. Use "default" to include the default extensions.
 
-         Parser     | "default" Values
+            Parser     | "default" Values
         ------------|---------------------------
-         default    | ["extra", "github", "toc", "headerid", "meta", "sane_lists", "smarty", "wikilinks"]
-         markdown   | ["extra", "github", "toc", "headerid", "meta", "sane_lists", "smarty", "wikilinks"]
-         github     | extension's values are not used.
+            default    | ["extra", "github", "toc", "meta", "sane_lists", "smarty", "wikilinks"]
+            markdown   | ["extra", "github", "toc", "meta", "sane_lists", "smarty", "wikilinks"]
+            github     | extension's values are not used.
 
     */
     "enabled_extensions": "default",
@@ -194,7 +215,7 @@
         Setting is a string value: (absolute | relative | base64 | none)
             absolute: converts relative local paths to absolute
             relative: converts relative local paths to a path relative to the
-                      HTML output
+                        HTML output
             base64: coverts the local file to base64 and embeds it in the HTML
             none: does nothing
     */
@@ -205,7 +226,7 @@
         Setting is a string value: (absolute | relative | none)
             absolute: converts relative local paths to absolute
             relative: converts relative local paths to a path relative to the
-                      HTML output
+                        HTML output
             none: does nothing
     */
     "file_path_conversions": "absolute",
@@ -218,21 +239,6 @@
             none: does nothing
     */
     "strip_critic_marks": "none",
-
-    /*
-        Sets whether highlight JS will auto-guess raw block's syntax.
-        Alternative is to to only highlight blocks where a language has
-        been defined.
-
-        Default is True (guess).
-
-        If you manually set codehilite as an included extension in "enabled_extensions",
-        your settings will override this one.  To configure language guessing manually:
-            "enabled_extensions": [
-                "codehilite(guess_lang=False)" // <-Turn off language guessing
-            ]
-    */
-    "guess_language": true,
 
     /*
         Strips the YAML front matter header and converts title to a heading

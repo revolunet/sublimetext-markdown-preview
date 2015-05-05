@@ -189,10 +189,11 @@ class SuperFencesBlockPreprocessor(Preprocessor):
     def check_codehilite(self):
         """ Check for code hilite extension """
         if not self.checked_for_codehilite:
-            for ext in self.markdown.registeredExtensions:
-                if isinstance(ext, CodeHiliteExtension):
-                    self.codehilite_conf = ext.config
-                    break
+            if CodeHilite:
+                for ext in self.markdown.registeredExtensions:
+                    if isinstance(ext, CodeHiliteExtension):
+                        self.codehilite_conf = ext.config
+                        break
             self.checked_for_codehilite = True
 
     def clear(self):
@@ -341,7 +342,7 @@ class SuperFencesBlockPreprocessor(Preprocessor):
         If config is not empty, then the codehlite extension
         is enabled, so we call into to highlight the code.
         """
-        if self.codehilite_conf:
+        if CodeHilite and self.codehilite_conf:
             code = CodeHilite(
                 source,
                 linenums=self.codehilite_conf['linenums'][0],
@@ -350,7 +351,8 @@ class SuperFencesBlockPreprocessor(Preprocessor):
                 style=self.codehilite_conf['pygments_style'][0],
                 lang=language,
                 noclasses=self.codehilite_conf['noclasses'][0],
-                hl_lines=parse_hl_lines(self.hl_lines)
+                hl_lines=parse_hl_lines(self.hl_lines),
+                use_pygments=self.codehilite_conf['use_pygments'][0]
             ).hilite()
         else:
             lang = self.CLASS_ATTR % language if language else ''
