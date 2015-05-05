@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 from ..extensions import Extension
 from ..treeprocessors import Treeprocessor
 import re
+from .. import util
 
 RE_CHECKBOX = re.compile(r"^(?P<checkbox> *\[(?P<state>(?:x|X| ){1})\] +)(?P<line>.*)")
 
@@ -58,9 +59,9 @@ class TasklistTreeprocessor(Treeprocessor):
     def run(self, root):
         """ Find list items that start with [ ] or [x] or [X] """
 
-        parent_map = dict((c, p) for p in root.getiterator() for c in p)
+        parent_map = dict((c, p) for p in util.iterate(root) for c in p)
         task_items = []
-        lilinks = root.getiterator('li')
+        lilinks = util.iterate(root, 'li')
         for li in lilinks:
             if li.text is None or li.text == "":
                 if not self.sub_paragraph(li):

@@ -22,7 +22,6 @@
         - insert
         - progressbar
         - toc
-        - headerid
         - smarty
         - meta
         - wikilinks
@@ -32,7 +31,7 @@
 test: This tests the meta extension
 title: This title will be overridden by YAML
 
-!!! hint "Recommended Extentions for Testing"
+!!! hint "Recommended Extensions for Testing"
     This is mainly used to test the Python Markdown parser.
 
     - extra
@@ -40,7 +39,6 @@ title: This title will be overridden by YAML
     - insert
     - progressbar
     - toc
-    - headerid
     - smarty
     - meta
     - wikilinks
@@ -234,7 +232,7 @@ This is a link "https://github.com/revolunet/sublimetext-markdown-preview/".
 With this link (https://github.com/revolunet/sublimetext-markdown-preview/), it still works.
 
 ## Abbreviation
-Abreviations source are found in a separate markdown file specified in frontmatter.
+Abbreviations source are found in a separate markdown file specified in frontmatter.
 ```
 The HTML specification 
 is maintained by the W3C.

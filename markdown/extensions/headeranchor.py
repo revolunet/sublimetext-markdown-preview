@@ -17,7 +17,8 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 from ..extensions import Extension
 from ..treeprocessors import Treeprocessor
-from .headerid import slugify, stashedHTML2text, itertext, unique
+from .toc import slugify, stashedHTML2text, unique, TocExtension
+from .. import util
 
 LINK = (
     '<a '
@@ -30,22 +31,42 @@ LINK = (
 
 
 class HeaderAnchorTreeprocessor(Treeprocessor):
+    def __init__(self, md):
+        super(HeaderAnchorTreeprocessor, self).__init__(md)
+        self.check_for_toc = False
+
+    def get_settings(self):
+        # Check for code hilite extension
+        if not self.check_for_toc:
+            self.slugify = self.config['slugify']
+            self.separator = self.config['separator']
+            self.use_toc_settings = self.config['use_toc_settings']
+            if TocExtension and self.use_toc_settings:
+                for ext in self.markdown.registeredExtensions:
+                    if isinstance(ext, TocExtension):
+                        self.separator = ext.config['separator'][0]
+                        self.slugify = ext.config['slugify'][0]
+                        break
+            self.check_for_toc = True
+
     def run(self, root):
         """ Add header anchors """
 
+        self.get_settings()
+
         # Get a list of id attributes
         used_ids = set()
-        for tag in root.getiterator():
+        for tag in util.iterate(root):
             if "id" in tag.attrib:
                 used_ids.add(tag.attrib["id"])
 
-        for tag in root.getiterator():
+        for tag in util.iterate(root):
             if tag.tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6'):
                 if "id" in tag.attrib:
                     id = tag.get('id')
                 else:
-                    id = stashedHTML2text(''.join(itertext(tag)), self.md)
-                    id = unique(self.config['slugify'](id, self.config['sep']), used_ids)
+                    id = stashedHTML2text(''.join(util.itertext(tag)), self.md)
+                    id = unique(self.slugify(id, self.separator), used_ids)
                     tag.set('id', id)
                 tag.text = self.markdown.htmlStash.store(
                     LINK % {"id": id},
@@ -57,8 +78,15 @@ class HeaderAnchorTreeprocessor(Treeprocessor):
 class HeaderAnchorExtension(Extension):
     def __init__(self, *args, **kwargs):
         self.config = {
-            'sep': ['-', "Separator to use when creating header ids - Default: '-'"],
-            'slugify': [slugify, 'Callable to generate anchors']
+            'separator': ['-', "Separator to use when creating header ids - Default: '-'"],
+            'slugify': [slugify, 'Callable to generate anchors'],
+            'use_toc_settings': [
+                True,
+                "Use markdown.extensions.toc's settings. "
+                "When 'True', 'slugify' and 'separator' "
+                "will be read from the current toc instance settings "
+                "(if available). - Default: True"
+            ]
         }
         self.configured = False
         super(HeaderAnchorExtension, self).__init__(*args, **kwargs)

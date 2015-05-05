@@ -76,7 +76,7 @@ ABS_EXCLUDE = tuple(
 )
 
 DEFAULT_EXT = [
-    "extra", "github", "toc", "headerid",
+    "extra", "github", "toc",
     "meta", "sane_lists", "smarty", "wikilinks",
     "admonition"
 ]
@@ -986,24 +986,20 @@ class MarkdownCompiler(Compiler):
 
     def process_extensions(self, extensions):
         re_pygments = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
+        re_use_pygments = re.compile(r"use_pygments\s*=\s*(True|False)")
         re_insert_pygment = re.compile(r"(?P<bracket_start>codehilite\([^)]+?)(?P<bracket_end>\s*\)$)|(?P<start>codehilite)")
         re_no_classes = re.compile(r"noclasses\s*=\s*(True|False)")
         # First search if pygments has manually been set,
         # and if so, read what the desired color scheme to use is
         self.pygments_style = None
         self.noclasses = False
-
-        use_pygments = self.settings.get('enable_pygments', True)
-        if use_pygments and not PYGMENTS_AVAILABLE:
-            use_pygments = False
-        if use_pygments:
-            codehilite.pygments = True
-        else:
-            codehilite.pygments = False
+        use_pygments = True
 
         count = 0
         for e in extensions:
             if e.startswith("codehilite"):
+                m = re_use_pygments.search(e)
+                use_pygments = True if m is None else m.group(1) == 'True'
                 pygments_style = re_pygments.search(e)
                 if pygments_style is None:
                     self.pygments_style = "github"
@@ -1031,7 +1027,12 @@ class MarkdownCompiler(Compiler):
             self.settings.get("enable_highlight") is True
         ):
             guess_lang = str(bool(self.settings.get("guess_language", True)))
-            extensions.append("codehilite(guess_lang=%s,pygments_style=github)" % guess_lang)
+            use_pygments = bool(self.settings.get("enable_pygments", True))
+            extensions.append(
+                "codehilite(guess_lang=%s,pygments_style=github,use_pygments=%s)" % (
+                    guess_lang, str(use_pygments)
+                )
+            )
             self.pygments_style = "github"
 
         if not use_pygments:

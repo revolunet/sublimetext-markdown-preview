@@ -7,9 +7,10 @@ from __future__ import unicode_literals
 from ..util import parseBoolValue
 import warnings
 
+
 class Extension(object):
     """ Base class for extensions to subclass. """
-    
+
     # Default config -- to be overriden by a subclass
     # Must be of the following format:
     #     {
@@ -18,31 +19,36 @@ class Extension(object):
     # Note that Extension.setConfig will raise a KeyError
     # if a default is not set here.
     config = {}
-    
+
     def __init__(self, *args, **kwargs):
         """ Initiate Extension and set up configs. """
 
         # check for configs arg for backward compat.
         # (there only ever used to be one so we use arg[0])
         if len(args):
-            self.setConfigs(args[0])
-            warnings.warn('Extension classes accepting positional args is pending Deprecation. '
-                          'Each setting should be passed into the Class as a keyword. Positional '
-                          'args will be deprecated in version 2.6 and raise an error in version '
-                          '2.7. See the Release Notes for Python-Markdown version 2.5 for more info.',
-                          PendingDeprecationWarning)
+            if args[0] is not None:
+                self.setConfigs(args[0])
+            warnings.warn('Extension classes accepting positional args is '
+                          'pending Deprecation. Each setting should be '
+                          'passed into the Class as a keyword. Positional '
+                          'args are deprecated and will raise '
+                          'an error in version 2.7. See the Release Notes for '
+                          'Python-Markdown version 2.6 for more info.',
+                          DeprecationWarning)
         # check for configs kwarg for backward compat.
         if 'configs' in kwargs.keys():
-            self.setConfigs(kwargs.pop('configs', {}))
-            warnings.warn('Extension classes accepting a dict on the single keyword "config" is '
-                          'pending Deprecation. Each setting should be passed into the Class as '
-                          'a keyword directly. The "config" keyword will be deprecated in version '
-                          '2.6 and raise an error in version 2.7. See the Release Notes for '
-                          'Python-Markdown version 2.5 for more info.',
-                          PendingDeprecationWarning)
+            if kwargs['configs'] is not None:
+                self.setConfigs(kwargs.pop('configs', {}))
+            warnings.warn('Extension classes accepting a dict on the single '
+                          'keyword "config" is pending Deprecation. Each '
+                          'setting should be passed into the Class as a '
+                          'keyword directly. The "config" keyword is '
+                          'deprecated and raise an error in '
+                          'version 2.7. See the Release Notes for '
+                          'Python-Markdown version 2.6 for more info.',
+                          DeprecationWarning)
         # finally, use kwargs
         self.setConfigs(kwargs)
-            
 
     def getConfig(self, key, default=''):
         """ Return a setting for the given key or an empty string. """
@@ -88,6 +94,7 @@ class Extension(object):
         * md_globals: Global variables in the markdown module namespace.
 
         """
-        raise NotImplementedError('Extension "%s.%s" must define an "extendMarkdown"' \
-            'method.' % (self.__class__.__module__, self.__class__.__name__))
-
+        raise NotImplementedError(
+            'Extension "%s.%s" must define an "extendMarkdown"'
+            'method.' % (self.__class__.__module__, self.__class__.__name__)
+        )

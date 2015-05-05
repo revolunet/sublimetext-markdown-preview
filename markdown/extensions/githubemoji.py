@@ -34,35 +34,48 @@ class SimpleEmojiPattern(Pattern):
     of a Pattern.
 
     """
-    def __init__(self, pattern):
+    def __init__(self, pattern, css_class='emoji'):
+        self.css_class = css_class
         Pattern.__init__(self, pattern)
 
     def handleMatch(self, m):
-        el = util.etree.Element(
-            "img",
-            {
-                "src": GITHUB_ASSETS % m.group(2),
-                "alt": m.group(2),
-                "title": m.group(2),
-                "height": "20px",
-                "width": "20px",
-                "align": "absmiddle"
-            }
-        )
+        attributes = {
+            "src": GITHUB_ASSETS % m.group(2),
+            "alt": ":%s:" % m.group(2),
+            "title": ":%s:" % m.group(2),
+            "height": "20px",
+            "width": "20px",
+            "align": "absmiddle"
+        }
+
+        if self.css_class:
+            attributes['class'] = self.css_class
+
+        el = util.etree.Element("img", attributes)
         return el
 
 
 class GithubEmojiExtension(Extension):
     """Adds delete extension to Markdown class."""
 
+    def __init__(self, *args, **kwargs):
+        self.config = {
+            'css_class': [
+                "emoji",
+                "CSS class name to add to emoji images.  Use an empty string if you want no class"
+                "- Default: 'emoji'"
+            ]
+        }
+        super(GithubEmojiExtension, self).__init__(*args, **kwargs)
+
     def extendMarkdown(self, md, md_globals):
         """Add support for <del>test</del> tags as ~~test~~"""
-
-        md.inlinePatterns.add("github-emoji-people", SimpleEmojiPattern(RE_EMOJI_PEOPLE), "<not_strong")
-        md.inlinePatterns.add("github-emoji-nature", SimpleEmojiPattern(RE_EMOJI_NATURE), "<not_strong")
-        md.inlinePatterns.add("github-emoji-objects", SimpleEmojiPattern(RE_EMOJI_OBJECTS), "<not_strong")
-        md.inlinePatterns.add("github-emoji-places", SimpleEmojiPattern(RE_EMOJI_PLACES), "<not_strong")
-        md.inlinePatterns.add("github-emoji-symbols", SimpleEmojiPattern(RE_EMOJI_SYMBOLS), "<not_strong")
+        css_class = self.getConfigs()["css_class"]
+        md.inlinePatterns.add("github-emoji-people", SimpleEmojiPattern(RE_EMOJI_PEOPLE, css_class), "<not_strong")
+        md.inlinePatterns.add("github-emoji-nature", SimpleEmojiPattern(RE_EMOJI_NATURE, css_class), "<not_strong")
+        md.inlinePatterns.add("github-emoji-objects", SimpleEmojiPattern(RE_EMOJI_OBJECTS, css_class), "<not_strong")
+        md.inlinePatterns.add("github-emoji-places", SimpleEmojiPattern(RE_EMOJI_PLACES, css_class), "<not_strong")
+        md.inlinePatterns.add("github-emoji-symbols", SimpleEmojiPattern(RE_EMOJI_SYMBOLS, css_class), "<not_strong")
 
 
 def makeExtension(*args, **kwargs):
