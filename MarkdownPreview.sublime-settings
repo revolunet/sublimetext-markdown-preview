@@ -20,7 +20,7 @@
 
         default - The current default parser is python-markdown parser.
         markdown - Use the built-in python-markdown parser
-        github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see http://github.github.com/github-flavored-markdown/
+        github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see https://help.github.com/articles/github-flavored-markdown/
     */
     "parser": "default",
 
