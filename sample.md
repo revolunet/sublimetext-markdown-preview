@@ -292,7 +292,7 @@ This plugin and this sample file is proudly brought to you by the [revolunet tea
  [ST]: http://sublimetext.com
  [revolunet]: http://revolunet.com
  [revolunet-logo]: http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg "revolunet logo"
- [gfm]: http://github.github.com/github-flavored-markdown/
+ [gfm]: https://help.github.com/articles/github-flavored-markdown/
  [emoji]: http://www.emoji-cheat-sheet.com/
 
 

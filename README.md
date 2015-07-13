@@ -178,7 +178,7 @@ The code is available at github [project][home] under [MIT licence][4].
  [3]: https://sublime.wbond.net/
  [4]: http://revolunet.mit-license.org
  [5]: http://developer.github.com/v3/markdown
- [6]: http://github.github.com/github-flavored-markdown/
+ [6]: https://help.github.com/articles/github-flavored-markdown/
  [7]: https://github.com/dz0ny/LiveReload-sublimetext2
  [8]: https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098
  [9]: https://github.com/revolunet/sublimetext-markdown-preview/issues/78#issuecomment-15644727
