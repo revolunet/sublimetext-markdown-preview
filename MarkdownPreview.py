@@ -909,7 +909,7 @@ class GithubCompiler(Compiler):
             if e.code == 401:
                 sublime.error_message('github API auth failed. Please check your OAuth token.')
             else:
-                sublime.error_message('github API responded in an unfashion way :/')
+                sublime.error_message('github API responded in an unfriendly way :/')
         except URLError:
             # Maybe this is a Linux-install of ST which doesn't bundle with SSL support
             # So let's try wrapping curl instead
