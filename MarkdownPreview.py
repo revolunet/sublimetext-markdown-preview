@@ -276,11 +276,14 @@ def repl_relative(m, base_path, relative_path):
 def repl_absolute(m, base_path):
     """ Replace path with absolute path """
     link = m.group(0)
-    scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
 
-    path = url2pathname(path)
+    try:
+        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
+    except Exception:
+        return link
 
     if (not is_absolute and not is_url):
+        path = url2pathname(path)
         temp = os.path.normpath(os.path.join(base_path, path))
         if os.path.exists(temp):
             path = pathname2url(temp.replace("\\", "/"))
