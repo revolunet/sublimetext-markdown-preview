@@ -44,7 +44,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
 For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 
 1. [Install][11] Package Control if you haven't yet.
-2. Use `cmd+shift+P` then `Package Control: Install Package`
+2. Use <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>P</kbd> then `Package Control: Install Package`
 3. Look for `Markdown Preview` and install it.
 
 ### Manual Install
@@ -59,7 +59,7 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 ### To preview :
 
  - optionally select some of your markdown for conversion
- - use `cmd+shift+P` then `Markdown Preview` to show the follow commands (you will be prompted to select which parser you prefer):
+ - use <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>P</kbd> then `Markdown Preview` to show the follow commands (you will be prompted to select which parser you prefer):
 	- Markdown Preview: Preview in Browser
 	- Markdown Preview: Export HTML in Sublime Text
 	- Markdown Preview: Copy to Clipboard
@@ -70,7 +70,7 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 
 ### To build :
 
- - Just use `Ctrl+B` (Windows/Linux) or `cmd+B` (Mac) to build current file.
+ - Just use <kbd>ctrl</kbd>+<kbd>B</kbd> (Windows/Linux) or <kbd>cmd</kbd>+<kbd>B</kbd> (Mac) to build current file.
 
 ### To config :
 
