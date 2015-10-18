@@ -28,7 +28,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
     | Extension | Documentation |
     |-----------|---------------|
     | magiclink | Find and convert HTML links and email address to links ([MagicLink Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/magiclink/)). |
-    | delete | Surround inline text with `~~crossed out~~` to get del tags ~~crossed out~~. |
+    | delete | Surround inline text with `~~strike through~~` to get del tags ~~strike through~~. |
     | insert | Surround inline text with `^^underlined^^` to get ins tags <ins>underlined</ins>. |
     | tasklist | Github Flavored Markdown tasklists ([Tasklist Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/tasklist/)). |
     | githubemoji | Support for Github Flavored Markdown emojis ([GithubEmoji Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/githubemoji/)). |
