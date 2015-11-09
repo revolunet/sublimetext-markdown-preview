@@ -175,15 +175,15 @@ This may be further enhanced in the future.
 The code is available at github [project][home] under [MIT licence][4].
 
  [home]: https://github.com/revolunet/sublimetext-markdown-preview
- [3]: https://sublime.wbond.net/
+ [3]: https://packagecontrol.io/
  [4]: http://revolunet.mit-license.org
- [5]: http://developer.github.com/v3/markdown
+ [5]: https://developer.github.com/v3/markdown/
  [6]: https://help.github.com/articles/github-flavored-markdown/
  [7]: https://github.com/dz0ny/LiveReload-sublimetext2
  [8]: https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098
  [9]: https://github.com/revolunet/sublimetext-markdown-preview/issues/78#issuecomment-15644727
  [10]: https://github.com/waylan/Python-Markdown
- [11]: https://sublime.wbond.net/installation
+ [11]: https://packagecontrol.io/installation
  [12]: https://github.com/revolunet/sublimetext-markdown-preview/archive/master.zip
  [issue]: https://github.com/revolunet/sublimetext-markdown-preview/issues
  [settings]: https://github.com/revolunet/sublimetext-markdown-preview/blob/master/MarkdownPreview.sublime-settings
