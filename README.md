@@ -22,7 +22,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - MathJax support : \\\\(\frac{\pi}{2}\\\\) thanks to @bps10
  - HTML template customisation thanks to @hozaka
  - Embed images as base64 (see [settings][settings] file for more info)
- - Strip out multimarkdown critic marks (see [settings][settings] file for more info)
+ - Strip out multimarkdown critic marks from either Githubs or Python Markdown input source (see [settings][settings] file for more info)
  - 3rd party extensions for the Python Markdown parser:
 
     | Extension | Documentation |

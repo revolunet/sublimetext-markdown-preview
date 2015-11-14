@@ -928,18 +928,23 @@ class GithubCompiler(Compiler):
         return markdown_html
 
 
-class MultiMarkdownCompiler(Compiler):
+class ExternalMarkdownCompiler(Compiler):
     default_css = "markdown.css"
+
+    def __init__(self, parser):
+        """Initialize."""
+
+        self.parser = parser
+        super(ExternalMarkdownCompiler, self).__init__()
 
     def parser_specific_convert(self, markdown_text):
         import subprocess
-        binary = self.settings.get("multimarkdown_binary", "")
-        if os.path.exists(binary):
-            cmd = [binary]
-            critic_mode = self.settings.get("strip_critic_marks", "accept")
-            if critic_mode in ("accept", "reject"):
-                cmd.append('-a' if critic_mode == "accept" else '-r')
-            sublime.status_message('converting markdown with multimarkdown...')
+        settings = sublime.load_settings("MarkdownPreview.sublime-settings")
+        binary = settings.get('markdown_binary_map', {})[self.parser]
+
+        if len(binary) and os.path.exists(binary[0]):
+            cmd = binary
+            sublime.status_message('converting markdown with %s...' % self.parser)
             if sublime.platform() == "windows":
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -961,7 +966,7 @@ class MultiMarkdownCompiler(Compiler):
                 print(markdown_html)
                 markdown_html = _CANNOT_CONVERT
         else:
-            sublime.error_message("Cannot find multimarkdown binary!")
+            sublime.error_message("Cannot find % binary!" % self.binary)
             markdown_html = _CANNOT_CONVERT
         return markdown_html
 
@@ -1070,15 +1075,20 @@ class MarkdownCompiler(Compiler):
 
 class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, target='browser'):
+
+        settings = sublime.load_settings("MarkdownPreview.sublime-settings")
+        md_map = settings.get('markdown_binary_map', {})
         parsers = [
             "markdown",
-            "github",
-            "multimarkdown"
+            "github"
         ]
+
+        # Add external markdown binaries.
+        for k in md_map.keys():
+            parsers.append(k)
 
         self.target = target
 
-        settings = sublime.load_settings("MarkdownPreview.sublime-settings")
         enabled_parsers = set()
         for p in settings.get("enabled_parsers", ["markdown", "github"]):
             if p in parsers:
@@ -1122,9 +1132,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         if parser == "github":
             compiler = GithubCompiler()
-        elif parser == "multimarkdown":
-            compiler = MultiMarkdownCompiler()
+        elif parser == 'markdown':
+            compiler = MarkdownCompiler()
+        elif parser in settings.get("enabled_parsers", ("markdown", "github")):
+            compiler = ExternalMarkdownCompiler(parser)
         else:
+            # Fallback to Python Markdown
             compiler = MarkdownCompiler()
 
         html, body = compiler.run(self.view, preview=(target in ['disk', 'browser']))
@@ -1262,8 +1275,10 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         if parser == "github":
             compiler = GithubCompiler()
-        elif parser == "multimarkdown":
-            compiler = MultiMarkdownCompiler()
+        elif parser == 'markdown':
+            compiler = MarkdownCompiler()
+        elif parser in settings.get("enabled_parsers", ("markdown", "github")):
+            compiler = ExternalMarkdownCompiler(parser)
         else:
             compiler = MarkdownCompiler()
 

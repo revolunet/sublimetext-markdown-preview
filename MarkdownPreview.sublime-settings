@@ -114,6 +114,23 @@
     "enabled_parsers": ["markdown", "github"],
 
     /*
+        Custom external markdown parsers.
+        
+        "markdown_binary_map" contains key values pairs.  The key
+        is name of the parser and what is used in "enabled_parsers"
+        to turn on the access to the parser.  The value is an array
+        containing the path to the binary and all the parameters that
+        are desired.
+
+        Multimarkdown is provided as an example below.  It's path may differ
+        on your system.
+    */
+
+    "markdown_binary_map": {
+        "multimarkdown": ["/usr/local/bin/multimarkdown"]
+    },
+
+    /*
         Default mode for the github Markdown parser : markdown (documents) or gfm (comments)
         see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
     */
@@ -196,11 +213,6 @@
     // "path_tempfile": "/tmp/my_notes",
 
     /*
-        Absolute path to multimarkdown executable
-    */
-    "multimarkdown_binary": "",
-
-    /*
         Sets HTML output to a simple form:
             - No head
             - No body tags
@@ -237,6 +249,8 @@
             accept: Accepts the proposed inserts and deletions (comments etc. are discarded)
             reject: Rejects the proposed inserts and deletions (comments etc. are discarded)
             none: does nothing
+
+        Critic marks only affects "github" and "markdown" (Python Markdown).
     */
     "strip_critic_marks": "none",
 
