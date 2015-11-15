@@ -1,5 +1,11 @@
 Changes in Markdown Preview
 ===========================
+## 1.3.0
+
+* Now supports any markdown parser through a generalized method.  Now you can map a binary to parser name via `markdown_binary_map`.  Then use the parser name in `enabled_parsers` to use it.
+* Multimarkdown specific settings have been removed.  Multimarkdown should now be configured via `markdown_binary_map` and `enabled_parsers`.
+* Upgraded to Python Markdown 2.6.4.
+* Removed internal PyYaml and Pygments.  Markdown Preview now uses Package Control dependencies to obtain PyYaml and Pygments.
 
 ## 1.0.3
 

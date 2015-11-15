@@ -68,6 +68,22 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser", "parser":"markdown"} },` for a specific parser and target or `{ "keys": ["alt+m"], "command": "markdown_preview_select", "args": {"target": "browser"} },` to bring up the quick panel to select enabled parsers for a given target.
  - once converted a first time, the output HTML will be updated on each file save (with LiveReload plugin)
 
+### Enabling Other External Markdown Parsers :
+
+External parser commands and arguments should first be mapped to a name.  The path to the binary should be first, followed by flags etc.
+
+```js
+    "markdown_binary_map": {
+        "multimarkdown": ["/usr/local/bin/multimarkdown"]
+    },
+```
+
+Then the name can be placed in `enabled_parsers` to enable use of the new parser.
+
+```js
+    "enabled_parsers": ["markdown", "github", "multimarkdown"],
+```
+
 ### To build :
 
  - Just use <kbd>ctrl</kbd>+<kbd>B</kbd> (Windows/Linux) or <kbd>cmd</kbd>+<kbd>B</kbd> (Mac) to build current file.
