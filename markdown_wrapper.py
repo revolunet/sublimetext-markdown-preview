@@ -9,20 +9,6 @@ if ST3:
     from .markdown.extensions import Extension
     import importlib
 else:
-    import sys
-    import os
-    # We have to modify the path, we've at least pushed the library
-    # down into a unique enough package that we shouldn't match anyone else
-    pygment_path = os.path.join(sublime.packages_path(), "Markdown Preview", "lib")
-    if pygment_path not in sys.path:
-        sys.path.append(pygment_path)
-    # In the sublime environment, there just appears to be no other way.
-    # Loop through and import the submodules so we can find them later
-    for parent in ("lexers", "styles"):
-        parent_folder = os.path.join(pygment_path, "markdown_preview_lib", "pygments", parent)
-        for mod in os.listdir(parent_folder):
-            if mod.endswith(".py") and mod != "__init__.py":
-                __import__("lib.markdown_preview_lib.pygments.%s.%s" % (parent, mod[:-3]))
     from markdown import Markdown, util
     from markdown.extensions import Extension
 
