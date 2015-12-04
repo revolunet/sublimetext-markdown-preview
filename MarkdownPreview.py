@@ -977,7 +977,6 @@ class MarkdownCompiler(Compiler):
     def set_highlight(self, pygments_style, css_class):
         ''' Set the Pygments css. '''
 
-        highlight = ''
         if pygments_style and not self.noclasses:
             style = None
             if pygments_style not in pygments_local:
@@ -1043,7 +1042,7 @@ class MarkdownCompiler(Compiler):
                 else:
                     pygments_css = pygments_style.group(1)
 
-                # Set the style, but update erase the setting if the CSS is pygments_local.
+                # Set the style, but erase the setting if the CSS is pygments_local.
                 # Don't allow 'no_css' with non internal themes.
                 # Replace the setting with the correct name if the style was invalid.
                 original = pygments_css
