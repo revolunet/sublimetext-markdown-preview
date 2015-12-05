@@ -22,19 +22,11 @@ from .. import util
 from ..treeprocessors import Treeprocessor
 
 try:
-    import sys
-    if sys.version_info >= (3, 0):
-        from ...lib.markdown_preview_lib.pygments import highlight
-        from ...lib.markdown_preview_lib.pygments.lexers import get_lexer_by_name, guess_lexer
-        from ...lib.markdown_preview_lib.pygments.formatters import find_formatter_class
-    else:
-        from lib.markdown_preview_lib.pygments import highlight
-        from lib.markdown_preview_lib.pygments.lexers import get_lexer_by_name, guess_lexer
-        from lib.markdown_preview_lib.pygments.formatters import find_formatter_class
-    HTMLFormatter = find_formatter_class('html')
+    from pygments import highlight
+    from pygments.lexers import get_lexer_by_name, guess_lexer
+    from pygments.formatters import get_formatter_by_name
     pygments = True
-except ImportError as e:
-    print(e)
+except ImportError:
     pygments = False
 
 
@@ -123,11 +115,12 @@ class CodeHilite(object):
                         lexer = get_lexer_by_name('text')
                 except ValueError:
                     lexer = get_lexer_by_name('text')
-            formatter = HTMLFormatter(linenos=self.linenums,
-                                      cssclass=self.css_class,
-                                      style=self.style,
-                                      noclasses=self.noclasses,
-                                      hl_lines=self.hl_lines)
+            formatter = get_formatter_by_name('html',
+                                              linenos=self.linenums,
+                                              cssclass=self.css_class,
+                                              style=self.style,
+                                              noclasses=self.noclasses,
+                                              hl_lines=self.hl_lines)
             return highlight(self.src, lexer, formatter)
         else:
             # just escape and build markup usable by JS highlighting libs

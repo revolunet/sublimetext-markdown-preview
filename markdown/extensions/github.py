@@ -15,12 +15,15 @@ extension_configs = {}
 
 
 class GithubExtension(Extension):
-    """Add various extensions to Markdown class"""
+    """Add various extensions to Markdown class."""
 
     def extendMarkdown(self, md, md_globals):
-        """Register extension instances"""
+        """Register extension instances."""
+
         md.registerExtensions(extensions, extension_configs)
 
 
 def makeExtension(*args, **kwargs):
+    """Return extension."""
+
     return GithubExtension(*args, **kwargs)

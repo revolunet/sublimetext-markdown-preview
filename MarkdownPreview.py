@@ -11,6 +11,12 @@ import json
 import time
 import codecs
 import cgi
+import yaml
+
+pygments_local = {
+    'github': 'pygments_css/github.css',
+    'github2014': 'pygments_css/github2014.css'
+}
 
 
 def is_ST3():
@@ -20,20 +26,14 @@ def is_ST3():
 
 if is_ST3():
     from . import desktop
-    from . import yaml
     from .markdown_settings import Settings
     from .markdown_wrapper import StMarkdown as Markdown
-    from .lib.markdown_preview_lib.pygments.formatters import get_formatter_by_name
     from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen, url2pathname, pathname2url
     from urllib.parse import urlparse, urlunparse
     from urllib.error import HTTPError, URLError
     from urllib.parse import quote
     from .markdown.extensions import codehilite
-    try:
-        PYGMENTS_AVAILABLE = codehilite.pygments
-    except:
-        PYGMENTS_AVAILABLE = False
 
     def Request(url, data, headers):
         ''' Adapter for urllib2 used in ST2 '''
@@ -44,21 +44,21 @@ if is_ST3():
 
 else:
     import desktop
-    import yaml
     from markdown_settings import Settings
     from markdown_wrapper import StMarkdown as Markdown
-    from lib.markdown_preview_lib.pygments.formatters import get_formatter_by_name
     from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
     from urllib import quote, url2pathname, pathname2url
     from urlparse import urlparse, urlunparse
     import markdown.extensions.codehilite as codehilite
-    try:
-        PYGMENTS_AVAILABLE = codehilite.pygments
-    except:
-        PYGMENTS_AVAILABLE = False
 
     unicode_str = unicode
+
+from pygments.formatters import get_formatter_by_name
+try:
+    PYGMENTS_AVAILABLE = codehilite.pygments
+except:
+    PYGMENTS_AVAILABLE = False
 
 _CANNOT_CONVERT = u'cannot convert markdown'
 
@@ -119,7 +119,7 @@ def load_resource(name):
         if is_ST3():
             return sublime.load_resource('Packages/Markdown Preview/{0}'.format(name))
         else:
-            filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, name)
+            filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, os.path.normpath(name))
             return load_utf8(filename)
     except:
         print("Error while load_resource('%s')" % name)
@@ -276,11 +276,14 @@ def repl_relative(m, base_path, relative_path):
 def repl_absolute(m, base_path):
     """ Replace path with absolute path """
     link = m.group(0)
-    scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
 
-    path = url2pathname(path)
+    try:
+        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
+    except Exception:
+        return link
 
     if (not is_absolute and not is_url):
+        path = url2pathname(path)
         temp = os.path.normpath(os.path.join(base_path, path))
         if os.path.exists(temp):
             path = pathname2url(temp.replace("\\", "/"))
@@ -925,18 +928,23 @@ class GithubCompiler(Compiler):
         return markdown_html
 
 
-class MultiMarkdownCompiler(Compiler):
+class ExternalMarkdownCompiler(Compiler):
     default_css = "markdown.css"
+
+    def __init__(self, parser):
+        """Initialize."""
+
+        self.parser = parser
+        super(ExternalMarkdownCompiler, self).__init__()
 
     def parser_specific_convert(self, markdown_text):
         import subprocess
-        binary = self.settings.get("multimarkdown_binary", "")
-        if os.path.exists(binary):
-            cmd = [binary]
-            critic_mode = self.settings.get("strip_critic_marks", "accept")
-            if critic_mode in ("accept", "reject"):
-                cmd.append('-a' if critic_mode == "accept" else '-r')
-            sublime.status_message('converting markdown with multimarkdown...')
+        settings = sublime.load_settings("MarkdownPreview.sublime-settings")
+        binary = settings.get('markdown_binary_map', {})[self.parser]
+
+        if len(binary) and os.path.exists(binary[0]):
+            cmd = binary
+            sublime.status_message('converting markdown with %s...' % self.parser)
             if sublime.platform() == "windows":
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -958,7 +966,7 @@ class MultiMarkdownCompiler(Compiler):
                 print(markdown_html)
                 markdown_html = _CANNOT_CONVERT
         else:
-            sublime.error_message("Cannot find multimarkdown binary!")
+            sublime.error_message("Cannot find % binary!" % self.binary)
             markdown_html = _CANNOT_CONVERT
         return markdown_html
 
@@ -966,14 +974,27 @@ class MultiMarkdownCompiler(Compiler):
 class MarkdownCompiler(Compiler):
     default_css = "markdown.css"
 
+    def set_highlight(self, pygments_style, css_class):
+        ''' Set the Pygments css. '''
+
+        if pygments_style and not self.noclasses:
+            style = None
+            if pygments_style not in pygments_local:
+                try:
+                    style = get_formatter_by_name('html', style=pygments_style).get_style_defs('.codehilite pre')
+                except Exception:
+                    pygments_style = 'github'
+            if style is None:
+                style = load_resource(pygments_local[pygments_style]) % {
+                    'css_class': ''.join(['.' + x for x in css_class.split(' ') if x])
+                }
+
+            self.pygments_style = '<style>%s</style>' % style
+        return pygments_style
+
     def get_highlight(self):
-        ''' return the Pygments css if enabled '''
-
-        highlight = ''
-        if self.pygments_style and not self.noclasses:
-            highlight += '<style>%s</style>' % get_formatter_by_name('html', style=self.pygments_style).get_style_defs('.codehilite pre')
-
-        return highlight
+        ''' return the Pygments css if enabled. '''
+        return self.pygments_style if self.pygments_style else ''
 
     def preprocessor_critic(self, text):
         ''' Stip out multi-markdown critic marks.  Accept changes by default '''
@@ -985,24 +1006,29 @@ class MarkdownCompiler(Compiler):
         return text
 
     def process_extensions(self, extensions):
-        re_pygments = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
+        re_pygments = re.compile(r"(?:\s*,)?pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
+        re_pygments_replace = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
         re_use_pygments = re.compile(r"use_pygments\s*=\s*(True|False)")
         re_insert_pygment = re.compile(r"(?P<bracket_start>codehilite\([^)]+?)(?P<bracket_end>\s*\)$)|(?P<start>codehilite)")
-        re_no_classes = re.compile(r"noclasses\s*=\s*(True|False)")
+        re_no_classes = re.compile(r"(?:\s*,)?noclasses\s*=\s*(True|False)")
+        re_css_class = re.compile(r"css_class\s*=\s*([\w\-]+)")
         # First search if pygments has manually been set,
         # and if so, read what the desired color scheme to use is
         self.pygments_style = None
         self.noclasses = False
         use_pygments = True
+        pygments_css = None
 
         count = 0
         for e in extensions:
             if e.startswith("codehilite"):
                 m = re_use_pygments.search(e)
                 use_pygments = True if m is None else m.group(1) == 'True'
+                m = re_css_class.search(e)
+                css_class = m.group(1) if m else 'codehilite'
                 pygments_style = re_pygments.search(e)
                 if pygments_style is None:
-                    self.pygments_style = "github"
+                    pygments_css = "github"
                     m = re_insert_pygment.match(e)
                     if m is not None:
                         if m.group('bracket_start'):
@@ -1012,9 +1038,20 @@ class MarkdownCompiler(Compiler):
                             start = m.group('start') + "(pygments_style="
                             end = ')'
 
-                        extensions[count] = start + self.pygments_style + end
+                        extensions[count] = start + pygments_css + end
                 else:
-                    self.pygments_style = pygments_style.group(1)
+                    pygments_css = pygments_style.group(1)
+
+                # Set the style, but erase the setting if the CSS is pygments_local.
+                # Don't allow 'no_css' with non internal themes.
+                # Replace the setting with the correct name if the style was invalid.
+                original = pygments_css
+                pygments_css = self.set_highlight(pygments_css, css_class)
+                if pygments_css in pygments_local:
+                    extensions[count] = re_no_classes.sub('', re_pygments.sub('', e))
+                elif original != pygments_css:
+                    extensions[count] = re_pygments_replace.sub('pygments_style=%s' % pygments_css, e)
+
                 noclasses = re_no_classes.search(e)
                 if noclasses is not None and noclasses.group(1) == "True":
                     self.noclasses = True
@@ -1023,17 +1060,17 @@ class MarkdownCompiler(Compiler):
         # Second, if nothing manual was set, see if "enable_highlight" is enabled with pygment support
         # If no style has been set, setup the default
         if (
-            self.pygments_style is None and
+            pygments_css is None and
             self.settings.get("enable_highlight") is True
         ):
+            pygments_css = self.set_highlight('github', 'codehilite')
             guess_lang = str(bool(self.settings.get("guess_language", True)))
             use_pygments = bool(self.settings.get("enable_pygments", True))
             extensions.append(
-                "codehilite(guess_lang=%s,pygments_style=github,use_pygments=%s)" % (
+                "codehilite(guess_lang=%s,use_pygments=%s)" % (
                     guess_lang, str(use_pygments)
                 )
             )
-            self.pygments_style = "github"
 
         if not use_pygments:
             self.pygments_style = None
@@ -1067,15 +1104,20 @@ class MarkdownCompiler(Compiler):
 
 class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
     def run(self, edit, target='browser'):
+
+        settings = sublime.load_settings("MarkdownPreview.sublime-settings")
+        md_map = settings.get('markdown_binary_map', {})
         parsers = [
             "markdown",
-            "github",
-            "multimarkdown"
+            "github"
         ]
+
+        # Add external markdown binaries.
+        for k in md_map.keys():
+            parsers.append(k)
 
         self.target = target
 
-        settings = sublime.load_settings("MarkdownPreview.sublime-settings")
         enabled_parsers = set()
         for p in settings.get("enabled_parsers", ["markdown", "github"]):
             if p in parsers:
@@ -1119,9 +1161,12 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         if parser == "github":
             compiler = GithubCompiler()
-        elif parser == "multimarkdown":
-            compiler = MultiMarkdownCompiler()
+        elif parser == 'markdown':
+            compiler = MarkdownCompiler()
+        elif parser in settings.get("enabled_parsers", ("markdown", "github")):
+            compiler = ExternalMarkdownCompiler(parser)
         else:
+            # Fallback to Python Markdown
             compiler = MarkdownCompiler()
 
         html, body = compiler.run(self.view, preview=(target in ['disk', 'browser']))
@@ -1259,8 +1304,10 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         if parser == "github":
             compiler = GithubCompiler()
-        elif parser == "multimarkdown":
-            compiler = MultiMarkdownCompiler()
+        elif parser == 'markdown':
+            compiler = MarkdownCompiler()
+        elif parser in settings.get("enabled_parsers", ("markdown", "github")):
+            compiler = ExternalMarkdownCompiler(parser)
         else:
             compiler = MarkdownCompiler()
 
