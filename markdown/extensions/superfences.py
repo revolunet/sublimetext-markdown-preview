@@ -33,10 +33,7 @@ from __future__ import unicode_literals
 from ..extensions import Extension
 from ..preprocessors import Preprocessor
 from ..blockprocessors import CodeBlockProcessor
-try:
-    from ..extensions.codehilite import CodeHilite, CodeHiliteExtension, parse_hl_lines
-except Exception:
-    CodeHilite = None
+from ..extensions.codehilite import CodeHilite, CodeHiliteExtension, parse_hl_lines
 from .. import util
 import re
 
@@ -246,11 +243,10 @@ class SuperFencesBlockPreprocessor(Preprocessor):
         """Check for code hilite extension to get its config."""
 
         if not self.checked_for_codehilite:
-            if CodeHilite:
-                for ext in self.markdown.registeredExtensions:
-                    if isinstance(ext, CodeHiliteExtension):
-                        self.codehilite_conf = ext.config
-                        break
+            for ext in self.markdown.registeredExtensions:
+                if isinstance(ext, CodeHiliteExtension):
+                    self.codehilite_conf = ext.config
+                    break
             self.checked_for_codehilite = True
 
     def clear(self):
@@ -277,7 +273,7 @@ class SuperFencesBlockPreprocessor(Preprocessor):
         elif len(m.group(1)) != self.ws_len and m.group(2) != '':
             # Not indented enough
             self.clear()
-        elif self.fence_end.match(m.group(0)) is not None:
+        elif self.fence_end.match(m.group(0)) is not None and not m.group(2).startswith(' '):
             # End of fence
             self.process_nested_block(m, start, end)
         else:
@@ -407,7 +403,7 @@ class SuperFencesBlockPreprocessor(Preprocessor):
         If config is not empty, then the codehlite extension
         is enabled, so we call into it to highlight the code.
         """
-        if CodeHilite and self.codehilite_conf:
+        if self.codehilite_conf:
             code = CodeHilite(
                 source,
                 linenums=self.codehilite_conf['linenums'][0],

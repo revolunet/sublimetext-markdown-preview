@@ -27,13 +27,18 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 from ..extensions import Extension
 from ..treeprocessors import Treeprocessor
-try:
-    import unicodedata
-except Exception:
-    unicodedata = None
+import unicodedata
 import re
-from .toc import slugify, stashedHTML2text, unique, TocExtension
+import sys
 from .. import util
+from .toc import slugify, stashedHTML2text, unique, TocExtension
+
+PY3 = sys.version_info >= (3, 0) and sys.version_info < (4, 0)
+
+if PY3:
+    from urllib.parse import quote  # noqa
+else:
+    from urllib import quote  # noqa
 
 LINK = (
     '<a '
@@ -49,17 +54,29 @@ RE_TAGS = re.compile(r'''</?[^>]*>''', re.UNICODE)
 RE_WORD = re.compile(r'''[^\w\- ]''', re.UNICODE)
 
 
-if unicodedata is not None:
-    # ST2 may bomb on unicode data, so we will ignore this if it happens.
-    def uslugify(text, sep):
-        """Custom slugify."""
+def uslugify(text, sep):
+    """Unicode slugify (utf-8)."""
 
-        if text is None:
-            return ''
-        # Normalize, Strip html tags, strip leading and trailing whitespace, and lower
-        tag_id = RE_TAGS.sub('', unicodedata.normalize('NFKD', text)).strip().lower()
-        # Remove non word characters, non spaces, and non dashes, and convert spaces to dashes.
-        return RE_WORD.sub('', tag_id).replace(' ', sep)
+    if text is None:
+        return ''
+    # Normalize, Strip html tags, strip leading and trailing whitespace, and lower
+    tag_id = RE_TAGS.sub('', unicodedata.normalize('NFKD', text)).strip().lower()
+    # Remove non word characters, non spaces, and non dashes, and convert spaces to dashes.
+    return RE_WORD.sub('', tag_id).replace(' ', sep)
+
+
+def uslugify_encoded(text, sep):
+    """Custom slugify (percent encoded)."""
+
+    if text is None:
+        return ''
+    # Strip html tags and lower
+    tag_id = RE_TAGS.sub('', unicodedata.normalize('NFKD', text)).lower()
+    # Remove non word characters or non spaces and dashes
+    # Then convert spaces to dashes
+    tag_id = RE_WORD.sub('', tag_id).replace(' ', sep)
+    # Encode anything that needs to be
+    return quote(tag_id.encode('utf-8'))
 
 
 class HeaderAnchorTreeprocessor(Treeprocessor):
@@ -78,7 +95,7 @@ class HeaderAnchorTreeprocessor(Treeprocessor):
             self.slugify = self.config['slugify']
             self.separator = self.config['separator']
             self.use_toc_settings = self.config['use_toc_settings']
-            if TocExtension and self.use_toc_settings:
+            if self.use_toc_settings:
                 for ext in self.markdown.registeredExtensions:
                     if isinstance(ext, TocExtension):
                         self.separator = ext.config['separator'][0]

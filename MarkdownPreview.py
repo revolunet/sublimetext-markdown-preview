@@ -25,10 +25,10 @@ def is_ST3():
 
 
 if is_ST3():
+    from .helper import INSTALLED_DIRECTORY
     from . import desktop
     from .markdown_settings import Settings
     from .markdown_wrapper import StMarkdown as Markdown
-    from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen, url2pathname, pathname2url
     from urllib.parse import urlparse, urlunparse
     from urllib.error import HTTPError, URLError
@@ -43,10 +43,10 @@ if is_ST3():
     unicode_str = str
 
 else:
+    from helper import INSTALLED_DIRECTORY
     import desktop
     from markdown_settings import Settings
     from markdown_wrapper import StMarkdown as Markdown
-    from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
     from urllib import quote, url2pathname, pathname2url
     from urlparse import urlparse, urlunparse
@@ -225,50 +225,50 @@ def repl_relative(m, base_path, relative_path):
     link = m.group(0)
     try:
         scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
+
+        if not is_url:
+            # Get the absolute path of the file or return
+            # if we can't resolve the path
+            path = url2pathname(path)
+            abs_path = None
+            if (not is_absolute):
+                # Convert current relative path to absolute
+                temp = os.path.normpath(os.path.join(base_path, path))
+                if os.path.exists(temp):
+                    abs_path = temp.replace("\\", "/")
+            elif os.path.exists(path):
+                abs_path = path
+
+            if abs_path is not None:
+                convert = False
+                # Determine if we should convert the relative path
+                # (or see if we can realistically convert the path)
+                if (sublime.platform() == "windows"):
+                    # Make sure basepath starts with same drive location as target
+                    # If they don't match, we will stay with absolute path.
+                    if (base_path.startswith('//') and base_path.startswith('//')):
+                        convert = True
+                    else:
+                        base_drive = RE_WIN_DRIVE_PATH.match(base_path)
+                        path_drive = RE_WIN_DRIVE_PATH.match(abs_path)
+                        if (
+                            (base_drive and path_drive) and
+                            base_drive.group('drive').lower() == path_drive.group('drive').lower()
+                        ):
+                            convert = True
+                else:
+                    # OSX and Linux
+                    convert = True
+
+                # Convert the path, url encode it, and format it as a link
+                if convert:
+                    path = pathname2url(os.path.relpath(abs_path, relative_path).replace('\\', '/'))
+                else:
+                    path = pathname2url(abs_path)
+                link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
     except:
         # Parsing crashed an burned; no need to continue.
-        return link
-
-    if not is_url:
-        # Get the absolute path of the file or return
-        # if we can't resolve the path
-        path = url2pathname(path)
-        abs_path = None
-        if (not is_absolute):
-            # Convert current relative path to absolute
-            temp = os.path.normpath(os.path.join(base_path, path))
-            if os.path.exists(temp):
-                abs_path = temp.replace("\\", "/")
-        elif os.path.exists(path):
-            abs_path = path
-
-        if abs_path is not None:
-            convert = False
-            # Determine if we should convert the relative path
-            # (or see if we can realistically convert the path)
-            if (sublime.platform() == "windows"):
-                # Make sure basepath starts with same drive location as target
-                # If they don't match, we will stay with absolute path.
-                if (base_path.startswith('//') and base_path.startswith('//')):
-                    convert = True
-                else:
-                    base_drive = RE_WIN_DRIVE_PATH.match(base_path)
-                    path_drive = RE_WIN_DRIVE_PATH.match(abs_path)
-                    if (
-                        (base_drive and path_drive) and
-                        base_drive.group('drive').lower() == path_drive.group('drive').lower()
-                    ):
-                        convert = True
-            else:
-                # OSX and Linux
-                convert = True
-
-            # Convert the path, url encode it, and format it as a link
-            if convert:
-                path = pathname2url(os.path.relpath(abs_path, relative_path).replace('\\', '/'))
-            else:
-                path = pathname2url(abs_path)
-            link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
+        pass
 
     return link
 
@@ -279,15 +279,16 @@ def repl_absolute(m, base_path):
 
     try:
         scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
-    except Exception:
-        return link
 
-    if (not is_absolute and not is_url):
-        path = url2pathname(path)
-        temp = os.path.normpath(os.path.join(base_path, path))
-        if os.path.exists(temp):
-            path = pathname2url(temp.replace("\\", "/"))
-            link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
+        if (not is_absolute and not is_url):
+            path = url2pathname(path)
+            temp = os.path.normpath(os.path.join(base_path, path))
+            if os.path.exists(temp):
+                path = pathname2url(temp.replace("\\", "/"))
+                link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
+    except Exception:
+        # Parsing crashed an burned; no need to continue.
+        pass
 
     return link
 
@@ -609,42 +610,42 @@ class Compiler(object):
 
         def b64(m):
             import base64
-            src = url2pathname(m.group('path')[1:-1])
             data = m.group(0)
-            base_path = self.settings.get('builtin').get("basepath")
-            if base_path is None:
-                base_path = ""
+            try:
+                src = url2pathname(m.group('path')[1:-1])
+                base_path = self.settings.get('builtin').get("basepath")
+                if base_path is None:
+                    base_path = ""
 
-            # Format the link
-            absolute = False
-            if src.startswith('file://'):
-                src = src.replace('file://', '', 1)
-                if sublime.platform() == "windows" and not src.startswith('//'):
-                    src = src.lstrip("/")
-                absolute = True
-            elif sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None:
-                absolute = True
+                # Format the link
+                absolute = False
+                if src.startswith('file://'):
+                    src = src.replace('file://', '', 1)
+                    if sublime.platform() == "windows" and not src.startswith('//'):
+                        src = src.lstrip("/")
+                    absolute = True
+                elif sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None:
+                    absolute = True
 
-            # Make sure we are working with an absolute path
-            if not src.startswith(exclusion_list):
-                if absolute:
-                    src = os.path.normpath(src)
-                else:
-                    src = os.path.normpath(os.path.join(base_path, src))
+                # Make sure we are working with an absolute path
+                if not src.startswith(exclusion_list):
+                    if absolute:
+                        src = os.path.normpath(src)
+                    else:
+                        src = os.path.normpath(os.path.join(base_path, src))
 
-                if os.path.exists(src):
-                    ext = os.path.splitext(src)[1].lower()
-                    for b64_ext in file_types:
-                        if ext in b64_ext:
-                            try:
+                    if os.path.exists(src):
+                        ext = os.path.splitext(src)[1].lower()
+                        for b64_ext in file_types:
+                            if ext in b64_ext:
                                 with open(src, "rb") as f:
                                     data = " src=\"data:%s;base64,%s\"" % (
                                         file_types[b64_ext],
                                         base64.b64encode(f.read()).decode('ascii')
                                     )
-                            except Exception:
-                                pass
-                            break
+                                break
+            except Exception:
+                pass
             return data
 
         def repl(m):
