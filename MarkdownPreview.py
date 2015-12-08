@@ -12,6 +12,14 @@ import time
 import codecs
 import cgi
 import yaml
+# Make sure unicodedata is accesible,
+# if not add the python executable path to sys.path
+# so we can properly import it (ST2 Windows).
+try:
+    import unicodedata
+except Exception:
+    sys.path.append(os.path.dirname(sys.executable))
+    import unicodedata
 
 pygments_local = {
     'github': 'pygments_css/github.css',
