@@ -5,6 +5,15 @@ import os.path
 import re
 import sys
 
+# Make sure unicodedata is accesible,
+# if not add the python executable path to sys.path
+# so we can properly import it (ST2 Windows).
+try:
+    import unicodedata
+except Exception:
+    sys.path.append(os.path.dirname(sys.executable))
+    import unicodedata
+
 '''
 INSTALLED_DIRECTORY - The install directory name for this plugin.
 

@@ -12,14 +12,6 @@ import time
 import codecs
 import cgi
 import yaml
-# Make sure unicodedata is accesible,
-# if not add the python executable path to sys.path
-# so we can properly import it (ST2 Windows).
-try:
-    import unicodedata
-except Exception:
-    sys.path.append(os.path.dirname(sys.executable))
-    import unicodedata
 
 pygments_local = {
     'github': 'pygments_css/github.css',
@@ -33,10 +25,10 @@ def is_ST3():
 
 
 if is_ST3():
+    from .helper import INSTALLED_DIRECTORY
     from . import desktop
     from .markdown_settings import Settings
     from .markdown_wrapper import StMarkdown as Markdown
-    from .helper import INSTALLED_DIRECTORY
     from urllib.request import urlopen, url2pathname, pathname2url
     from urllib.parse import urlparse, urlunparse
     from urllib.error import HTTPError, URLError
@@ -51,10 +43,10 @@ if is_ST3():
     unicode_str = str
 
 else:
+    from helper import INSTALLED_DIRECTORY
     import desktop
     from markdown_settings import Settings
     from markdown_wrapper import StMarkdown as Markdown
-    from helper import INSTALLED_DIRECTORY
     from urllib2 import Request, urlopen, HTTPError, URLError
     from urllib import quote, url2pathname, pathname2url
     from urlparse import urlparse, urlunparse
