@@ -120,7 +120,7 @@ class HeaderAnchorTreeprocessor(Treeprocessor):
                     id_attr = tag.get('id')
                 else:
                     id_attr = stashedHTML2text(''.join(util.itertext(tag)), self.md)
-                    id_attr = unique(self.slugify(id, self.separator), used_ids)
+                    id_attr = unique(self.slugify(id_attr, self.separator), used_ids)
                     tag.set('id', id_attr)
                 tag.text = self.markdown.htmlStash.store(
                     LINK % {"id": id_attr},
