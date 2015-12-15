@@ -143,6 +143,7 @@
 
     /*
         Uses an OAuth token when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
+        Warn: this secret *must not be shared* with anyone and at least you should create it with minimal scopes for security reasons.
     */
     // "github_oauth_token": "secret",
 
