@@ -393,19 +393,24 @@ class Compiler(object):
 
     def get_default_css(self):
         ''' locate the correct CSS with the 'css' setting '''
-        css_name = self.settings.get('css', 'default')
+        css_list = self.settings.get('css', ['default'])
 
-        if self.isurl(css_name):
-            # link to remote URL
-            return u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name
-        elif os.path.isfile(os.path.expanduser(css_name)):
-            # use custom CSS file
-            return u"<style>%s</style>" % load_utf8(os.path.expanduser(css_name))
-        elif css_name == 'default':
-            # use parser CSS file
-            return u"<style>%s</style>" % load_resource(self.default_css)
+        if not isinstance(css_list, list):
+            css_list = [css_list]
 
-        return ''
+        css_text = []
+        for css_name in css_list:
+            if self.isurl(css_name):
+                # link to remote URL
+                css_text.append(u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name)
+            elif os.path.isfile(os.path.expanduser(css_name)):
+                # use custom CSS file
+                css_text.append(u"<style>%s</style>" % load_utf8(os.path.expanduser(css_name)))
+            elif css_name == 'default':
+                # use parser CSS file
+                css_text.append(u"<style>%s</style>" % load_resource(self.default_css))
+
+        return u'\n'.join(css_text)
 
     def get_override_css(self):
         ''' handls allow_css_overrides setting. '''

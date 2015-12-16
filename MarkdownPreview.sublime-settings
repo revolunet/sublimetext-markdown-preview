@@ -115,7 +115,7 @@
 
     /*
         Custom external markdown parsers.
-        
+
         "markdown_binary_map" contains key values pairs.  The key
         is name of the parser and what is used in "enabled_parsers"
         to turn on the access to the parser.  The value is an array
@@ -151,8 +151,10 @@
 
         default - Use the builtin CSS or github CSS, depending on parser config (markdown.css or github.css)
         other - Set an absolute path or url to any css file
+
+        Should be an array, but will take a single string to support legacy convention.
     */
-    "css": "default",
+    "css": ["default"],
 
     /*
         Allow CSS overrides
