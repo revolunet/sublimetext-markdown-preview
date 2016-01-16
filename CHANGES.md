@@ -1,5 +1,10 @@
 Changes in Markdown Preview
 ===========================
+## 1.4.0
+
+* `css` setting can now be an array and contain multiple CSS files (see settings file for more info).
+* Updated Github style to latest.
+
 ## 1.3.0
 
 * Now supports any markdown parser through a generalized method.  Now you can map a binary to parser name via `markdown_binary_map`.  Then use the parser name in `enabled_parsers` to use it.
