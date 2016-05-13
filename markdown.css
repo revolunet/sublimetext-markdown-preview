@@ -1,5 +1,5 @@
 body {
-  width: 45em;
+  max-width: 980px;
   border: 1px solid #ddd;
   outline: 1300px solid #fff;
   margin: 16px auto;
@@ -7,7 +7,7 @@ body {
 
 body .markdown-body
 {
-  padding: 30px;
+  padding: 45px;
 }
 
 @font-face {
