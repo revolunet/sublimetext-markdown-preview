@@ -241,7 +241,7 @@ class Pattern(object):
                     return value
                 else:
                     # An etree Element - return text content only
-                    return ''.join(itertext(value))
+                    return ''.join(util.itertext(value))
         return util.INLINE_PLACEHOLDER_RE.sub(get_stash, text)
 
 
