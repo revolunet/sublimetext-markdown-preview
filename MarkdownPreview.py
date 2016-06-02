@@ -352,7 +352,8 @@ class MarkdownPreviewListener(sublime_plugin.EventListener):
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         if settings.get('enable_autoreload', True):
             filetypes = settings.get('markdown_filetypes')
-            if filetypes and view.file_name().endswith(tuple(filetypes)):
+            file_name = view.file_name()
+            if filetypes and file_name is not None and file_name.endswith(tuple(filetypes)):
                 temp_file = getTempMarkdownPreviewPath(view)
                 if os.path.isfile(temp_file):
                     # reexec markdown conversion
