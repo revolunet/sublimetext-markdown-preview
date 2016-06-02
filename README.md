@@ -156,7 +156,11 @@ Yaml frontmatter has a few special key names that are used that will not be hand
 Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can actually handle them in a couple of ways: online and offline.
 
 #### Online :
-Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting `github_mode` to `gfm` to get things like tasklists to render properly.
+Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting `github_mode` to `gfm` to get things like tasklists to render properly. You can set your API key in the settings as follows:
+
+```js
+    "github_oauth_token": "secret"
+```
 
 #### Offline :
 By default almost all extensions are enabled to help with the github feel, but there are some tweaks needed to get the full experience.
