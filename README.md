@@ -187,12 +187,12 @@ This may be further enhanced in the future.
 ## Support :
 
 - Any bugs about Markdown Preview please feel free to report [here][issue].
-- And you are welcome to fork and submit pullrequests.
+- And you are welcome to fork and submit pull requests.
 
 
 ## License :
 
-The code is available at github [project][home] under [MIT licence][4].
+The code is available at github [project][home] under [MIT license][4].
 
  [home]: https://github.com/revolunet/sublimetext-markdown-preview
  [3]: https://packagecontrol.io/
