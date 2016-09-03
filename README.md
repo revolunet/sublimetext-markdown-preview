@@ -19,7 +19,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
  - YAML support thanks to @tommi
  - Clipboard selection and copy to clipboard thanks to @hexatrope
- - MathJax support : \\\\(\frac{\pi}{2}\\\\) thanks to @bps10
+ - MathJax support : \\\\(\frac{\pi}{2}\\\\) thanks to @bps10. You have to set `enable_mathjax` to `true` in your settings. MathJax is then downloaded in the background so you need to have an internet access.
  - HTML template customisation thanks to @hozaka
  - Embed images as base64 (see [settings][settings] file for more info)
  - Strip out multimarkdown critic marks from either Githubs or Python Markdown input source (see [settings][settings] file for more info)
