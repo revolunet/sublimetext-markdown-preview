@@ -920,18 +920,18 @@ class GithubCompiler(Compiler):
             markdown_html = urlopen(request).read().decode('utf-8')
         except HTTPError as e:
             if e.code == 401:
-                error_message = 'GitHub API authentication failed. Please check your OAuth token.\r\n\r\n'
+                error_message = 'GitHub API authentication failed. Please check your OAuth token.\n\n'
                 sublime.error_message(error_message + get_github_response_from_exception(e))
             elif e.code == 403: # Forbidden
-                message = "It seems like you have exceeded GitHub\'s API rate limit.\r\n\r\n"
+                message = "It seems like you have exceeded GitHub\'s API rate limit.\n\n"
                 message += "To continue using GitHub's markdown format with this package, log in to "
                 message += "GitHub, then go to Settings > Personal access tokens > Generate new token, "
                 message +=" copy the token's value, and paste it in this package's user settings under the key "
-                message += "'github_oauth_token'. Example:\r\n\r\n"
-                message += "{\r\n\t\"github_oauth_token\": \"xxxx....\"\r\n}\r\n\r\n"""
+                message += "'github_oauth_token'. Example:\n\n"
+                message += "{\n\t\"github_oauth_token\": \"xxxx....\"\n}\n\n"""
                 sublime.error_message(message + get_github_response_from_exception(e))
             else:
-                error_message = 'GitHub API responded in an unfriendly way.\r\n\r\n'
+                error_message = 'GitHub API responded in an unfriendly way.\n\n'
                 sublime.error_message(error_message + get_github_response_from_exception(e))
         except URLError:
             # Maybe this is a Linux-install of ST which doesn't bundle with SSL support
@@ -941,7 +941,7 @@ class GithubCompiler(Compiler):
             e = sys.exc_info()[1]
             print(e)
             traceback.print_exc()
-            sublime.error_message('Cannot use GitHub\'s API to convert Markdown. Please check your settings.\r\n\r\n' + get_github_response_from_exception(e))
+            sublime.error_message('Cannot use GitHub\'s API to convert Markdown. Please check your settings.\n\n' + get_github_response_from_exception(e))
         else:
             sublime.status_message('converted markdown with github API successfully')
 
