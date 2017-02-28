@@ -770,6 +770,9 @@ class Compiler(object):
 
         html_template = self.settings.get('html_template')
 
+        if html_template:
+            html_template = os.path.abspath(os.path.expanduser(html_template))
+
         # use customized html template if given
         if self.settings.get('html_simple', False):
             html = body
