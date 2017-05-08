@@ -1126,6 +1126,8 @@ class MarkdownCompiler(Compiler):
 
 
 class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
+    selected = 0
+
     def run(self, edit, target='browser'):
 
         settings = sublime.load_settings("MarkdownPreview.sublime-settings")
@@ -1161,10 +1163,13 @@ class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
                     }
                 )
             else:
-                window.show_quick_panel(self.user_parsers, self.run_command)
+                window.show_quick_panel(
+                    self.user_parsers, self.run_command, 0, self.selected
+                )
 
     def run_command(self, value):
         if value > -1:
+            self.selected = value
             self.view.run_command(
                 "markdown_preview",
                 {
