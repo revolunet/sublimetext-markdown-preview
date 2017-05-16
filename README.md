@@ -14,7 +14,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - Markdown preview using the [Python-markdown][10] or the Github API just choose select the build commands.
  - Syntax highlighting via Pygments. See "[Configuring Pygments](#configuring-pygments)" for more info.
  - Build markdown file using Sublime Text build system. The build parser are config via the `"parser"` config.
- - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
+ - Browser preview auto reload on save if you have the [ST LiveReload plugin][7] installed.
  - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong`, `smarty`,  `wikilinks`, `meta`, `sane_lists`, `codehilite`, `nl2br`, and `toc` markdown extensions.
  - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
  - YAML support thanks to @tommi
@@ -66,7 +66,13 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 	- Markdown Preview: Open Markdown Cheat sheet
  - or bind some key in your user key binding, using a line like this one:
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser", "parser":"markdown"} },` for a specific parser and target or `{ "keys": ["alt+m"], "command": "markdown_preview_select", "args": {"target": "browser"} },` to bring up the quick panel to select enabled parsers for a given target.
- - once converted a first time, the output HTML will be updated on each file save (with LiveReload plugin)
+
+### LiveReload
+
+:warning: If you want to enable LiveReload, you have to set `enable_autoreload: true` in the settings. This will convert the markdown on every file save (and send it to github API if you use github parser).
+
+Also you need the [Sublime Text LiveReload plugin](7)
+
 
 ### Enabling Other External Markdown Parsers :
 
@@ -199,7 +205,7 @@ The code is available at github [project][home] under [MIT license][4].
  [4]: http://revolunet.mit-license.org
  [5]: https://developer.github.com/v3/markdown/
  [6]: https://help.github.com/articles/github-flavored-markdown/
- [7]: https://github.com/dz0ny/LiveReload-sublimetext2
+ [7]: https://github.com/Grafikart/ST3-LiveReload
  [8]: https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098
  [9]: https://github.com/revolunet/sublimetext-markdown-preview/issues/78#issuecomment-15644727
  [10]: https://github.com/waylan/Python-Markdown
