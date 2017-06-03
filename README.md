@@ -67,12 +67,18 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
  - or bind some key in your user key binding, using a line like this one:
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser", "parser":"markdown"} },` for a specific parser and target or `{ "keys": ["alt+m"], "command": "markdown_preview_select", "args": {"target": "browser"} },` to bring up the quick panel to select enabled parsers for a given target.
 
-### LiveReload
+### Live Reload
 
-:warning: If you want to enable LiveReload, you have to set `enable_autoreload: true` in the settings. This will convert the markdown on every file save (and send it to github API if you use github parser).
+To get live updates while editing a file after preview, you need to do the following:
 
-Also you need the [Sublime Text LiveReload plugin](7)
+1. enable the `enable_autoreload` setting in `MarkdownPreview.sublime-settings`.
+2. Install [LiveReload][7] package from Package Control.
+3. Restart.
+4. Open the command palette and select the command `LiveReload: Enable/disable plug-ins`.
+5. Select `Simple Reload with delay (400ms)`.  It is possible you can get away with `Simple Reload`, but some experience an issue where they are one rev behind when using `Simple Reload`.
+6. Edit document and enjoy live reload.
 
+You don't need to enable `Simple Reload` on every file.  Once is enough.  New files should auto-reload when you open them in the browser.
 
 ### Enabling Other External Markdown Parsers :
 
