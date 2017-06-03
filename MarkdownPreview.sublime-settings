@@ -101,7 +101,7 @@
             github     | extension's values are not used.
 
     */
-    "enabled_extensions": "default",
+    "markdown_extensions": "default",
 
     /*
         Enabled parsers for the parser "select parser" command

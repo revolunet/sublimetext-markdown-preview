@@ -2,7 +2,9 @@
     "*": {
         "*": [
             "pygments",
-            "pyyaml"
+            "pyyaml",
+            "python-markdown",
+            "pymdownx"
         ]
     }
 }

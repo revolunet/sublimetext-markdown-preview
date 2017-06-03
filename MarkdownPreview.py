@@ -12,55 +12,19 @@ import time
 import codecs
 import cgi
 import yaml
-
-pygments_local = {
-    'github': 'pygments_css/github.css',
-    'github2014': 'pygments_css/github2014.css'
-}
-
-
-def is_ST3():
-    ''' check if ST3 based on python version '''
-    return sys.version_info >= (3, 0)
-
-
-if is_ST3():
-    from .helper import INSTALLED_DIRECTORY
-    from . import desktop
-    from .markdown_settings import Settings
-    from .markdown_wrapper import StMarkdown as Markdown
-    from urllib.request import urlopen, url2pathname, pathname2url
-    from urllib.parse import urlparse, urlunparse
-    from urllib.error import HTTPError, URLError
-    from urllib.parse import quote
-    from .markdown.extensions import codehilite
-
-    def Request(url, data, headers):
-        ''' Adapter for urllib2 used in ST2 '''
-        import urllib.request
-        return urllib.request.Request(url, data=data, headers=headers, method='POST')
-
-    unicode_str = str
-
-else:
-    from helper import INSTALLED_DIRECTORY
-    import desktop
-    from markdown_settings import Settings
-    from markdown_wrapper import StMarkdown as Markdown
-    from urllib2 import Request, urlopen, HTTPError, URLError
-    from urllib import quote, url2pathname, pathname2url
-    from urlparse import urlparse, urlunparse
-    import markdown.extensions.codehilite as codehilite
-
-    unicode_str = unicode
-
+import pymdownx.emoji
+from collections import OrderedDict
+from urllib.request import urlopen, url2pathname, pathname2url
+from urllib.parse import urlparse, urlunparse
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote
 from pygments.formatters import get_formatter_by_name
-try:
-    PYGMENTS_AVAILABLE = codehilite.pygments
-except:
-    PYGMENTS_AVAILABLE = False
+from markdown.extensions import codehilite
+from . import desktop
+from .markdown_settings import Settings
+from .markdown_wrapper import StMarkdown as Markdown
 
-_CANNOT_CONVERT = u'cannot convert markdown'
+_CANNOT_CONVERT = 'cannot convert markdown'
 
 PATH_EXCLUDE = tuple(
     [
@@ -75,11 +39,92 @@ ABS_EXCLUDE = tuple(
     ] + (['\\'] if sys.platform.startswith('win') else [])
 )
 
-DEFAULT_EXT = [
-    "extra", "github", "toc",
-    "meta", "sane_lists", "smarty", "wikilinks",
-    "admonition"
-]
+EMOJI_CONFIG = {
+    # Github style emoji
+    "emoji_index": pymdownx.emoji.gemoji,
+    "emoji_generator": pymdownx.emoji.to_png,
+    "alt": "short",
+    "options": {
+        "attributes": {
+            "align": "absmiddle",
+            "height": "20px",
+            "width": "20px"
+        },
+        "image_path": "https://assets-cdn.github.com/images/icons/emoji/unicode/",
+        "non_standard_image_path": "https://assets-cdn.github.com/images/icons/emoji/"
+    }
+}
+
+DEFAULT_EXT = OrderedDict(
+    [
+        ('markdown.extensions.smart_strong', None),
+        ('markdown.extensions.footnotes', None),
+        ('markdown.extensions.attr_list', None),
+        ('markdown.extensions.def_list', None),
+        ('markdown.extensions.tables', None),
+        ('markdown.extensions.abbr', None),
+        ("markdown.extensions.toc", None),
+        ("markdown.extensions.meta", None),
+        ("markdown.extensions.sane_lists", None),
+        ("markdown.extensions.smarty", None),
+        ("markdown.extensions.wikilinks", None),
+        ("markdown.extensions.admonition", None),
+        ('pymdownx.extrarawhtml', None),
+        ('pymdownx.superfences', None),
+        ('pymdownx.tilde', None),
+        ('pymdownx.emoji', EMOJI_CONFIG),
+        ('pymdownx.magiclink', None),
+        ('pymdownx.tasklist', None),
+        ('pymdownx.superfences', None)
+    ]
+)
+
+pygments_local = {
+    'github': 'pygments_css/github.css',
+    'github2014': 'pygments_css/github2014.css'
+}
+
+
+def yaml_load(stream, loader=yaml.Loader, object_pairs_hook=OrderedDict):
+    """
+    Custom yaml loader.
+    Make all YAML dictionaries load as ordered Dicts.
+    http://stackoverflow.com/a/21912744/3609487
+    Load all strings as unicode.
+    http://stackoverflow.com/a/2967461/3609487
+    """
+
+    def construct_mapping(loader, node):
+        """Convert to ordered dict."""
+
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+
+    def construct_yaml_str(self, node):
+        """Override the default string handling function to always return unicode objects."""
+
+        return self.construct_scalar(node)
+
+    class Loader(loader):
+        """Custom Loader."""
+
+    Loader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping
+    )
+
+    Loader.add_constructor(
+        'tag:yaml.org,2002:str',
+        construct_yaml_str
+    )
+
+    return yaml.load(stream, Loader)
+
+
+def Request(url, data, headers):
+    ''' Adapter for urllib2 used in ST2 '''
+    import urllib.request
+    return urllib.request.Request(url, data=data, headers=headers, method='POST')
 
 
 def getTempMarkdownPreviewPath(view):
@@ -116,11 +161,7 @@ def load_resource(name):
     ''' return file contents for files within the package root folder '''
 
     try:
-        if is_ST3():
-            return sublime.load_resource('Packages/Markdown Preview/{0}'.format(name))
-        else:
-            filename = os.path.join(sublime.packages_path(), INSTALLED_DIRECTORY, os.path.normpath(name))
-            return load_utf8(filename)
+        return sublime.load_resource('Packages/Markdown Preview/{0}'.format(name))
     except:
         print("Error while load_resource('%s')" % name)
         traceback.print_exc()
@@ -141,14 +182,9 @@ def new_view(window, text, scratch=False):
     new_view = window.new_file()
     if scratch:
         new_view.set_scratch(True)
-    if is_ST3():
-        new_view.run_command('append', {
-            'characters': text,
-        })
-    else:  # 2.x
-        new_edit = new_view.begin_edit()
-        new_view.insert(new_edit, 0, text)
-        new_view.end_edit(new_edit)
+    new_view.run_command('append', {
+        'characters': text,
+    })
     return new_view
 
 
@@ -403,15 +439,15 @@ class Compiler(object):
         for css_name in css_list:
             if self.isurl(css_name):
                 # link to remote URL
-                css_text.append(u"<link href='%s' rel='stylesheet' type='text/css'>" % css_name)
+                css_text.append("<link href='%s' rel='stylesheet' type='text/css'>" % css_name)
             elif os.path.isfile(os.path.expanduser(css_name)):
                 # use custom CSS file
-                css_text.append(u"<style>%s</style>" % load_utf8(os.path.expanduser(css_name)))
+                css_text.append("<style>%s</style>" % load_utf8(os.path.expanduser(css_name)))
             elif css_name == 'default':
                 # use parser CSS file
-                css_text.append(u"<style>%s</style>" % load_resource(self.default_css))
+                css_text.append("<style>%s</style>" % load_resource(self.default_css))
 
-        return u'\n'.join(css_text)
+        return '\n'.join(css_text)
 
     def get_override_css(self):
         ''' handls allow_css_overrides setting. '''
@@ -425,7 +461,7 @@ class Compiler(object):
                     if filename.endswith(filetype):
                         css_filename = filename.rpartition(filetype)[0] + '.css'
                         if (os.path.isfile(css_filename)):
-                            return u"<style>%s</style>" % load_utf8(css_filename)
+                            return "<style>%s</style>" % load_utf8(css_filename)
         return ''
 
     def get_stylesheet(self):
@@ -438,16 +474,16 @@ class Compiler(object):
 
         if js_files is not None:
             # Ensure string values become a list.
-            if isinstance(js_files, str) or isinstance(js_files, unicode_str):
+            if isinstance(js_files, str) or isinstance(js_files, str):
                 js_files = [js_files]
             # Only load scripts if we have a list.
             if isinstance(js_files, list):
                 for js_file in js_files:
                     if os.path.isabs(js_file):
                         # Load the script inline to avoid cross-origin.
-                        scripts += u"<script>%s</script>" % load_utf8(js_file)
+                        scripts += "<script>%s</script>" % load_utf8(js_file)
                     else:
-                        scripts += u"<script type='text/javascript' src='%s'></script>" % js_file
+                        scripts += "<script type='text/javascript' src='%s'></script>" % js_file
         return scripts
 
     def get_mathjax(self):
@@ -748,7 +784,7 @@ class Compiler(object):
                         v = ""
                     else:
                         v = v[0]
-                self.meta_title = unicode_str(v)
+                self.meta_title = str(v)
                 continue
             if isinstance(v, list):
                 v = ','.join(v)
@@ -777,7 +813,7 @@ class Compiler(object):
         if self.settings.get('html_simple', False):
             html = body
         elif html_template and os.path.exists(html_template):
-            head = u''
+            head = ''
             head += self.get_meta()
             if not self.settings.get('skip_default_stylesheet'):
                 head += self.get_stylesheet()
@@ -791,7 +827,7 @@ class Compiler(object):
             html = html.replace('{{ HEAD }}', head, 1)
             html = html.replace('{{ BODY }}', body, 1)
         else:
-            html = u'<!DOCTYPE html>'
+            html = '<!DOCTYPE html>'
             html += '<html><head><meta charset="utf-8">'
             html += self.get_meta()
             html += self.get_stylesheet()
@@ -1029,12 +1065,7 @@ class MarkdownCompiler(Compiler):
         return text
 
     def process_extensions(self, extensions):
-        re_pygments = re.compile(r"(?:\s*,)?pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
-        re_pygments_replace = re.compile(r"pygments_style\s*=\s*([a-zA-Z][a-zA-Z_\d]*)")
-        re_use_pygments = re.compile(r"use_pygments\s*=\s*(True|False)")
-        re_insert_pygment = re.compile(r"(?P<bracket_start>codehilite\([^)]+?)(?P<bracket_end>\s*\)$)|(?P<start>codehilite)")
-        re_no_classes = re.compile(r"(?:\s*,)?noclasses\s*=\s*(True|False)")
-        re_css_class = re.compile(r"css_class\s*=\s*([\w\-]+)")
+        ''' Process extensions '''
         # First search if pygments has manually been set,
         # and if so, read what the desired color scheme to use is
         self.pygments_style = None
@@ -1042,43 +1073,47 @@ class MarkdownCompiler(Compiler):
         use_pygments = True
         pygments_css = None
 
-        count = 0
-        for e in extensions:
-            if e.startswith("codehilite"):
-                m = re_use_pygments.search(e)
-                use_pygments = True if m is None else m.group(1) == 'True'
-                m = re_css_class.search(e)
-                css_class = m.group(1) if m else 'codehilite'
-                pygments_style = re_pygments.search(e)
-                if pygments_style is None:
-                    pygments_css = "github"
-                    m = re_insert_pygment.match(e)
-                    if m is not None:
-                        if m.group('bracket_start'):
-                            start = m.group('bracket_start') + ',pygments_style='
-                            end = ")"
-                        else:
-                            start = m.group('start') + "(pygments_style="
-                            end = ')'
+        # Get the base path of source file if available
+        base_path = self.settings.get('builtin').get("basepath")
+        if base_path is None:
+            base_path = ""
 
-                        extensions[count] = start + pygments_css + end
-                else:
-                    pygments_css = pygments_style.group(1)
+        names = []
+        settings = {}
+
+        for ext, config in extensions.items():
+            if config is None:
+                config = {}
+
+            names.append(ext)
+            settings[ext] = config
+
+            if ext in ("markdown.extensions.codehilite", "pymdownx.highlight"):
+
+                use_pygments = config.get('use_pygments', True)
+                css_class = config.get('css_class', 'codehilite')
+                pygments_css = config.get('pygments_style')
+                if pygments_css is None:
+                    pygments_css = 'github'
 
                 # Set the style, but erase the setting if the CSS is pygments_local.
-                # Don't allow 'no_css' with non internal themes.
+                # Don't allow 'noclasses' with non internal themes.
                 # Replace the setting with the correct name if the style was invalid.
                 original = pygments_css
                 pygments_css = self.set_highlight(pygments_css, css_class)
                 if pygments_css in pygments_local:
-                    extensions[count] = re_no_classes.sub('', re_pygments.sub('', e))
+                    if 'noclasses' in config:
+                        del config['noclasses']
+                    if 'pygments_style' in config:
+                        del config['pygments_style']
                 elif original != pygments_css:
-                    extensions[count] = re_pygments_replace.sub('pygments_style=%s' % pygments_css, e)
+                    config['pygments_style'] = pygments_css
 
-                noclasses = re_no_classes.search(e)
-                if noclasses is not None and noclasses.group(1) == "True":
-                    self.noclasses = True
-            count += 1
+                self.noclasses = bool(config.get('noclasses', False))
+            else:
+                for k, v in config.items():
+                    if isinstance(v, str):
+                        config[k] = v.replace("${BASE_PATH}", base_path)
 
         # Second, if nothing manual was set, see if "enable_highlight" is enabled with pygment support
         # If no style has been set, setup the default
@@ -1087,38 +1122,33 @@ class MarkdownCompiler(Compiler):
             self.settings.get("enable_highlight") is True
         ):
             pygments_css = self.set_highlight('github', 'codehilite')
-            guess_lang = str(bool(self.settings.get("guess_language", True)))
             use_pygments = bool(self.settings.get("enable_pygments", True))
-            extensions.append(
-                "codehilite(guess_lang=%s,use_pygments=%s)" % (
-                    guess_lang, str(use_pygments)
-                )
-            )
+            extensions['markdown.extensions.codehilite'] = {
+                'guess_lang': bool(self.settings.get("guess_language", True)),
+                'use_pygments': use_pygments
+            }
 
         if not use_pygments:
             self.pygments_style = None
 
-        # Get the base path of source file if available
-        base_path = self.settings.get('builtin').get("basepath")
-        if base_path is None:
-            base_path = ""
+        return names, settings
 
-        # Replace BASE_PATH keyword with the actual base_path
-        return [e.replace("${BASE_PATH}", base_path) for e in extensions]
+    def get_config_extensions(self):
+        ext_config = self.settings.get('markdown_extensions')
+        if ext_config == 'default':
+            extensions = DEFAULT_EXT
+        else:
+            try:
+                extensions = yaml_load(ext_config)
+            except Exception:
+                extensions = DEFAULT_EXT
 
-    def get_config_extensions(self, default_extensions):
-        config_extensions = self.settings.get('enabled_extensions')
-        if not config_extensions or config_extensions == 'default':
-            return self.process_extensions(default_extensions)
-        if 'default' in config_extensions:
-            config_extensions.remove('default')
-            config_extensions.extend(default_extensions)
-        return self.process_extensions(config_extensions)
+        return self.process_extensions(extensions)
 
     def parser_specific_convert(self, markdown_text):
         sublime.status_message('converting markdown with Python markdown...')
-        config_extensions = self.get_config_extensions(DEFAULT_EXT)
-        md = Markdown(extensions=config_extensions)
+        extensions, extension_configs = self.get_config_extensions()
+        md = Markdown(extensions=extensions, extension_configs=extension_configs)
         html_text = md.convert(markdown_text)
         # Retrieve the meta data returned from the "meta" extension
         self.settings.add_meta(md.Meta)
@@ -1280,26 +1310,11 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 class MarkdownBuildCommand(sublime_plugin.WindowCommand):
     def init_panel(self):
         if not hasattr(self, 'output_view'):
-            if is_ST3():
-                self.output_view = self.window.create_output_panel("markdown")
-            else:
-                self.output_view = self.window.get_output_panel("markdown")
+            self.output_view = self.window.create_output_panel("markdown")
 
     def puts(self, message):
         message = message + '\n'
-        if is_ST3():
-            self.output_view.run_command('append', {'characters': message, 'force': True, 'scroll_to_end': True})
-        else:
-            selection_was_at_end = (len(self.output_view.sel()) == 1
-                                    and self.output_view.sel()[0]
-                                    == sublime.Region(self.output_view.size()))
-            self.output_view.set_read_only(False)
-            edit = self.output_view.begin_edit()
-            self.output_view.insert(edit, self.output_view.size(), message)
-            if selection_was_at_end:
-                self.output_view.show(self.output_view.size())
-            self.output_view.end_edit(edit)
-            self.output_view.set_read_only(True)
+        self.output_view.run_command('append', {'characters': message, 'force': True, 'scroll_to_end': True})
 
     def run(self):
         view = self.window.active_view()
