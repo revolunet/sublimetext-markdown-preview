@@ -1,5 +1,9 @@
 Changes in Markdown Preview
 ===========================
+## 1.4.3
+
+* Fix issue where Chrome prevents live reload.
+
 ## 1.4.0
 
 * `css` setting can now be an array and contain multiple CSS files (see settings file for more info).
