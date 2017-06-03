@@ -411,7 +411,7 @@ class Compiler(object):
         return '\n'.join(css_text)
 
     def get_override_css(self):
-        ''' handls allow_css_overrides setting. '''
+        ''' handles allow_css_overrides setting. '''
 
         if self.settings.get('allow_css_overrides'):
             filename = self.view.file_name()

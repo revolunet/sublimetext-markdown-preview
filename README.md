@@ -1,4 +1,4 @@
-Sublime Text 2/3 Markdown Preview
+Sublime Text 2/3 Markdown Previews
 =================================
 
 Preview and build your markdown files quickly in your web browser from sublime text 2/3. 
@@ -11,9 +11,9 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
 
 ## Features :
 
- - Markdown preview using the [Python-markdown][10] or the Github API just choose select the build commands.
+ - Markdown preview using the [python-markdown][10] or the Github API. Just select the build commands.
  - Syntax highlighting via Pygments. See "[Configuring Pygments](#configuring-pygments)" for more info.
- - Build markdown file using Sublime Text build system. The build parser are config via the `"parser"` config.
+ - Build markdown file using Sublime Text build system. The build parser are configured via the `"parser"` config.
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
  - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong`, `smarty`,  `wikilinks`, `meta`, `sane_lists`, `codehilite`, `nl2br`, and `toc` markdown extensions.
  - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
@@ -23,19 +23,9 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - HTML template customisation thanks to @hozaka
  - Embed images as base64 (see [settings][settings] file for more info)
  - Strip out multimarkdown critic marks from either Githubs or Python Markdown input source (see [settings][settings] file for more info)
- - 3rd party extensions for the Python Markdown parser:
+ - Supports 3rd party Python Markdown extensions.  [PyMdown Extensions][1] are included via Package Control dependencies, but others can be included as well. Usage of some extensions may require additional JavaScript or CSS. See the desired extension's documentation to learn how to configure them.
 
-    | Extension | Documentation |
-    |-----------|---------------|
-    | magiclink | Find and convert HTML links and email address to links ([MagicLink Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/magiclink/)). |
-    | delete | Surround inline text with `~~strike through~~` to get del tags ~~strike through~~. |
-    | insert | Surround inline text with `^^underlined^^` to get ins tags <ins>underlined</ins>. |
-    | tasklist | Github Flavored Markdown tasklists ([Tasklist Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/tasklist/)). |
-    | githubemoji | Support for Github Flavored Markdown emojis ([GithubEmoji Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/githubemoji/)). |
-    | headeranchor | Github Flavored Markdown style header anchors ([HeaderAnchor Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/headeranchor/)). |
-    | github | A convenience extension to add: `magiclink`, `delete`, `tasklist`, `githubemoji`, `headeranchor`, `superfences`, and `nl2br` to parse and display Markdown in a github-ish way.  It is recommed to pair `github` with `extra` and `codehilite` (with language guessing off) to parse close to github's way.  Be aware of what extensions `github` loads, because you should not load extensions more than once. |
-    | progressbar | Create progress bars ([ProgressBar Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/progressbar/)). |
-    | superfences | Allow fenced blocks to be nested under lists, blockquotes, etc. and add special UML diagram blocks ([SuperFences Documentation](http://facelessuser.github.io/pymdown-extensions/extensions/superfences/)). |
+    When configuring PyMdown Extensions, please read its [Usage Notes][13] to learn about extension conflicts and which ones cannot be included together.
 
 ## Installation :
 
@@ -84,11 +74,59 @@ Then the name can be placed in `enabled_parsers` to enable use of the new parser
     "enabled_parsers": ["markdown", "github", "multimarkdown"],
 ```
 
+### Configuring Python Markdown Extensions
+
+Python Markdown comes with a number of extensions and can also use a number of 3rd party extensions.  To configure Markdown Preview with extensions, use the `markdown_extensions` setting.
+
+`markdown_extensions` is a setting that contains an array of extensions in the format of their import path. For instance, the Toc (Table of Contents) extension is found in the Markdown Package at `markdown.extensions.toc`.  This is according to Python Markdown [documentation][2].  All extensions must be specified this way.
+
+```js
+    "markdown_extensions": [
+        "markdown.extensions.toc"
+    ]
+```
+
+To configure an extension, make the entry a dictionary.  In this example, we want to turn on Toc's permalink feature:
+
+```js
+    "markdown_extensions": [
+        {
+            "markdown.extensions.toc": {
+                "permalink": true
+            }
+        }
+    ]
+```
+
+You can configure extension options with strings, booleans, integers, floats, etc.  But sometimes, an extension can take a function.  Functions are not part of the JSON spec. Luckily, support has been added with the following syntax:
+
+To specify a function, create an object whose key is named `!!python/name`, and whose value is the import path of the function.  This syntax was picked to be similar to PyYaml's syntax which is used for the Markdown frontmatter.
+
+So let's pretend we didn't like Toc's default slugify `markdown.extensions.headerid.slugify`, and instead wanted to use PyMdown Extensions' slugify `pymdownx.slugs.uslugify`.  We could specify the new slugify function with the following syntax:
+
+```js
+    "markdown_extensions": [
+        {
+            "markdown.extensions.toc": {
+                "slugify": {"!!python/name", "pymdownx.slugs.uslugify"}
+            }
+        }
+    ]
+```
+
+Compare to the PyYaml format:
+
+```yml
+markdown_extensions:
+  - markdown.extensions.toc:
+      slugify: !!python/name:pymdownx.slugs.uslugify
+```
+
 ### To build :
 
  - Just use <kbd>ctrl</kbd>+<kbd>B</kbd> (Windows/Linux) or <kbd>cmd</kbd>+<kbd>B</kbd> (Mac) to build current file.
 
-### To config :
+### To configure :
 
 Using Sublime Text menu: `Preferences`->`Package Settings`->`Markdown Preview`
 
@@ -98,11 +136,55 @@ Using Sublime Text menu: `Preferences`->`Package Settings`->`Markdown Preview`
 ### Configuring Pygments
 If you add the codehilite extension manually in the enabled extensions, you can override some of the default settings.
 
-* Turn language guessing *on* or *off* (*on* will highlight fenced blocks even if you don't specify a language)  `codehilite(guess_lang=False)` (True|False).
-* Show line numbers: `codehilite(linenums=True)` (True|False).
-* Change the higlight theme: `codehilite(pygments_style=emacs)`.
-* Inline the CSS: `codehilite(noclasses=True)` (True|False).
-* Use multiple: `codehilite(linenums=True, pygments_style-emacs)`.
+* Turn language guessing *on* or *off* (*on* will highlight fenced blocks even if you don't specify a language):
+
+    ```js
+    "markdown_extensions": [
+        "codehilite": {
+            "guess_lang": false
+        }
+    ]
+    ```
+
+* Show line numbers:
+
+    ```js
+    "markdown_extensions": [
+        "codehilite": {
+            "linenums": false
+        }
+    ]
+    ```
+
+* Change the higlight theme:
+
+    ```js
+    "markdown_extensions": [
+        "codehilite": {
+            "pygments_style": "emacs"
+        }
+    ]
+    ```
+
+* Inline the CSS:
+
+    ```js
+    "markdown_extensions": [
+        "codehilite": {
+            "noclasses": true
+        }
+    ]
+    ```
+
+* Use multiple:
+    ```js
+    "markdown_extensions": [
+        "codehilite": {
+            "linenums": true,
+            "pygments_style": "emacs"
+        }
+    ]
+    ```
 
 See [codehilte page](https://pythonhosted.org/Markdown/extensions/code_hilite.html) for more info.
 
@@ -110,17 +192,16 @@ See [codehilte page](https://pythonhosted.org/Markdown/extensions/code_hilite.ht
 When the `meta` extension is enabled (https://pythonhosted.org/Markdown/extensions/meta_data.html), the results will be written to the HTML head in the form `<meta name="key" content="value1,value2">`.  `title` is the one exception, and its content will be written to the title tag in the HTML head.
 
 ### YAML Frontmatter Support
-YAML frontmatter can be stripped out and read when `strip_yaml_front_matter` is set to  `true` in the settings file.  In general the, the fronmatter is handled the same as [meta data](#meta-data-support), but if both exist in a file, the YAML keys will override the `meta` extension keys.  There are a few special keys names that won't be handled as html meta data.
+YAML frontmatter can be stripped out and read when `strip_yaml_front_matter` is set to  `true` in the settings file.  In general the, the frontmatter is handled the same as [meta data](#meta-data-support), but if both exist in a file, the YAML keys will override the `meta` extension keys.  There are a few special key names that won't be handled as HTML meta data.
 
 #### Special YAML Key Names
-Yaml frontmatter has a few special key names that are used that will not be handled as meta data:
+YAML frontmatter has a few special key names that are used that will not be handled as meta data:
 
 - **basepath**: An absolute path to configure the relative paths for images etc. (for when the markdown is supposed to reference images in a different location.)
 - **references**: Can take a file path or an array of file paths for separate markdown files containing references, footnotes, etc.  Can be an absolute path or relative path.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
 - **destination**: This is an absolute file path or relative file path for when the markdown is saved to html via the build command or the `Save to HTML` command.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
 - **settings**: This is a dictionary where you can override settings that are in the settings file.
 
-#### Example
 ```yaml
 ---
     # Builtin values
@@ -139,16 +220,26 @@ Yaml frontmatter has a few special key names that are used that will not be hand
 
     # Settings overrides
     settings:
-        enabled_extensions:
-        - extra
-        - github
-        - toc
-        - headerid
-        - smarty(smart_quotes=False) # smart quotes interferes with attr_list
-        - meta
-        - wikilinks
-        - admonition
-        - codehilite(guess_lang=False,pygments_style=github)
+        enable_uml: true
+        markdown_extensions:
+          - markdown.extensions.footnotes
+          - markdown.extensions.attr_list
+          - markdown.extensions.def_list
+          - markdown.extensions.tables
+          - markdown.extensions.abbr
+          - markdown.extensions.toc
+          - markdown.extensions.smarty
+          - markdown.extensions.meta
+          - markdown.extensions.wikilinks
+          - markdown.extensions.admonition
+          - markdown.extensions.codehilite:
+              guess_lang: false
+              pygments_style: github
+          - pymdownx.extrarawhtml
+          - pymdownx.progressbar
+          - pymdownx.github
+          - pymdownx.caret:
+              superscript: false
 ---
 ```
 
@@ -163,26 +254,61 @@ Parsing GFM using the online method requires using the Github API as the parser.
 ```
 
 #### Offline :
-By default almost all extensions are enabled to help with the github feel, but there are some tweaks needed to get the full experience.
+By default almost all extensions are enabled to help with a GitHub-ish feel, but there are some tweaks needed to get the full experience.
 
 GFM does not auto guess language in fenced blocks, but Markdown Preview does this by default.  You can fix this in one of two ways:
 
 1. Disable auto language guessing in the settings file `"guess_language": false,`
-2. Or if you are manually defining extensions: `"enabled_extensions": ["codehilite(guess_lang=False,pygments_style=github)"]`
+2. Or if you are manually defining extensions:
 
+        ```js
+    "markdown_extensions": [
+        "codehilite": {
+            "guess_lang": false,
+            "pygments_style": "github"
+        }
+    ]
+    ```
 
-As mentioned earlier, almost all extensions are enabled by default, but as a reference, the minimum extensions that should be enabled are listed below:
+As mentioned earlier, a number of extensions are included by default. You can remove ones that are not part of GFM.
 
-```javascript
-	"enabled_extensions": [
-		"extra",
-		"github",
-		"codehilite(guess_lang=False,pygments_style=github)"
-	]
+## Including CSS
+
+By default Markdown Preview includes a default CSS via the `css` setting.  It uses the special keyword `default` to represent the default CSS.
+
+```js
+    "css": ["default"],
 ```
 
-This may be further enhanced in the future.
+You can include whatever CSS you want, and even remove the `default` if you like.  It can take URLs or file paths.
 
+### Override CSS by File Type
+
+You can also override the default CSS with special file specific CSS. This CSS does not replace the default, but will append CSS for a supported file type after the conventional CSS.
+
+So assuming the following configuration:
+
+```js
+    "css": ["default"],
+    // File must be of one type below
+    "markdown_filetypes": [".md", ".markdown", ".mdown"],
+```
+
+We could enable the following:
+
+```js
+    "allow_css_overrides": true,
+```
+
+Then if we have a file `filename.md` and a CSS in the same directory `filename.css`, that CSS will be applied to that file.
+
+## Including JavaScript
+
+JavaScript files can be included via the `js` setting.  It is a list and can take file paths or URLs.
+
+```js
+    "js": ["default"],
+```
 
 ## Support :
 
@@ -195,6 +321,8 @@ This may be further enhanced in the future.
 The code is available at github [project][home] under [MIT license][4].
 
  [home]: https://github.com/revolunet/sublimetext-markdown-preview
+ [1]: http://facelessuser.github.io/pymdown-extensions/
+ [2]: https://pythonhosted.org/Markdown/extensions/toc.html#usage
  [3]: https://packagecontrol.io/
  [4]: http://revolunet.mit-license.org
  [5]: https://developer.github.com/v3/markdown/
@@ -205,5 +333,6 @@ The code is available at github [project][home] under [MIT license][4].
  [10]: https://github.com/waylan/Python-Markdown
  [11]: https://packagecontrol.io/installation
  [12]: https://github.com/revolunet/sublimetext-markdown-preview/archive/master.zip
+ [13]: http://facelessuser.github.io/pymdown-extensions/usage_notes/
  [issue]: https://github.com/revolunet/sublimetext-markdown-preview/issues
  [settings]: https://github.com/revolunet/sublimetext-markdown-preview/blob/master/MarkdownPreview.sublime-settings

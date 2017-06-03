@@ -25,7 +25,6 @@
           - markdown.extensions.toc
           - markdown.extensions.smarty
           - markdown.extensions.meta
-          - markdown.extensions.wikilinks
           - markdown.extensions.admonition
           - markdown.extensions.codehilite:
               guess_lang: false

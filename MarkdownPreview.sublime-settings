@@ -91,23 +91,39 @@
         and set it to the import path to the function "module.submodule.etc.function".
     */
     "markdown_extensions": [
+        // Python Markdown Extra with SuperFences.
+        // You can't include "extra" and "superfences"
+        // as "fenced_code" can not be included with "superfences",
+        // so we include the pieces separately.
         "markdown.extensions.smart_strong",
         "markdown.extensions.footnotes",
         "markdown.extensions.attr_list",
         "markdown.extensions.def_list",
         "markdown.extensions.tables",
         "markdown.extensions.abbr",
+        // Extra's Markdown parsing in raw HTML cannot be
+        // included by itself, but "pymdownx" exposes it so we can.
+        "pymdownx.extrarawhtml",
+
+        // More default Python Markdown extensions
         "markdown.extensions.toc",
         "markdown.extensions.meta",
         "markdown.extensions.sane_lists",
         "markdown.extensions.smarty",
         "markdown.extensions.wikilinks",
         "markdown.extensions.admonition",
-        "pymdownx.extrarawhtml",
-        "pymdownx.superfences",
-        "pymdownx.tilde",
+
+        // PyMdown extensions that help give a GitHub-ish feel
+        "pymdownx.superfences",  // Nested fences and UML support
+        "pymdownx.magiclink",    // Auto linkify URLs and email addresses
+        "pymdownx.tasklist",     // Task lists
         {
-            "pymdownx.emoji": {
+            "pymdownx.caret": {  // Provide ~~delete~~
+                "superscript": false
+            }
+        },
+        {
+            "pymdownx.emoji": {  // Provide GitHub's emojis
                 "emoji_index": {"!!python/name": "pymdownx.emoji.gemoji"},
                 "emoji_generator": {"!!python/name": "pymdownx.emoji.to_png"},
                 "alt": "short",
@@ -121,10 +137,7 @@
                    "non_standard_image_path": "https://assets-cdn.github.com/images/icons/emoji/"
                 }
             }
-        },
-        "pymdownx.magiclink",
-        "pymdownx.tasklist",
-        "pymdownx.superfences"
+        }
     ],
 
     /*
