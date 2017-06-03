@@ -535,10 +535,11 @@ class Compiler(object):
         frontmatter = {}
 
         if text.startswith("---"):
-            m = re.search(r'^(---(.*?)---[ \t]*\r?\n)', text, re.DOTALL)
+            m = re.search(r'^(-{3}(.*?)(?<=\n)(?:-{3}|\.{3})[ \t]*\r?\n)', text, re.DOTALL)
             if m:
                 try:
-                    frontmatter = yaml.load(m.group(2))
+                    content = m.group(2).strip()
+                    frontmatter = yaml_load(content) if content else {}
                 except:
                     print(traceback.format_exc())
                 text = text[m.end(1):]
