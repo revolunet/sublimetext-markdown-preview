@@ -25,6 +25,7 @@ from .markdown_settings import Settings
 from .markdown_wrapper import StMarkdown as Markdown
 
 _CANNOT_CONVERT = 'cannot convert markdown'
+_EXT_CONFIG = "Packages/Markdown Preview/markdown_preview.yml"
 
 PATH_EXCLUDE = tuple(
     [
@@ -37,46 +38,6 @@ ABS_EXCLUDE = tuple(
     [
         'file://', '/'
     ] + (['\\'] if sys.platform.startswith('win') else [])
-)
-
-EMOJI_CONFIG = {
-    # Github style emoji
-    "emoji_index": pymdownx.emoji.gemoji,
-    "emoji_generator": pymdownx.emoji.to_png,
-    "alt": "short",
-    "options": {
-        "attributes": {
-            "align": "absmiddle",
-            "height": "20px",
-            "width": "20px"
-        },
-        "image_path": "https://assets-cdn.github.com/images/icons/emoji/unicode/",
-        "non_standard_image_path": "https://assets-cdn.github.com/images/icons/emoji/"
-    }
-}
-
-DEFAULT_EXT = OrderedDict(
-    [
-        ('markdown.extensions.smart_strong', None),
-        ('markdown.extensions.footnotes', None),
-        ('markdown.extensions.attr_list', None),
-        ('markdown.extensions.def_list', None),
-        ('markdown.extensions.tables', None),
-        ('markdown.extensions.abbr', None),
-        ("markdown.extensions.toc", None),
-        ("markdown.extensions.meta", None),
-        ("markdown.extensions.sane_lists", None),
-        ("markdown.extensions.smarty", None),
-        ("markdown.extensions.wikilinks", None),
-        ("markdown.extensions.admonition", None),
-        ('pymdownx.extrarawhtml', None),
-        ('pymdownx.superfences', None),
-        ('pymdownx.tilde', None),
-        ('pymdownx.emoji', EMOJI_CONFIG),
-        ('pymdownx.magiclink', None),
-        ('pymdownx.tasklist', None),
-        ('pymdownx.superfences', None)
-    ]
 )
 
 pygments_local = {
@@ -1082,9 +1043,19 @@ class MarkdownCompiler(Compiler):
         names = []
         settings = {}
 
-        for ext, config in extensions.items():
-            if config is None:
+        for e in extensions:
+            if isinstance(e, str):
+                ext = e
                 config = {}
+
+            elif isinstance(e, (dict, OrderedDict)):
+                ext = list(e.keys())[0]
+                config = list(e.values())[0]
+                if config is None:
+                    confit = {}
+
+            else:
+                continue
 
             names.append(ext)
             settings[ext] = config
@@ -1124,10 +1095,15 @@ class MarkdownCompiler(Compiler):
         ):
             pygments_css = self.set_highlight('github', 'codehilite')
             use_pygments = bool(self.settings.get("enable_pygments", True))
-            extensions['markdown.extensions.codehilite'] = {
-                'guess_lang': bool(self.settings.get("guess_language", True)),
-                'use_pygments': use_pygments
-            }
+            names.append('markdown.extensions.codehilite')
+            settings.append(
+                {
+                    'markdown.extensions.codehilite': {
+                        'guess_lang': bool(self.settings.get("guess_language", True)),
+                        'use_pygments': use_pygments
+                    }
+                }
+            )
 
         if not use_pygments:
             self.pygments_style = None
@@ -1136,13 +1112,16 @@ class MarkdownCompiler(Compiler):
 
     def get_config_extensions(self):
         ext_config = self.settings.get('markdown_extensions')
-        if ext_config == 'default':
-            extensions = DEFAULT_EXT
+        if isinstance(ext_config, (dict, OrderedDict)):
+            extensions = ext_config
         else:
-            try:
-                extensions = yaml_load(ext_config)
-            except Exception:
-                extensions = DEFAULT_EXT
+            if ext_config == 'default':
+                extensions = yaml_load(sublime.load_resource(_EXT_CONFIG))['markdown_extensions']
+            else:
+                try:
+                    extensions = yaml_load(sublime.load_resource(ext_config))['markdown_extensions']
+                except Exception as e:
+                    extensions = yaml_load(sublime.load_resource(_EXT_CONFIG))['markdown_extensions']
 
         return self.process_extensions(extensions)
 

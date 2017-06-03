@@ -16,41 +16,28 @@
     # Settings overrides
     settings:
         enable_uml: true
-        enabled_extensions:
-        - extra
-        - github
-        - insert
-        - progressbar
-        - toc
-        - smarty
-        - meta
-        - wikilinks
-        - admonition
-        - codehilite(guess_lang=False,pygments_style=github)
+        markdown_extensions:
+          - markdown.extensions.footnotes
+          - markdown.extensions.attr_list
+          - markdown.extensions.def_list
+          - markdown.extensions.tables
+          - markdown.extensions.abbr
+          - markdown.extensions.toc
+          - markdown.extensions.smarty
+          - markdown.extensions.meta
+          - markdown.extensions.wikilinks
+          - markdown.extensions.admonition
+          - markdown.extensions.codehilite:
+              guess_lang: false
+              pygments_style: github
+          - pymdownx.extrarawhtml
+          - pymdownx.progressbar
+          - pymdownx.github
+          - pymdownx.caret:
+              superscript: false
 ---
 test: This tests the meta extension
 title: This title will be overridden by YAML
-
-!!! hint "Recommended Extensions for Testing"
-    This is mainly used to test the Python Markdown parser.
-
-    - extra
-    - github
-    - insert
-    - progressbar
-    - toc
-    - smarty
-    - meta
-    - wikilinks
-    - admonition
-    - codehilite(guess_lang=False,pygments_style=github)
-
-    !!! Caution "Testing Note"
-        - `sane_lists` will alter the results of the second test in [Mixed Lists](#mixed-lists). When turned off, this test will have all list items mixed and aligned proper.  With `sane_lists` on, some will not be recognized, and some items may be aligned in different lists.
-        - having `guess_lang=False` allows the testing of the selective highlighting.  When omitted or set `true`, it can be expected that all of the blocks will be highlighted to some extent.
-        - Most tests are spot checked at this point or a link can be clicked to verify it is working.
-        - base64, absolute paths, and external resources require this to be in an unzipped sublime package environment when converting.
-
 
 # Cheat Sheet and Test
 [TOC]

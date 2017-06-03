@@ -85,21 +85,9 @@
     "guess_language": true,
 
     /*
-        List of enabled extensions of the selected markdown parser.
+        Location of Python Markdown extension configuration file.
 
-        You can get the full list of extensions at:
-            * The python markdown parser, the `markdown`: http://pythonhosted.org/Markdown/extensions/index.html
-
-
-        default - use the default set of extensions, see table later.
-        [ "default", "def_list", ... ] - a list of extensions. Use "default" to include the default extensions.
-
-            Parser     | "default" Values
-        ------------|---------------------------
-            default    | ["extra", "github", "toc", "meta", "sane_lists", "smarty", "wikilinks"]
-            markdown   | ["extra", "github", "toc", "meta", "sane_lists", "smarty", "wikilinks"]
-            github     | extension's values are not used.
-
+        "default" will use the default "Packages/Markdown Preview/markdown_preview.yml"
     */
     "markdown_extensions": "default",
 
