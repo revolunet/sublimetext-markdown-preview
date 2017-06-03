@@ -1112,18 +1112,7 @@ class MarkdownCompiler(Compiler):
 
     def get_config_extensions(self):
         ext_config = self.settings.get('markdown_extensions')
-        if isinstance(ext_config, (dict, OrderedDict)):
-            extensions = ext_config
-        else:
-            if ext_config == 'default':
-                extensions = yaml_load(sublime.load_resource(_EXT_CONFIG))['markdown_extensions']
-            else:
-                try:
-                    extensions = yaml_load(sublime.load_resource(ext_config))['markdown_extensions']
-                except Exception as e:
-                    extensions = yaml_load(sublime.load_resource(_EXT_CONFIG))['markdown_extensions']
-
-        return self.process_extensions(extensions)
+        return self.process_extensions(ext_config)
 
     def parser_specific_convert(self, markdown_text):
         sublime.status_message('converting markdown with Python markdown...')

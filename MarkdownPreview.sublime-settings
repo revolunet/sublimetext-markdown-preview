@@ -85,11 +85,47 @@
     "guess_language": true,
 
     /*
-        Location of Python Markdown extension configuration file.
+        Markdown extension configuration.
 
-        "default" will use the default "Packages/Markdown Preview/markdown_preview.yml"
+        To specify a function in this JSON configuration, create an object with the key "!!python/name"
+        and set it to the import path to the function "module.submodule.etc.function".
     */
-    "markdown_extensions": "default",
+    "markdown_extensions": [
+        "markdown.extensions.smart_strong",
+        "markdown.extensions.footnotes",
+        "markdown.extensions.attr_list",
+        "markdown.extensions.def_list",
+        "markdown.extensions.tables",
+        "markdown.extensions.abbr",
+        "markdown.extensions.toc",
+        "markdown.extensions.meta",
+        "markdown.extensions.sane_lists",
+        "markdown.extensions.smarty",
+        "markdown.extensions.wikilinks",
+        "markdown.extensions.admonition",
+        "pymdownx.extrarawhtml",
+        "pymdownx.superfences",
+        "pymdownx.tilde",
+        {
+            "pymdownx.emoji": {
+                "emoji_index": {"!!python/name": "pymdownx.emoji.gemoji"},
+                "emoji_generator": {"!!python/name": "pymdownx.emoji.to_png"},
+                "alt": "short",
+                "options": {
+                    "attributes": {
+                        "align": "absmiddle",
+                        "height": "20px",
+                        "width": "20px"
+                    },
+                   "image_path": "https://assets-cdn.github.com/images/icons/emoji/unicode/",
+                   "non_standard_image_path": "https://assets-cdn.github.com/images/icons/emoji/"
+                }
+            }
+        },
+        "pymdownx.magiclink",
+        "pymdownx.tasklist",
+        "pymdownx.superfences"
+    ],
 
     /*
         Enabled parsers for the parser "select parser" command

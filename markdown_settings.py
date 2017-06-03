@@ -3,6 +3,8 @@ import sublime
 import os
 import sys
 import re
+import json
+import importlib
 
 BUILTIN_KEYS = ('basepath', 'references', 'destination')
 
@@ -11,6 +13,17 @@ if ST3:
     unicode_str = str
 else:
     unicode_str = unicode
+
+
+def extended_decode(d):
+    """Decode python functions."""
+
+    if '!!python/name' in d:
+        parts = d["!!python/name"].split('.')
+        function = parts[-1]
+        module = '.'.join(parts[:-1])
+        return getattr(importlib.import_module(module), function)
+    return d
 
 
 class Settings(object):
@@ -25,11 +38,18 @@ class Settings(object):
             "meta": {}
         }
 
+    def parse_md_ext(self):
+        extensions = self._sub_settings.get('markdown_extensions', {})
+        return json.loads(json.dumps(extensions), object_hook=extended_decode)
+
     def get(self, key, default=None):
         if key in self._overrides:
             return self._overrides[key]
         else:
-            return self._sub_settings.get(key, default)
+            if key == 'markdown_extensions':
+                return self.parse_md_ext()
+            else:
+                return self._sub_settings.get(key, default)
 
     def set(self, key, value):
         self._overrides[key] = value
