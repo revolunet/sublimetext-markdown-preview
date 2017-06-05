@@ -56,7 +56,19 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 	- Markdown Preview: Open Markdown Cheat sheet
  - or bind some key in your user key binding, using a line like this one:
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser", "parser":"markdown"} },` for a specific parser and target or `{ "keys": ["alt+m"], "command": "markdown_preview_select", "args": {"target": "browser"} },` to bring up the quick panel to select enabled parsers for a given target.
- - once converted a first time, the output HTML will be updated on each file save (with LiveReload plugin)
+
+### LiveReload
+
+To get live updates while editing a file after preview, you need to do the following:
+
+1. enable the `enable_autoreload` setting in `MarkdownPreview.sublime-settings`.
+2. Install [LiveReload][7] package from Package Control.
+3. Restart.
+4. Open the command palette and select the command `LiveReload: Enable/disable plug-ins`.
+5. Select `Simple Reload with delay (400ms)`.  It is possible you can get away with `Simple Reload`, but some experience an issue where they are one rev behind when using `Simple Reload`.
+6. Edit document and enjoy live reload.
+
+You don't need to enable `Simple Reload` on every file as it is done globally; it can be turned on or off as needed.  From now on, files should auto-reload when you open them in the browser unless you disable `Simple Reload`.
 
 ### Enabling Other External Markdown Parsers :
 
@@ -327,7 +339,7 @@ The code is available at github [project][home] under [MIT license][4].
  [4]: http://revolunet.mit-license.org
  [5]: https://developer.github.com/v3/markdown/
  [6]: https://help.github.com/articles/github-flavored-markdown/
- [7]: https://github.com/dz0ny/LiveReload-sublimetext2
+ [7]: https://packagecontrol.io/packages/LiveReload
  [8]: https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098
  [9]: https://github.com/revolunet/sublimetext-markdown-preview/issues/78#issuecomment-15644727
  [10]: https://github.com/waylan/Python-Markdown
