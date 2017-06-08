@@ -458,8 +458,7 @@ class Compiler(object):
         ''' return the uml scripts if enabled '''
 
         if self.settings.get('enable_uml') is True:
-            flow = load_resource('flowchart-min.js')
-            return load_resource('uml.html').replace('{{ flowchart }}', flow, 1)
+            return load_resource('uml.html')
         return ''
 
     def get_highlight(self):
