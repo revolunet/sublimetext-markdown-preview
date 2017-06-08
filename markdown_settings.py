@@ -8,12 +8,6 @@ import importlib
 
 BUILTIN_KEYS = ('basepath', 'references', 'destination')
 
-ST3 = int(sublime.version()) >= 3000
-if ST3:
-    unicode_str = str
-else:
-    unicode_str = unicode
-
 
 def extended_decode(d):
     """Decode python functions."""
@@ -163,7 +157,7 @@ class Settings(object):
                             self._overrides["builtin"][key] = file_name
             else:
                 if isinstance(value, list):
-                    value = [unicode_str(v) for v in value]
+                    value = [str(v) for v in value]
                 else:
-                    value = unicode_str(value)
-                self._overrides["meta"][unicode_str(key)] = value
+                    value = str(value)
+                self._overrides["meta"][str(key)] = value
