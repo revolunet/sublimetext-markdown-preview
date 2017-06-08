@@ -2,15 +2,9 @@ from __future__ import absolute_import
 import sublime
 import traceback
 
-ST3 = int(sublime.version()) >= 3000
-
-if ST3:
-    from markdown import Markdown, util
-    from markdown.extensions import Extension
-    import importlib
-else:
-    from markdown import Markdown, util
-    from markdown.extensions import Extension
+from markdown import Markdown, util
+from markdown.extensions import Extension
+import importlib
 
 
 class StMarkdown(Markdown):
