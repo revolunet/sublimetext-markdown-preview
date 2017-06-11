@@ -491,18 +491,27 @@ class Compiler(object):
         return text
 
     def preprocessor_yaml_frontmatter(self, text):
-        """ Get frontmatter from string """
-        frontmatter = {}
+        """ Get frontmatter from string. """
+
+        frontmatter = OrderedDict()
 
         if text.startswith("---"):
-            m = re.search(r'^(-{3}(.*?)(?<=\n)(?:-{3}|\.{3})[ \t]*\r?\n)', text, re.DOTALL)
+            m = re.search(r'^(-{3}(.*?)(?:-{3}|\.{3})\r?\n)', text, re.DOTALL)
             if m:
+                yaml_okay = True
                 try:
-                    content = m.group(2).strip()
-                    frontmatter = yaml_load(content) if content else {}
-                except:
-                    print(traceback.format_exc())
-                text = text[m.end(1):]
+                    frontmatter = yaml_load(m.group(2))
+                    if frontmatter is None:
+                        frontmatter = OrderedDict()
+                    # If we didn't get a dictionary, we don't want this as it isn't frontmatter.
+                    assert isinstance(frontmatter, (dict, OrderedDict)), TypeError
+                except Exception:
+                    # We had a parsing error. This is not the YAML we are looking for.
+                    yaml_okay = False
+                    frontmatter = OrderedDict()
+                    traceback.format_exc()
+                if yaml_okay:
+                    text = text[m.end(1):]
 
         return frontmatter, text
 
