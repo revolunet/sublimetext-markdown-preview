@@ -475,7 +475,7 @@ class Compiler(object):
                 contents = selection
 
         # Remove yaml front matter
-        if self.settings.get('strip_yaml_front_matter') and contents.startswith('---'):
+        if self.settings.get('strip_yaml_front_matter'):
             frontmatter, contents = self.preprocessor_yaml_frontmatter(contents)
             self.settings.apply_frontmatter(frontmatter)
 
