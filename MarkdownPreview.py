@@ -1010,7 +1010,7 @@ class MarkdownCompiler(Compiler):
             style = None
             if pygments_style not in pygments_local:
                 try:
-                    style = get_formatter_by_name('html', style=pygments_style).get_style_defs('.codehilite pre')
+                    style = get_formatter_by_name('html', style=pygments_style).get_style_defs(css_class)
                 except Exception:
                     pygments_style = 'github'
             if style is None:
