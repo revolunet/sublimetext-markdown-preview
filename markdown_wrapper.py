@@ -25,7 +25,8 @@ class StMarkdown(Markdown):
         """
         for ext in extensions:
             try:
-                if isinstance(ext, util.string_type):
+                # Make sure we aren't using old form `extension(option=value)`
+                if isinstance(ext, util.string_type) and ('(' not in ext):
                     ext = self.build_extension(ext, configs.get(ext, []))
                 if isinstance(ext, Extension):
                     ext.extendMarkdown(self, globals())
@@ -35,6 +36,5 @@ class StMarkdown(Markdown):
                         % (ext.__class__.__module__, ext.__class__.__name__))
             except:
                 print(str(traceback.format_exc()))
-                continue
 
         return self
