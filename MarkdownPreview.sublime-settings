@@ -22,7 +22,7 @@
         markdown - Use the built-in python-markdown parser
         github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see https://help.github.com/articles/github-flavored-markdown/
     */
-    "parser": "default",
+    "parser": "markdown",
 
     /*
         By default, Markdown Preview builds the HTML in the source directory.
@@ -229,9 +229,9 @@
     // "js": ["http://example.com/script.js", "/path/to/script.js"],
 
     /*
-        Enable or not whether parsed files will be auto-reloaded on save
+        Enable auto-reloaded on save. Will not work if GitHub parser is used without oauth key specified.
     */
-    "enable_autoreload": false,
+    "enable_autoreload": true,
 
     /*
         Sets the supported filetypes for auto-reload on save

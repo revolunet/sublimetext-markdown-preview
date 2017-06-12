@@ -46,6 +46,14 @@ pygments_local = {
     'github2014': 'pygments_css/github2014.css'
 }
 
+RELOAD_JS = """<script async>
+document.write(
+  '<script src="http://' +
+  (location.host || 'localhost').split(':')[0] +
+  ':%d/livereload.js?snipver=1"></' +
+  'script>')
+</script>
+"""
 
 def yaml_load(stream, loader=yaml.Loader, object_pairs_hook=OrderedDict):
     """
@@ -1147,17 +1155,19 @@ class MarkdownPreviewSelectCommand(sublime_plugin.TextCommand):
 
 class MarkdownPreviewCommand(sublime_plugin.TextCommand):
     def run(self, edit, parser='markdown', target='browser'):
-        settings = sublime.load_settings('MarkdownPreview.sublime-settings')
+        self.settings = sublime.load_settings('MarkdownPreview.sublime-settings')
 
         # backup parser+target for later saves
         self.view.settings().set('parser', parser)
         self.view.settings().set('target', target)
+        self.parser = parser
+        self.target = target
 
         if parser == "github":
             compiler = GithubCompiler()
         elif parser == 'markdown':
             compiler = MarkdownCompiler()
-        elif parser in settings.get("enabled_parsers", ("markdown", "github")):
+        elif parser in self.settings.get("enabled_parsers", ("markdown", "github")):
             compiler = ExternalMarkdownCompiler(parser)
         else:
             # Fallback to Python Markdown
@@ -1166,47 +1176,63 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
         html, body = compiler.run(self.view, preview=(target in ['disk', 'browser']))
 
         if target in ['disk', 'browser']:
-            # do not use LiveReload unless autoreload is enabled
-            if settings.get('enable_autoreload', True):
-                # check if LiveReload ST2 extension installed and add its script to the resulting HTML
-                livereload_installed = ('LiveReload' in os.listdir(sublime.packages_path()))
-                # build the html
-                if livereload_installed:
-                    port = sublime.load_settings('LiveReload.sublime-settings').get('port', 35729)
-                    html += '<script async>document.write(\'<script src="http://\' + (location.host || \'localhost\').split(\':\')[0] + \':%d/livereload.js?snipver=1"></\' + \'script>\')</script>' % port
-            # update output html file
-            tmp_fullpath = getTempMarkdownPreviewPath(self.view)
-            save_utf8(tmp_fullpath, html)
-            # now opens in browser if needed
-            if target == 'browser':
-                self.__class__.open_in_browser(tmp_fullpath, settings.get('browser', 'default'))
+            self.to_disk(html, self.target == 'browser')
         elif target == 'sublime':
-            # create a new buffer and paste the output HTML
-            embed_css = settings.get('embed_css_for_sublime_output', True)
-            if embed_css:
-                new_view(self.view.window(), html, scratch=True)
-            else:
-                new_view(self.view.window(), body, scratch=True)
-            sublime.status_message('Markdown preview launched in sublime')
+            self.to_sublime(html if embed_css else body)
         elif target == 'clipboard':
-            # clipboard copy the full HTML
-            sublime.set_clipboard(html)
-            sublime.status_message('Markdown export copied to clipboard')
+            self.to_clipboard(html)
         elif target == 'save':
-            save_location = compiler.settings.get('builtin').get('destination', None)
-            if save_location is None:
-                save_location = self.view.file_name()
-                if save_location is None or not os.path.exists(save_location):
-                    # Save as...
-                    v = new_view(self.view.window(), html)
-                    if v is not None:
-                        v.run_command('save')
-                else:
-                    # Save
-                    htmlfile = os.path.splitext(save_location)[0] + '.html'
-                    save_utf8(htmlfile, html)
+            self.save(compiler, html)
+
+    def to_disk(self, html, open_in_browser):
+        """Save to disk and open in browser if desired."""
+
+        # do not use LiveReload unless autoreload is enabled
+        github_auth_provided = self.settings.get('github_oauth_token') is not None
+        if self.settings.get('enable_autoreload', True) and (self.parser != 'github' or github_auth_provided) :
+            # check if LiveReload ST2 extension installed and add its script to the resulting HTML
+            if 'LiveReload' in os.listdir(sublime.packages_path()):
+                port = sublime.load_settings('LiveReload.sublime-settings').get('port', 35729)
+                html += RELOAD_JS % port
+        # update output html file
+        tmp_fullpath = getTempMarkdownPreviewPath(self.view)
+        save_utf8(tmp_fullpath, html)
+        # now opens in browser if needed
+        if open_in_browser:
+            self.__class__.open_in_browser(tmp_fullpath, self.settings.get('browser', 'default'))
+
+    def to_sublime(self, html):
+        """To Sublime view."""
+
+        # create a new buffer and paste the output HTML
+        embed_css = self.settings.get('embed_css_for_sublime_output', True)
+        new_view(self.view.window(), html, scratch=True)
+        sublime.status_message('Markdown preview launched in sublime')
+
+    def to_clipboard(self, html):
+        """Save to clipboard."""
+
+        # clipboard copy the full HTML
+        sublime.set_clipboard(html)
+        sublime.status_message('Markdown export copied to clipboard')
+
+    def save(self, compiler, html):
+        """Save output."""
+
+        save_location = compiler.settings.get('builtin').get('destination', None)
+        if save_location is None:
+            save_location = self.view.file_name()
+            if save_location is None or not os.path.exists(save_location):
+                # Save as...
+                v = new_view(self.view.window(), html)
+                if v is not None:
+                    v.run_command('save')
             else:
-                save_utf8(save_location, html)
+                # Save
+                htmlfile = os.path.splitext(save_location)[0] + '.html'
+                save_utf8(htmlfile, html)
+        else:
+            save_utf8(save_location, html)
 
     @classmethod
     def open_in_browser(cls, path, browser='default'):
