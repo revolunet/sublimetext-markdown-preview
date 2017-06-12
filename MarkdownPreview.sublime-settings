@@ -52,22 +52,23 @@
     "enable_uml": false,
 
     /*
-        Enable highlighting. This enables codehilite extension if not already enabled.
+        If Pygments is being used, you may want to inject one of the Pygment styles provided into the HTML.
+        If so, enable this.
     */
-    "enable_highlight": false,
+    "pygments_inject_css": true,
 
     /*
-        Pygments support for syntax highlighting.  Controls whether codehilite extension
-        will use Pygments.  If disabled, code blocks will be formatted for javascript
-        highighters such as highlight.js.
-
-        If you manually set codehilite as an included extension in "enabled_extensions",
-        your settings will override this one.  To configure using pygments manually:
-            "enabled_extensions": [
-                "codehilite(use_pygments=False)" // <-Turn off pygments usage
-            ]
+        Name of the Pygments style to inject. Available styles are the sytles provided by pygments
+        plus "github" and "github2014".
     */
-    "enable_pygments": true,
+    "pygments_style": "github",
+
+    /*
+        This is the class to prepend to the pygments CSS styles. Make sure it matches whatever class(es)
+        you've specified in the extension that controls Pygments highlighting.  CodeHilite's default is
+        "codehilite".
+    */
+    "pygments_css_class": "codehilite",
 
     /*
         Sets whether highlight JS will auto-guess raw block's syntax.

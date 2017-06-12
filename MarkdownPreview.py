@@ -19,6 +19,7 @@ from urllib.parse import urlparse, urlunparse
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from pygments.formatters import get_formatter_by_name
+from pygments.styles import get_style_by_name
 from markdown.extensions import codehilite
 from . import desktop
 from .markdown_settings import Settings
@@ -1006,12 +1007,15 @@ class MarkdownCompiler(Compiler):
     def set_highlight(self, pygments_style, css_class):
         ''' Set the Pygments css. '''
 
-        if pygments_style and not self.noclasses:
+        if pygments_style:
             style = None
             if pygments_style not in pygments_local:
                 try:
-                    style = get_formatter_by_name('html', style=pygments_style).get_style_defs(css_class)
+                    style = get_formatter_by_name('html', style=pygments_style).get_style_defs(
+                        ''.join(['.' + x for x in css_class.split(' ') if x])
+                    )
                 except Exception:
+                    traceback.print_exc()
                     pygments_style = 'github'
             if style is None:
                 style = load_resource(pygments_local[pygments_style]) % {
@@ -1036,12 +1040,13 @@ class MarkdownCompiler(Compiler):
 
     def process_extensions(self, extensions):
         ''' Process extensions '''
-        # First search if pygments has manually been set,
-        # and if so, read what the desired color scheme to use is
+
+        # See if we need to inject CSS for pygments.
         self.pygments_style = None
-        self.noclasses = False
-        use_pygments = True
-        pygments_css = None
+        style = self.settings.get('pygments_style', 'github')
+        if self.settings.get('pygments_inject_css', True):
+            # Check if the desired style exists internally
+            self.set_highlight(style, self.settings.get('pygments_css_class', 'codehilite'))
 
         # Get the base path of source file if available
         base_path = self.settings.get('builtin').get("basepath")
@@ -1050,71 +1055,25 @@ class MarkdownCompiler(Compiler):
 
         names = []
         settings = {}
-
         for e in extensions:
+            # Ensure extension is in correct format and separate config from extension
             if isinstance(e, str):
                 ext = e
-                config = {}
-
+                config = OrderedDict()
             elif isinstance(e, (dict, OrderedDict)):
                 ext = list(e.keys())[0]
                 config = list(e.values())[0]
                 if config is None:
-                    confit = {}
-
+                    config = OrderedDict()
             else:
                 continue
 
             names.append(ext)
             settings[ext] = config
 
-            if ext in ("markdown.extensions.codehilite", "pymdownx.highlight"):
-
-                use_pygments = config.get('use_pygments', True)
-                css_class = config.get('css_class', 'codehilite')
-                pygments_css = config.get('pygments_style')
-                if pygments_css is None:
-                    pygments_css = 'github'
-
-                # Set the style, but erase the setting if the CSS is pygments_local.
-                # Don't allow 'noclasses' with non internal themes.
-                # Replace the setting with the correct name if the style was invalid.
-                original = pygments_css
-                pygments_css = self.set_highlight(pygments_css, css_class)
-                if pygments_css in pygments_local:
-                    if 'noclasses' in config:
-                        del config['noclasses']
-                    if 'pygments_style' in config:
-                        del config['pygments_style']
-                elif original != pygments_css:
-                    config['pygments_style'] = pygments_css
-
-                self.noclasses = bool(config.get('noclasses', False))
-            else:
-                for k, v in config.items():
-                    if isinstance(v, str):
-                        config[k] = v.replace("${BASE_PATH}", base_path)
-
-        # Second, if nothing manual was set, see if "enable_highlight" is enabled with pygment support
-        # If no style has been set, setup the default
-        if (
-            pygments_css is None and
-            self.settings.get("enable_highlight") is True
-        ):
-            pygments_css = self.set_highlight('github', 'codehilite')
-            use_pygments = bool(self.settings.get("enable_pygments", True))
-            names.append('markdown.extensions.codehilite')
-            settings.append(
-                {
-                    'markdown.extensions.codehilite': {
-                        'guess_lang': bool(self.settings.get("guess_language", True)),
-                        'use_pygments': use_pygments
-                    }
-                }
-            )
-
-        if not use_pygments:
-            self.pygments_style = None
+            for k, v in config.items():
+                if isinstance(v, str):
+                    config[k] = v.replace("${BASE_PATH}", base_path)
 
         return names, settings
 

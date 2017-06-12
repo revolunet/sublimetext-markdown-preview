@@ -15,6 +15,7 @@
 
     # Settings overrides
     settings:
+        pygments_style: github
         enable_uml: true
         markdown_extensions:
           - markdown.extensions.footnotes
@@ -28,7 +29,6 @@
           - markdown.extensions.admonition
           - markdown.extensions.codehilite:
               guess_lang: false
-              pygments_style: github
           - pymdownx.extrarawhtml
           - pymdownx.progressbar
           - pymdownx.github
