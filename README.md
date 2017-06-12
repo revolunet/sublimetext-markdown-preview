@@ -273,7 +273,7 @@ GFM does not auto guess language in fenced blocks, but Markdown Preview does thi
 1. Disable auto language guessing in the settings file `"guess_language": false,`
 2. Or if you are manually defining extensions:
 
-        ```js
+    ```js
     "markdown_extensions": [
         "codehilite": {
             "guess_lang": false,
