@@ -7,7 +7,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
 
 **NOTE:** If you choose the GitHub API for conversion (set parser: github in your settings), your code will be sent through https to github for live conversion. You'll have [Github flavored markdown][6], syntax highlighting and EMOJI support for free :heart: :octocat: :gift:. If you make more than 60 calls a day, be sure to set your GitHub API key in the settings :). You can also get most of this in the default Markdown parser with by enabling certain extensions; see "[Parsing Github Flavored Markdown](#parsing-github-flavored-markdown-)"" below for more information.
 
-**LINUX users:** If you want to use GitHub API for conversion, you'll need to have a custom Python install that includes python-ssl as its not built in the Sublime Text 2 Linux package. see [@dusteye comment][8]. If you use a custom window manager, also be sure to set a `BROWSER` environment variable. see [@PPvG comments][9]
+**LINUX users:** If you want to use GitHub API for conversion, you'll need to have a custom Python install that includes python-ssl as its not built in the Sublime Text 2 Linux package. see [@dusteye][dusteye] [comment][8]. If you use a custom window manager, also be sure to set a `BROWSER` environment variable. see [@PPvG][PPvg] comments][9]
 
 ## Features :
 
@@ -17,10 +17,10 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - Browser preview auto reload on save if you have the [ST2 LiveReload plugin][7] installed.
  - Builtin parser : supports `abbr`, `attr_list`, `def_list`, `fenced_code`, `footnotes`, `tables`, `smart_strong`, `smarty`,  `wikilinks`, `meta`, `sane_lists`, `codehilite`, `nl2br`, and `toc` markdown extensions.
  - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
- - YAML support thanks to @tommi
- - Clipboard selection and copy to clipboard thanks to @hexatrope
- - MathJax support : \\\\(\frac{\pi}{2}\\\\) thanks to @bps10. You have to set `enable_mathjax` to `true` in your settings. MathJax is then downloaded in the background so you need to have an internet access.
- - HTML template customisation thanks to @hozaka
+ - YAML support thanks to [@tommi][tommi]
+ - Clipboard selection and copy to clipboard thanks to [@hexatrope][hexatrope]
+ - MathJax support : \\\\(\frac{\pi}{2}\\\\) thanks to [@bps10][bps10]. You have to set `enable_mathjax` to `true` in your settings. MathJax is then downloaded in the background so you need to have an internet access.
+ - HTML template customisation thanks to [@hozaka][hozaka]
  - Embed images as base64 (see [settings][settings] file for more info)
  - Strip out multimarkdown critic marks from either Githubs or Python Markdown input source (see [settings][settings] file for more info)
  - Supports 3rd party Python Markdown extensions.  [PyMdown Extensions][1] are included via Package Control dependencies, but others can be included as well. Usage of some extensions may require additional JavaScript or CSS. See the desired extension's documentation to learn how to configure them.
@@ -348,3 +348,9 @@ The code is available at github [project][home] under [MIT license][4].
  [13]: http://facelessuser.github.io/pymdown-extensions/usage_notes/
  [issue]: https://github.com/revolunet/sublimetext-markdown-preview/issues
  [settings]: https://github.com/revolunet/sublimetext-markdown-preview/blob/master/MarkdownPreview.sublime-settings
+ [hozaka]: https://github.com/hozaka
+ [tommi]: https://github.com/tommi
+ [bps10]: https://github.com/bps10
+ [dusteye]: https://github.com/dusteye
+ [PPvG]: https://github.com/PPvG
+ [hexatrope]: https://github.com/hexatrope
