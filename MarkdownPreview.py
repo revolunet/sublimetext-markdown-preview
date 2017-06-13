@@ -173,182 +173,19 @@ def get_references(file_name, encoding="utf-8"):
     return text
 
 
-def parse_url(url):
-    """
-    Parse the url and
-    try to determine if the following is a file path or
-    (as we will call anything else) a url
-    """
+def process_criticmarkup(source, accept):
+    ''' Stip out multi-markdown critic marks.  Accept changes by default '''
 
-    RE_PATH = re.compile(r'file|[A-Za-z]')
-    RE_WIN_DRIVE = re.compile(r"[A-Za-z]:?")
-    RE_URL = re.compile('(http|ftp)s?|data|mailto|tel|news')
-    is_url = False
-    is_absolute = False
-    scheme, netloc, path, params, query, fragment = urlparse(url)
+    from pymdownx.critic import CriticViewPreprocessor, CriticStash, CRITIC_KEY
 
-    if RE_URL.match(scheme):
-        # Clearly a url
-        is_url = True
-    elif scheme == '' and netloc == '' and path == '':
-        # Maybe just a url fragment
-        is_url = True
-    elif scheme == '' or RE_PATH.match(scheme):
-        if sublime.platform() == "windows":
-            if scheme == 'file' and RE_WIN_DRIVE.match(netloc):
-                # file://c:/path
-                path = netloc + path
-                netloc = ''
-                scheme = ''
-                is_absolute = True
-            elif RE_WIN_DRIVE.match(scheme):
-                # c:/path
-                path = '%s:%s' % (scheme, path)
-                scheme = ''
-                is_absolute = True
-            elif scheme != '' or netloc != '':
-                # Unknown url scheme
-                is_url = True
-            elif path.startswith('//'):
-                # //Some/Network/location
-                is_absolute = True
-        else:
-            if scheme not in ('', 'file') and netloc != '':
-                # A non-nix filepath or strange url
-                is_url = True
-            else:
-                # Check if nix path is absolute or not
-                if path.startswith('/'):
-                    is_absolute = True
-                scheme = ''
-    return (scheme, netloc, path, params, query, fragment, is_url, is_absolute)
+    text = ''
+    mode = 'accept' if accept else 'reject'
+    critic_stash = CriticStash(CRITIC_KEY)
+    critic = CriticViewPreprocessor(critic_stash)
+    critic.config = {'mode': mode}
+    text = '\n'.join(critic.run(source.split('\n')))
 
-
-def repl_relative(m, base_path, relative_path):
-    """ Replace path with relative path """
-
-    RE_WIN_DRIVE_PATH = re.compile(r"(^(?P<drive>[A-Za-z]{1}):(?:\\|/))")
-    link = m.group(0)
-    try:
-        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
-
-        if not is_url:
-            # Get the absolute path of the file or return
-            # if we can't resolve the path
-            path = url2pathname(path)
-            abs_path = None
-            if (not is_absolute):
-                # Convert current relative path to absolute
-                temp = os.path.normpath(os.path.join(base_path, path))
-                if os.path.exists(temp):
-                    abs_path = temp.replace("\\", "/")
-            elif os.path.exists(path):
-                abs_path = path
-
-            if abs_path is not None:
-                convert = False
-                # Determine if we should convert the relative path
-                # (or see if we can realistically convert the path)
-                if (sublime.platform() == "windows"):
-                    # Make sure basepath starts with same drive location as target
-                    # If they don't match, we will stay with absolute path.
-                    if (base_path.startswith('//') and base_path.startswith('//')):
-                        convert = True
-                    else:
-                        base_drive = RE_WIN_DRIVE_PATH.match(base_path)
-                        path_drive = RE_WIN_DRIVE_PATH.match(abs_path)
-                        if (
-                            (base_drive and path_drive) and
-                            base_drive.group('drive').lower() == path_drive.group('drive').lower()
-                        ):
-                            convert = True
-                else:
-                    # OSX and Linux
-                    convert = True
-
-                # Convert the path, url encode it, and format it as a link
-                if convert:
-                    path = pathname2url(os.path.relpath(abs_path, relative_path).replace('\\', '/'))
-                else:
-                    path = pathname2url(abs_path)
-                link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
-    except:
-        # Parsing crashed an burned; no need to continue.
-        pass
-
-    return link
-
-
-def repl_absolute(m, base_path):
-    """ Replace path with absolute path """
-    link = m.group(0)
-
-    try:
-        scheme, netloc, path, params, query, fragment, is_url, is_absolute = parse_url(m.group('path')[1:-1])
-
-        if (not is_absolute and not is_url):
-            path = url2pathname(path)
-            temp = os.path.normpath(os.path.join(base_path, path))
-            if os.path.exists(temp):
-                path = pathname2url(temp.replace("\\", "/"))
-                link = '%s"%s"' % (m.group('name'), urlunparse((scheme, netloc, path, params, query, fragment)))
-    except Exception:
-        # Parsing crashed an burned; no need to continue.
-        pass
-
-    return link
-
-
-class CriticDump(object):
-    RE_CRITIC = re.compile(
-        r'''
-            ((?P<open>\{)
-                (?:
-                    (?P<ins_open>\+{2})(?P<ins_text>.*?)(?P<ins_close>\+{2})
-                  | (?P<del_open>\-{2})(?P<del_text>.*?)(?P<del_close>\-{2})
-                  | (?P<mark_open>\={2})(?P<mark_text>.*?)(?P<mark_close>\={2})
-                  | (?P<comment>(?P<com_open>\>{2})(?P<com_text>.*?)(?P<com_close>\<{2}))
-                  | (?P<sub_open>\~{2})(?P<sub_del_text>.*?)(?P<sub_mid>\~\>)(?P<sub_ins_text>.*?)(?P<sub_close>\~{2})
-                )
-            (?P<close>\})|.)
-        ''',
-        re.MULTILINE | re.DOTALL | re.VERBOSE
-    )
-
-    def process(self, m):
-        if self.accept:
-            if m.group('ins_open'):
-                return m.group('ins_text')
-            elif m.group('del_open'):
-                return ''
-            elif m.group('mark_open'):
-                return m.group('mark_text')
-            elif m.group('com_open'):
-                return ''
-            elif m.group('sub_open'):
-                return m.group('sub_ins_text')
-            else:
-                return m.group(0)
-        else:
-            if m.group('ins_open'):
-                return ''
-            elif m.group('del_open'):
-                return m.group('del_text')
-            elif m.group('mark_open'):
-                return m.group('mark_text')
-            elif m.group('com_open'):
-                return ''
-            elif m.group('sub_open'):
-                return m.group('sub_del_text')
-            else:
-                return m.group(0)
-
-    def dump(self, source, accept):
-        text = ''
-        self.accept = accept
-        for m in self.RE_CRITIC.finditer(source):
-            text += self.process(m)
-        return text
+    return text
 
 
 class MarkdownPreviewListener(sublime_plugin.EventListener):
@@ -525,199 +362,65 @@ class Compiler(object):
         return frontmatter, text
 
     def parser_specific_postprocess(self, text):
+        """
+        Parser specific post process.
+
+        Override this to add parser specific post processing.
+        """
         return text
 
-    def postprocessor_pathconverter(self, html, image_convert, file_convert, absolute=False):
+    def postprocessor_pathconverter(self, source, image_convert, file_convert, absolute=False):
+        """Convert paths to absolute or relative paths."""
+        from pymdownx.pathconverter import PathConverterPostprocessor
 
-        RE_TAG_HTML = r'''(?xus)
-        (?:
-            (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
-            (?P<open><(?P<tag>(?:%s)))
-            (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
-            (?P<close>\s*(?:\/?)>)
-        )
-        '''
-
-        RE_TAG_LINK_ATTR = re.compile(
-            r'''(?xus)
-            (?P<attr>
-                (?:
-                    (?P<name>\s+(?:href|src)\s*=\s*)
-                    (?P<path>"[^"]*"|'[^']*')
-                )
-            )
-            '''
-        )
-
-        RE_SOURCES = re.compile(
-            RE_TAG_HTML % (
-                (r"img" if image_convert else "") +
-                (r"|" if image_convert and file_convert else "") +
-                (r"script|a|link" if file_convert else "")
-            )
-        )
-
-        def repl(m, base_path, rel_path=None):
-            if m.group('comments'):
-                tag = m.group('comments')
-            else:
-                tag = m.group('open')
-                if rel_path is None:
-                    tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_absolute(m2, base_path), m.group('attr'))
-                else:
-                    tag += RE_TAG_LINK_ATTR.sub(lambda m2: repl_relative(m2, base_path, rel_path), m.group('attr'))
-                tag += m.group('close')
-            return tag
-
-        basepath = self.settings.get('builtin').get("basepath")
-        if basepath is None:
-            basepath = ""
-
-        if absolute:
-            if basepath:
-                return RE_SOURCES.sub(lambda m: repl(m, basepath), html)
-        else:
+        relative_path = ''
+        if not absolute:
             if self.preview:
-                relativepath = getTempMarkdownPreviewPath(self.view)
+                relative_path = getTempMarkdownPreviewPath(self.view)
             else:
-                relativepath = self.settings.get('builtin').get("destination")
-                if not relativepath:
+                relative_path = self.settings.get('builtin').get("destination")
+                if not relative_path:
                     mdfile = self.view.file_name()
                     if mdfile is not None and os.path.exists(mdfile):
-                        relativepath = os.path.splitext(mdfile)[0] + '.html'
+                        relative_path = os.path.splitext(mdfile)[0] + '.html'
+            if relative_path:
+                relative_path = os.path.dirname(relative_path)
 
-            if relativepath:
-                relativepath = os.path.dirname(relativepath)
+        tags = []
+        if file_convert:
+            tags.extend(["script", "a", "link"])
+        if image_convert:
+            tags.append('img')
 
-            if basepath and relativepath:
-                return RE_SOURCES.sub(lambda m: repl(m, basepath, relativepath), html)
-        return html
-
-    def postprocessor_base64(self, html):
-        ''' convert resources (currently images only) to base64 '''
-
-        file_types = {
-            (".png",): "image/png",
-            (".jpg", ".jpeg"): "image/jpeg",
-            (".gif",): "image/gif"
+        pathconv = PathConverterPostprocessor()
+        pathconv.config = {
+            "base_path": self.settings.get('builtin').get("basepath"),
+            "relative_path": relative_path,
+            "absolute": absolute,
+            "tags": ' '.join(tags)
         }
 
-        exclusion_list = tuple(
-            ['https://', 'http://', '#'] +
-            ["data:%s;base64," % ft for ft in file_types.values()]
-        )
+        return pathconv.run(source)
 
-        RE_WIN_DRIVE = re.compile(r"(^[A-Za-z]{1}:(?:\\|/))")
-        RE_TAG_HTML = re.compile(
-            r'''(?xus)
-            (?:
-                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
-                (?P<open><(?P<tag>img))
-                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
-                (?P<close>\s*(?:\/?)>)
-            )
-            '''
-        )
-        RE_TAG_LINK_ATTR = re.compile(
-            r'''(?xus)
-            (?P<attr>
-                (?:
-                    (?P<name>\s+src\s*=\s*)
-                    (?P<path>"[^"]*"|'[^']*')
-                )
-            )
-            '''
-        )
+    def postprocessor_base64(self, source):
+        '''Convert resources (currently images only) to base64 '''
+        from pymdownx.b64 import B64Postprocessor
 
-        def b64(m):
-            import base64
-            data = m.group(0)
-            try:
-                src = url2pathname(m.group('path')[1:-1])
-                base_path = self.settings.get('builtin').get("basepath")
-                if base_path is None:
-                    base_path = ""
+        b64proc = B64Postprocessor()
+        b64proc.config = {'base_path': self.settings.get('builtin').get("basepath")}
+        return b64proc.run(source)
 
-                # Format the link
-                absolute = False
-                if src.startswith('file://'):
-                    src = src.replace('file://', '', 1)
-                    if sublime.platform() == "windows" and not src.startswith('//'):
-                        src = src.lstrip("/")
-                    absolute = True
-                elif sublime.platform() == "windows" and RE_WIN_DRIVE.match(src) is not None:
-                    absolute = True
-
-                # Make sure we are working with an absolute path
-                if not src.startswith(exclusion_list):
-                    if absolute:
-                        src = os.path.normpath(src)
-                    else:
-                        src = os.path.normpath(os.path.join(base_path, src))
-
-                    if os.path.exists(src):
-                        ext = os.path.splitext(src)[1].lower()
-                        for b64_ext in file_types:
-                            if ext in b64_ext:
-                                with open(src, "rb") as f:
-                                    data = " src=\"data:%s;base64,%s\"" % (
-                                        file_types[b64_ext],
-                                        base64.b64encode(f.read()).decode('ascii')
-                                    )
-                                break
-            except Exception:
-                pass
-            return data
-
-        def repl(m):
-            if m.group('comments'):
-                tag = m.group('comments')
-            else:
-                tag = m.group('open')
-                tag += RE_TAG_LINK_ATTR.sub(lambda m2: b64(m2), m.group('attr'))
-                tag += m.group('close')
-            return tag
-
-        return RE_TAG_HTML.sub(repl, html)
-
-    def postprocessor_simple(self, html):
+    def postprocessor_simple(self, source):
         ''' Strip out ids and classes for a simplified HTML output '''
+        from pymdownx.plainhtml import PlainHtmlPostprocessor
 
-        def repl(m):
-            if m.group('comments'):
-                tag = ''
-            else:
-                tag = m.group('open')
-                tag += RE_TAG_BAD_ATTR.sub('', m.group('attr'))
-                tag += m.group('close')
-            return tag
-
-        # Strip out id, class, on<word>, and style attributes for a simple html output
-        RE_TAG_HTML = re.compile(
-            r'''(?x)
-            (?:
-                (?P<comments>(\r?\n?\s*)<!--[\s\S]*?-->(\s*)(?=\r?\n)|<!--[\s\S]*?-->)|
-                (?P<open><[\w\:\.\-]+)
-                (?P<attr>(?:\s+[\w\-:]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)
-                (?P<close>\s*(?:\/?)>)
-            )
-            ''',
-            re.DOTALL | re.UNICODE
-        )
-
-        RE_TAG_BAD_ATTR = re.compile(
-            r'''(?x)
-            (?P<attr>
-                (?:
-                    \s+(?:id|class|style|on[\w]+)
-                    (?:\s*=\s*(?:"[^"]*"|'[^']*'))
-                )*
-            )
-            ''',
-            re.DOTALL | re.UNICODE
-        )
-
-        return RE_TAG_HTML.sub(repl, html)
+        plainhtml = PlainHtmlPostprocessor()
+        plainhtml.config = {
+            'strip_comments': True,
+            'strip_attributes': 'id class style',
+            'strip_js_on_attributes': True
+        }
+        return plainhtml(source)
 
     def convert_markdown(self, markdown_text):
         ''' convert input markdown to HTML, with github or builtin parser '''
@@ -730,10 +433,20 @@ class Compiler(object):
         markdown_html = self.parser_specific_postprocess(markdown_html)
 
         if "absolute" in (image_convert, file_convert):
-            markdown_html = self.postprocessor_pathconverter(markdown_html, image_convert, file_convert, True)
+            markdown_html = self.postprocessor_pathconverter(
+                markdown_html,
+                image_convert == 'absolute',
+                file_convert == 'absolute',
+                True
+            )
 
         if "relative" in (image_convert, file_convert):
-            markdown_html = self.postprocessor_pathconverter(markdown_html, image_convert, file_convert, False)
+            markdown_html = self.postprocessor_pathconverter(
+                markdown_html,
+                image_convert == 'relative',
+                file_convert == 'relative',
+                False
+            )
 
         if image_convert == "base64":
             markdown_html = self.postprocessor_base64(markdown_html)
@@ -858,13 +571,9 @@ class GithubCompiler(Compiler):
             sublime.error_message('cannot use github API to convert markdown. SSL is not included in your Python installation. And using curl didn\'t work either')
         return None
 
-    def preprocessor_critic(self, text):
-        ''' Stip out multi-markdown critic marks.  Accept changes by default '''
-        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
-
     def parser_specific_preprocess(self, text):
-        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
-            text = self.preprocessor_critic(text)
+        if self.settings.get("strip_critic_marks", "accept") in ("accept", "reject"):
+            text = process_criticmarkup(text, self.settings.get("strip_critic_marks", "accept") == "accept")
         return text
 
     def parser_specific_postprocess(self, html):
@@ -1037,13 +746,23 @@ class MarkdownCompiler(Compiler):
         ''' return the Pygments css if enabled. '''
         return self.pygments_style if self.pygments_style else ''
 
-    def preprocessor_critic(self, text):
+    def preprocessor_critic(self, source):
         ''' Stip out multi-markdown critic marks.  Accept changes by default '''
-        return CriticDump().dump(text, self.settings.get("strip_critic_marks", "accept") == "accept")
+
+        from pymdownx.critic import CriticViewPreprocessor, CriticStash, CRITIC_KEY
+
+        text = ''
+        mode = 'accept' if self.settings.get("strip_critic_marks", "accept") == "accept" else 'reject'
+        critic_stash = CriticStash(CRITIC_KEY)
+        critic = CriticViewPreprocessor(critic_stash)
+        critic.config = {'mode': mode}
+        text = '\n'.join(critic.run(source.split('\n')))
+
+        return text
 
     def parser_specific_preprocess(self, text):
         if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
-            text = self.preprocessor_critic(text)
+            text = process_criticmarkup(text, self.settings.get("strip_critic_marks", "accept") == "accept")
         return text
 
     def process_extensions(self, extensions):
