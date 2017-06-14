@@ -160,20 +160,6 @@ def get_references(file_name, encoding="utf-8"):
     return text
 
 
-def process_criticmarkup(source, accept):
-    """Stip out multi-markdown critic marks.  Accept changes by default."""
-    from pymdownx.critic import CriticViewPreprocessor, CriticStash, CRITIC_KEY
-
-    text = ''
-    mode = 'accept' if accept else 'reject'
-    critic_stash = CriticStash(CRITIC_KEY)
-    critic = CriticViewPreprocessor(critic_stash)
-    critic.config = {'mode': mode}
-    text = '\n'.join(critic.run(source.split('\n')))
-
-    return text
-
-
 class MarkdownPreviewListener(sublime_plugin.EventListener):
     """Auto update the output html if markdown file has already been converted once."""
 
@@ -323,6 +309,10 @@ class Compiler(object):
         for ref in references:
             contents += get_references(ref)
 
+        # Striip CriticMarkup
+        if self.settings.get("strip_critic_marks", "accept") in ("accept", "reject"):
+            contents = self.preprocessor_criticmarkup(contents, self.settings.get("strip_critic_marks", "accept") == "accept")
+
         contents = self.parser_specific_preprocess(contents)
 
         return contents
@@ -416,6 +406,19 @@ class Compiler(object):
             'strip_js_on_attributes': True
         }
         return plainhtml(source)
+
+    def preprocessor_criticmarkup(self, source, accept):
+        """Stip out multi-markdown critic marks.  Accept changes by default."""
+        from pymdownx.critic import CriticViewPreprocessor, CriticStash, CRITIC_KEY
+
+        text = ''
+        mode = 'accept' if accept else 'reject'
+        critic_stash = CriticStash(CRITIC_KEY)
+        critic = CriticViewPreprocessor(critic_stash)
+        critic.config = {'mode': mode}
+        text = '\n'.join(critic.run(source.split('\n')))
+
+        return text
 
     def convert_markdown(self, markdown_text):
         """Convert input markdown to HTML, with github or builtin parser."""
@@ -576,12 +579,6 @@ class GithubCompiler(Compiler):
                 )
             )
         return None
-
-    def parser_specific_preprocess(self, text):
-        """Run GitHub specific preprocesses."""
-        if self.settings.get("strip_critic_marks", "accept") in ("accept", "reject"):
-            text = process_criticmarkup(text, self.settings.get("strip_critic_marks", "accept") == "accept")
-        return text
 
     def parser_specific_postprocess(self, html):
         """Run GitHub specific postprocesses."""
@@ -776,12 +773,6 @@ class MarkdownCompiler(Compiler):
         critic.config = {'mode': mode}
         text = '\n'.join(critic.run(source.split('\n')))
 
-        return text
-
-    def parser_specific_preprocess(self, text):
-        """Python Markdown specific preprocess."""
-        if self.settings.get("strip_critic_marks", "accept") in ["accept", "reject"]:
-            text = process_criticmarkup(text, self.settings.get("strip_critic_marks", "accept") == "accept")
         return text
 
     def process_extensions(self, extensions):
