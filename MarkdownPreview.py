@@ -25,8 +25,8 @@ _CANNOT_CONVERT = 'cannot convert markdown'
 _EXT_CONFIG = "Packages/Markdown Preview/markdown_preview.yml"
 
 PYGMENTS_LOCAL = {
-    'github': 'pygments_css/github.css',
-    'github2014': 'pygments_css/github2014.css'
+    'github': 'css/pygments/github.css',
+    'github2014': 'css/pygments/github2014.css'
 }
 
 RELOAD_JS = """<script async>
@@ -200,7 +200,7 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
         """Execute command."""
-        lines = '\n'.join(load_resource('sample.md').splitlines())
+        lines = '\n'.join(load_resource('samples/sample.md').splitlines())
         view = new_view(self.view.window(), lines, scratch=True)
         view.set_name("Markdown Cheatsheet")
 
@@ -220,7 +220,7 @@ class MarkdownCheatsheetCommand(sublime_plugin.TextCommand):
 class Compiler(object):
     """Base compiler that does the markdown converting."""
 
-    default_css = "markdown.css"
+    default_css = "css/markdown.css"
 
     def isurl(self, css_name):
         """Check if URL."""
@@ -291,13 +291,13 @@ class Compiler(object):
     def get_mathjax(self):
         """Return the MathJax script if enabled."""
         if self.settings.get('enable_mathjax') is True:
-            return load_resource('mathjax.html')
+            return load_resource('partials/mathjax.html')
         return ''
 
     def get_uml(self):
         """Return the UML scripts if enabled."""
         if self.settings.get('enable_uml') is True:
-            return load_resource('uml.html')
+            return load_resource('partials/uml.html')
         return ''
 
     def get_highlight(self):
@@ -537,7 +537,7 @@ class Compiler(object):
 class GithubCompiler(Compiler):
     """GitHub compiler."""
 
-    default_css = "github.css"
+    default_css = "css/github.css"
 
     def curl_convert(self, data):
         """Use curl to send Markdown content through GitHub API."""
@@ -596,7 +596,7 @@ class GithubCompiler(Compiler):
         re_header = re.compile(r'(?P<open><h([1-6])>)(?P<text>.*?)(?P<close></h\2>)', re.DOTALL)
 
         def inject_id(m):
-            id = uslugify(m.group('text'))
+            id = uslugify(m.group('text'), '-')
             if id == '':
                 return m.group(0)
             # Append a dash and number for uniqueness if needed
@@ -689,7 +689,7 @@ class GithubCompiler(Compiler):
 class ExternalMarkdownCompiler(Compiler):
     """Compiler for other, external Markdown parsers."""
 
-    default_css = "markdown.css"
+    default_css = "css/markdown.css"
 
     def __init__(self, parser):
         """Initialize."""
@@ -735,7 +735,7 @@ class ExternalMarkdownCompiler(Compiler):
 class MarkdownCompiler(Compiler):
     """Python Markdown compiler."""
 
-    default_css = "markdown.css"
+    default_css = "css/markdown.css"
 
     def set_highlight(self, pygments_style, css_class):
         """Set the Pygments css."""
