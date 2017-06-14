@@ -1,18 +1,19 @@
+"""Markdown Preview wrapper."""
 from __future__ import absolute_import
-import sublime
 import traceback
-
 from markdown import Markdown, util
 from markdown.extensions import Extension
-import importlib
 
 
 class StMarkdown(Markdown):
+    """A wrapper around "markdown" lib."""
+
     def __init__(self, *args, **kwargs):
+        """Intialize."""
         Markdown.__init__(self, *args, **kwargs)
         self.Meta = {}
 
-    def registerExtensions(self, extensions, configs):
+    def registerExtensions(self, extensions, configs):  # noqa
         """
         Register extensions with this instance of Markdown.
 
@@ -22,6 +23,8 @@ class StMarkdown(Markdown):
            be strings or objects.  See the docstring on Markdown.
         * configs: A dictionary mapping module names to config options.
 
+        We are overriding this in order to gracefully handle bad extensions
+        and to prevent old deprecated style of 'extensions(option=value)'.
         """
         for ext in extensions:
             try:
