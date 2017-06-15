@@ -311,7 +311,9 @@ class Compiler(object):
 
         # Striip CriticMarkup
         if self.settings.get("strip_critic_marks", "accept") in ("accept", "reject"):
-            contents = self.preprocessor_criticmarkup(contents, self.settings.get("strip_critic_marks", "accept") == "accept")
+            contents = self.preprocessor_criticmarkup(
+                contents, self.settings.get("strip_critic_marks", "accept") == "accept"
+            )
 
         contents = self.parser_specific_preprocess(contents)
 
