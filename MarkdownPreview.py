@@ -329,7 +329,7 @@ class Compiler(object):
         frontmatter = OrderedDict()
 
         if text.startswith("---"):
-            m = re.search(r'^(-{3}(.*?)(?:-{3}|\.{3})\r?\n)', text, re.DOTALL)
+            m = re.search(r'^(-{3}\r?\n(?!\r?\n)(.*?)(?<=\n)(?:-{3}|\.{3})\r?\n)', text, re.DOTALL)
             if m:
                 yaml_okay = True
                 try:
