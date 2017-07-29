@@ -58,7 +58,7 @@
     "pygments_inject_css": true,
 
     /*
-        Name of the Pygments style to inject. Available styles are the sytles provided by pygments
+        Name of the Pygments style to inject. Available styles are the styles provided by pygments
         plus "github" and "github2014".
     */
     "pygments_style": "github",
@@ -69,21 +69,6 @@
         "codehilite".
     */
     "pygments_css_class": "codehilite",
-
-    /*
-        Sets whether highlight JS will auto-guess raw block's syntax.
-        Alternative is to to only highlight blocks where a language has
-        been defined.
-
-        Default is True (guess).
-
-        If you manually set codehilite as an included extension in "enabled_extensions",
-        your settings will override this one.  To configure language guessing manually:
-            "enabled_extensions": [
-                "codehilite(guess_lang=False)" // <-Turn off language guessing
-            ]
-    */
-    "guess_language": true,
 
     /*
         Markdown extension configuration.
@@ -300,7 +285,7 @@
     */
     "strip_yaml_front_matter": false,
 
-    /* do we show the panel when build with CMD+B */
+    /* do we show the panel when building with CMD+B */
     "show_panel_on_build": true,
 
     /* do we include the CSS when outputting HTML into a new sublime view ? */
