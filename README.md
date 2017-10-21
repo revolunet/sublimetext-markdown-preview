@@ -64,6 +64,7 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 	- Markdown Preview: Export HTML in Sublime Text
 	- Markdown Preview: Copy to Clipboard
 	- Markdown Preview: Open Markdown Cheat sheet
+![Usage Demo](sublimetext-markdown-preview.gif)
  - or bind some key in your user key binding, using a line like this one:
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser", "parser":"markdown"} },` for a specific parser and target or `{ "keys": ["alt+m"], "command": "markdown_preview_select", "args": {"target": "browser"} },` to bring up the quick panel to select enabled parsers for a given target.
 
