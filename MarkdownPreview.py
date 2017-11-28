@@ -1028,8 +1028,6 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         parser = settings.get('parser', 'markdown')
-        if parser == 'default':
-            parser = 'markdown'
 
         target = settings.get('build_action', 'build')
         if target in ('browser', 'sublime', 'clipboard', 'save'):
