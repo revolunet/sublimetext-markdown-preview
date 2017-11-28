@@ -1028,6 +1028,12 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         settings = sublime.load_settings('MarkdownPreview.sublime-settings')
         parser = settings.get('parser', 'markdown')
+        if parser == 'default':
+            print(
+                'Markdown Preview: The use of "default" as a parser is now deprecated,'
+                ' please specify a valid parser name.'
+            )
+            parser = 'markdown'
 
         target = settings.get('build_action', 'build')
         if target in ('browser', 'sublime', 'clipboard', 'save'):
