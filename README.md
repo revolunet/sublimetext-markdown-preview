@@ -9,7 +9,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
 
 **LINUX users:** If you want to use GitHub API for conversion, you'll need to have a custom Python install that includes python-ssl as its not built in the Sublime Text 2 Linux package. see [@dusteye][dusteye] [comment][8]. If you use a custom window manager, also be sure to set a `BROWSER` environment variable. see [@PPvG][PPvg] comments][9]
 
-## Features :
+## Features
 
  - Markdown preview using the [python-markdown][10] or the Github API. Just select the build commands.
  - Syntax highlighting via Pygments. See "[Configuring Pygments](#configuring-pygments)" for more info.
@@ -27,7 +27,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
 
     When configuring PyMdown Extensions, please read its [Usage Notes][13] to learn about extension conflicts and which ones cannot be included together.
 
-## Installation :
+## Installation
 
 ### Using [Package Control][3] (*Recommended*)
 
@@ -37,17 +37,17 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 2. Use <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>P</kbd> then `Package Control: Install Package`
 3. Look for `Markdown Preview` and install it.
 
-## Usage :
+## Usage
 
-### To preview :
+### To preview
 
  - optionally select some of your markdown for conversion
  - use <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>P</kbd> then `Markdown Preview` to show the follow commands (you will be prompted to select which parser you prefer):
-	- Markdown Preview: Preview in Browser
-	- Markdown Preview: Export HTML in Sublime Text
-	- Markdown Preview: Copy to Clipboard
-	- Markdown Preview: Open Markdown Cheat sheet
-![Usage Demo](sublimetext-markdown-preview.gif)
+    - Markdown Preview: Preview in Browser
+    - Markdown Preview: Export HTML in Sublime Text
+    - Markdown Preview: Copy to Clipboard
+    - Markdown Preview: Open Markdown Cheat sheet
+        ![Usage Demo](sublimetext-markdown-preview.gif)
  - or bind some key in your user key binding, using a line like this one:
    `{ "keys": ["alt+m"], "command": "markdown_preview", "args": {"target": "browser", "parser":"markdown"} },` for a specific parser and target or `{ "keys": ["alt+m"], "command": "markdown_preview_select", "args": {"target": "browser"} },` to bring up the quick panel to select enabled parsers for a given target.
 
@@ -55,16 +55,16 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 
 To get live updates while editing a file after preview, you need to do the following:
 
-1. enable the `enable_autoreload` setting in `MarkdownPreview.sublime-settings`.
-2. Install [LiveReload][7] package from Package Control.
-3. Restart.
-4. Open the command palette and select the command `LiveReload: Enable/disable plug-ins`.
-5. Select `Simple Reload with delay (400ms)`.  It is possible you can get away with `Simple Reload`, but some experience an issue where they are one rev behind when using `Simple Reload`.
-6. Edit document and enjoy live reload.
+ 1. enable the `enable_autoreload` setting in `MarkdownPreview.sublime-settings`.
+ 2. Install [LiveReload][7] package from Package Control.
+ 3. Restart.
+ 4. Open the command palette and select the command `LiveReload: Enable/disable plug-ins`.
+ 5. Select `Simple Reload with delay (400ms)`.  It is possible you can get away with `Simple Reload`, but some experience an issue where they are one rev behind when using `Simple Reload`.
+ 6. Edit document and enjoy live reload.
 
 You don't need to enable `Simple Reload` on every file as it is done globally; it can be turned on or off as needed.  From now on, files should auto-reload when you open them in the browser unless you disable `Simple Reload`.
 
-### Enabling Other External Markdown Parsers :
+### Enabling Other External Markdown Parsers
 
 External parser commands and arguments should first be mapped to a name.  Each binary value must be an array with the path to the binary being first, followed by flags and options as individual indexes in the array.
 
@@ -128,7 +128,7 @@ markdown_extensions:
       slugify: !!python/name:pymdownx.slugs.uslugify
 ```
 
-### To build :
+### To build
 
 Just use <kbd>ctrl</kbd>+<kbd>B</kbd> (Windows/Linux) or <kbd>cmd</kbd>+<kbd>B</kbd> (Mac) to build current file.
 
@@ -153,12 +153,12 @@ You can configure the build action by using the `build_action` setting.
     "build_action": "build",
 ```
 
-### To configure :
+### To configure
 
 Using Sublime Text menu: `Preferences`->`Package Settings`->`Markdown Preview`
 
-- `Settings - User` is where you change your settings for Markdown Preview.
-- `Settings - Default` is a good reference with detailed descriptions for each setting.
+ - `Settings - User` is where you change your settings for Markdown Preview.
+ - `Settings - Default` is a good reference with detailed descriptions for each setting.
 
 ### Configuring Pygments
 If you add the codehilite extension manually in the enabled extensions, you can override some of the default settings.
@@ -216,18 +216,21 @@ If you add the codehilite extension manually in the enabled extensions, you can 
 See [codehilte page](https://pythonhosted.org/Markdown/extensions/code_hilite.html) for more info.
 
 ### Meta Data Support
+
 When the `meta` extension is enabled (https://pythonhosted.org/Markdown/extensions/meta_data.html), the results will be written to the HTML head in the form `<meta name="key" content="value1,value2">`.  `title` is the one exception, and its content will be written to the title tag in the HTML head.
 
 ### YAML Frontmatter Support
+
 YAML frontmatter can be stripped out and read when `strip_yaml_front_matter` is set to  `true` in the settings file.  In general the, the frontmatter is handled the same as [meta data](#meta-data-support), but if both exist in a file, the YAML keys will override the `meta` extension keys.  There are a few special key names that won't be handled as HTML meta data.
 
 #### Special YAML Key Names
+
 YAML frontmatter has a few special key names that are used that will not be handled as meta data:
 
-- **basepath**: An absolute path to configure the relative paths for images etc. (for when the markdown is supposed to reference images in a different location.)
-- **references**: Can take a file path or an array of file paths for separate markdown files containing references, footnotes, etc.  Can be an absolute path or relative path.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
-- **destination**: This is an absolute file path or relative file path for when the markdown is saved to html via the build command or the `Save to HTML` command.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
-- **settings**: This is a dictionary where you can override settings that are in the settings file.
+ - **basepath**: An absolute path to configure the relative paths for images etc. (for when the markdown is supposed to reference images in a different location.)
+ - **references**: Can take a file path or an array of file paths for separate markdown files containing references, footnotes, etc.  Can be an absolute path or relative path.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
+ - **destination**: This is an absolute file path or relative file path for when the markdown is saved to html via the build command or the `Save to HTML` command.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the `basepath` setting.
+ - **settings**: This is a dictionary where you can override settings that are in the settings file.
 
 ```yaml
 ---
@@ -270,17 +273,20 @@ YAML frontmatter has a few special key names that are used that will not be hand
 ---
 ```
 
-### Parsing Github Flavored Markdown :
+### Parsing Github Flavored Markdown
+
 Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can actually handle them in a couple of ways: online and offline.
 
-#### Online :
+#### Online
+
 Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting `github_mode` to `gfm` to get things like tasklists to render properly. You can set your API key in the settings as follows:
 
 ```js
     "github_oauth_token": "secret"
 ```
 
-#### Offline :
+#### Offline
+
 By default almost all extensions are enabled to help with a GitHub-ish feel, but there are some tweaks needed to get the full experience.
 
 GFM does not auto guess language in fenced blocks, but Markdown Preview does this by default.  You can fix this in one of two ways:
@@ -337,13 +343,13 @@ JavaScript files can be included via the `js` setting.  It is a list and can tak
     "js": ["default"],
 ```
 
-## Support :
+## Support
 
 - Any bugs about Markdown Preview please feel free to report [here][issue].
 - And you are welcome to fork and submit pull requests.
 
 
-## License :
+## License
 
 The code is available at github [project][home] under [MIT license][4].
 
