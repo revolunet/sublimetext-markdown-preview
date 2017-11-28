@@ -65,11 +65,11 @@ You don't need to enable `Simple Reload` on every file as it is done globally; i
 
 ### Enabling Other External Markdown Parsers :
 
-External parser commands and arguments should first be mapped to a name.  The path to the binary should be first, followed by flags etc.
+External parser commands and arguments should first be mapped to a name.  Each binary value must be an array with the path to the binary being first, followed by flags and options as individual indexes in the array.
 
 ```js
     "markdown_binary_map": {
-        "multimarkdown": ["/usr/local/bin/multimarkdown"]
+        "multimarkdown": ["/usr/local/bin/multimarkdown", "--some-option", "some-value"]
     },
 ```
 
@@ -129,7 +129,28 @@ markdown_extensions:
 
 ### To build :
 
- - Just use <kbd>ctrl</kbd>+<kbd>B</kbd> (Windows/Linux) or <kbd>cmd</kbd>+<kbd>B</kbd> (Mac) to build current file.
+Just use <kbd>ctrl</kbd>+<kbd>B</kbd> (Windows/Linux) or <kbd>cmd</kbd>+<kbd>B</kbd> (Mac) to build current file.
+
+You can configure the build action by using the `build_action` setting.
+
+```js
+    /*
+        By default, Markdown Preview builds the HTML in the source directory.
+        It expects the file to exist on disk.  It pops up the build output panel etc.
+
+        If you wish to override this behavior, you can change "build_action"
+
+        build - The default build behavior.
+        browser - Preview the file in your browser.
+        clipboard - Copy the HTML output to the clipboard.
+        sublime - Export the HTML to a Sublime tab.
+        save - Run the normal save command that outputs to the source directory.
+            It will also prompt for "save as" if the file does not exit on disk.
+
+        All the build options use the default parser defined above in "parser"
+    */
+    "build_action": "build",
+```
 
 ### To configure :
 
