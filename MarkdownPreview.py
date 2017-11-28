@@ -117,7 +117,7 @@ def load_resource(name):
     """Return file contents for files within the package root folder."""
     try:
         return sublime.load_resource('Packages/Markdown Preview/{0}'.format(name))
-    except:
+    except Exception:
         print("Error while load_resource('%s')" % name)
         traceback.print_exc()
         return ''
@@ -153,7 +153,7 @@ def get_references(file_name, encoding="utf-8"):
             try:
                 with codecs.open(file_name, "r", encoding=encoding) as f:
                     text = f.read()
-            except:
+            except Exception:
                 print(traceback.format_exc())
         else:
             print("Could not find reference file %s!", file_name)
@@ -671,7 +671,7 @@ class GithubCompiler(Compiler):
             # Maybe this is a Linux-install of ST which doesn't bundle with SSL support
             # So let's try wrapping curl instead
             markdown_html = self.curl_convert(data)
-        except:
+        except Exception:
             e = sys.exc_info()[1]
             print(e)
             traceback.print_exc()
