@@ -101,10 +101,15 @@
 
         // PyMdown extensions that help give a GitHub-ish feel
         "pymdownx.superfences",  // Nested fences and UML support
-        "pymdownx.magiclink",    // Auto linkify URLs and email addresses
+        {
+            "pymdownx.magiclink": {   // Auto linkify URLs and email addresses
+                "repo_url_shortener": true,
+                "repo_url_shorthand": true
+            }
+        },
         "pymdownx.tasklist",     // Task lists
         {
-            "pymdownx.caret": {  // Provide ~~delete~~
+            "pymdownx.tilde": {  // Provide ~~delete~~
                 "superscript": false
             }
         },

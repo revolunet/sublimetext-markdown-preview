@@ -19,7 +19,7 @@ You can use builtin [python-markdown][10] parser or use the [github markdown API
  - CSS search path for local and build-in CSS files (always enabled) and/or CSS overriding if you need
  - YAML support thanks to [@tommi][tommi]
  - Clipboard selection and copy to clipboard thanks to [@hexatrope][hexatrope]
- - MathJax support : \\\\(\frac{\pi}{2}\\\\) thanks to [@bps10][bps10]. You have to set `enable_mathjax` to `true` in your settings. MathJax is then downloaded in the background so you need to have an internet access.
+ - MathJax support : \\\\(\frac{\pi}{2}\\\\) thanks to [@bps10][bps10].
  - HTML template customisation thanks to [@hozaka][hozaka]
  - Embed images as base64 (see [settings][settings] file for more info)
  - Strip out multimarkdown critic marks from either Githubs or Python Markdown input source (see [settings][settings] file for more info)
@@ -39,6 +39,11 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 
 ## Usage
 
+When referring to settings, we are referring to the settings found at `Preferences`->`Package Settings`->`Markdown Preview`.
+
+ - `Settings - User` is where you change your settings for Markdown Preview.
+ - `Settings - Default` is a good reference with detailed descriptions for each setting.
+
 ### To preview
 
  - optionally select some of your markdown for conversion
@@ -55,7 +60,13 @@ For all Sublime Text 2/3 users we recommend install via [Package Control][3].
 
 To get live updates while editing a file after preview, you need to do the following:
 
- 1. enable the `enable_autoreload` setting in `MarkdownPreview.sublime-settings`.
+ 1. Enable the `enable_autoreload` setting in `MarkdownPreview.sublime-settings`.
+    ```js
+         /*
+            Enable auto-reloaded on save. Will not work if GitHub parser is used without oauth key specified.
+        */
+        "enable_autoreload": true,
+    ```
  2. Install [LiveReload][7] package from Package Control.
  3. Restart.
  4. Open the command palette and select the command `LiveReload: Enable/disable plug-ins`.
@@ -153,12 +164,23 @@ You can configure the build action by using the `build_action` setting.
     "build_action": "build",
 ```
 
-### To configure
+And the parser that is used when building is set in the `parser` setting:
 
-Using Sublime Text menu: `Preferences`->`Package Settings`->`Markdown Preview`
+```js
+    /*
+        Sets the parser used for building markdown to HTML.
 
- - `Settings - User` is where you change your settings for Markdown Preview.
- - `Settings - Default` is a good reference with detailed descriptions for each setting.
+        NOTE: The parser setting is not for the preview commands now.
+        The previews have separate commands for each parser markdown.
+
+        Warning for github API: if you have a ST2 linux build, Python is not built with SSL so it may not work
+
+        default - The current default parser is python-markdown parser.
+        markdown - Use the built-in python-markdown parser
+        github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see https://help.github.com/articles/github-flavored-markdown/
+    */
+    "parser": "markdown",
+```
 
 ### Configuring Pygments
 If you add the codehilite extension manually in the enabled extensions, you can override some of the default settings.
@@ -223,6 +245,13 @@ When the `meta` extension is enabled (https://pythonhosted.org/Markdown/extensio
 
 YAML frontmatter can be stripped out and read when `strip_yaml_front_matter` is set to  `true` in the settings file.  In general the, the frontmatter is handled the same as [meta data](#meta-data-support), but if both exist in a file, the YAML keys will override the `meta` extension keys.  There are a few special key names that won't be handled as HTML meta data.
 
+```js
+    /*
+        Strips the YAML front matter header and converts title to a heading
+    */
+    "strip_yaml_front_matter": false,
+```
+
 #### Special YAML Key Names
 
 YAML frontmatter has a few special key names that are used that will not be handled as meta data:
@@ -279,10 +308,33 @@ Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can 
 
 #### Online
 
-Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting `github_mode` to `gfm` to get things like tasklists to render properly. You can set your API key in the settings as follows:
+Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting `github_mode` to `gfm` to get things like tasklists to render properly.
 
 ```js
-    "github_oauth_token": "secret"
+    /*
+        Default mode for the github Markdown parser : markdown (documents) or gfm (comments)
+        see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
+    */
+    "github_mode": "markdown",
+```
+
+Using the GitHub API without an oauth key is limited to so many calls.  After the limit is reached, the GitHub API will deny further calls until after a set limit of time. To avoid this issue, you can set your API key in the settings as follows:
+
+```js
+    /*
+        Uses an OAuth token when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.
+        Warn: this secret *must not be shared* with anyone and at least you should create it with minimal scopes for security reasons.
+    */
+    "github_oauth_token": "secret",
+```
+
+The GitHub API only inserts IDs for headers when `github_mode` is `markdown`, but it doesn't quite generate the way that GitHub does in your project's readmes on the site. This makes it so the GitHub CSS doesn't create the clickable anchors. So when `github_mode` is `markdown`, you can have Markdown Preview insert the ids properly so the CSS works with the following option:
+
+```js
+    /*
+        Enables a post process to inject header ids to ensure hrefs to headers work
+    */
+    "github_inject_header_ids": true,
 ```
 
 #### Offline
@@ -305,7 +357,7 @@ GFM does not auto guess language in fenced blocks, but Markdown Preview does thi
 
 As mentioned earlier, a number of extensions are included by default. You can remove ones that are not part of GFM.
 
-## Including CSS
+### Including CSS
 
 By default Markdown Preview includes a default CSS via the `css` setting.  It uses the special keyword `default` to represent the default CSS.
 
@@ -315,7 +367,7 @@ By default Markdown Preview includes a default CSS via the `css` setting.  It us
 
 You can include whatever CSS you want, and even remove the `default` if you like.  It can take URLs or file paths.
 
-### Override CSS by File Type
+#### Override CSS by File Type
 
 You can also override the default CSS with special file specific CSS. This CSS does not replace the default, but will append CSS for a supported file type after the conventional CSS.
 
@@ -335,7 +387,7 @@ We could enable the following:
 
 Then if we have a file `filename.md` and a CSS in the same directory `filename.css`, that CSS will be applied to that file.
 
-## Including JavaScript
+### Including JavaScript
 
 JavaScript files can be included via the `js` setting.  It is a list and can take file paths or URLs.
 
@@ -343,11 +395,38 @@ JavaScript files can be included via the `js` setting.  It is a list and can tak
     "js": ["default"],
 ```
 
+### CriticMarkup
+
+Python Markdown can strip/apply out [CriticMarkup][14] syntax if desired.  Simply enable the following option:
+
+```js
+    /*
+        Sets how multimarkdown critic marks are handled.
+        Setting is a string value: (accept | reject | none)
+            accept: Accepts the proposed inserts and deletions (comments etc. are discarded)
+            reject: Rejects the proposed inserts and deletions (comments etc. are discarded)
+            none: does nothing
+
+        Critic marks only affects "github" and "markdown" (Python Markdown).
+    */
+    "strip_critic_marks": "none",
+```
+
+### MathJax Support
+
+To render Tex style math in Markdown, you can use the default MathJax setup that is available via the setting `enable_mathjax` setting. This will include HTML that will include MathJax via the MathJax CDN.  It is advised to use a Markdown extension (if using  Python Markdown; the `markdown` parser) to preserve the Tex style format.  You can check out [Arithmatex][15] which can do the preservation.
+
+```js
+    /*
+        Enable or not mathjax support.
+    */
+    "enable_mathjax": false,
+```
+
 ## Support
 
 - Any bugs about Markdown Preview please feel free to report [here][issue].
 - And you are welcome to fork and submit pull requests.
-
 
 ## License
 
@@ -367,6 +446,8 @@ The code is available at github [project][home] under [MIT license][4].
  [11]: https://packagecontrol.io/installation
  [12]: https://github.com/revolunet/sublimetext-markdown-preview/archive/master.zip
  [13]: http://facelessuser.github.io/pymdown-extensions/usage_notes/
+ [14]: http://criticmarkup.com/
+ [15]: https://facelessuser.github.io/pymdown-extensions/extensions/arithmatex/
  [issue]: https://github.com/revolunet/sublimetext-markdown-preview/issues
  [settings]: https://github.com/revolunet/sublimetext-markdown-preview/blob/master/MarkdownPreview.sublime-settings
  [hozaka]: https://github.com/hozaka

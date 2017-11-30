@@ -31,9 +31,29 @@
               guess_lang: false
           - pymdownx.extrarawhtml
           - pymdownx.progressbar
-          - pymdownx.github
           - pymdownx.caret:
               superscript: false
+          - pymdownx.magiclink:
+              repo_url_shortener: true
+              repo_url_shorthand: true
+              user: revolunet
+              repo: sublimetext-markdown-preview
+          - pymdownx.betterem
+          - pymdownx.tilde:
+              subscript: false
+          - pymdownx.emoji:
+              emoji_index: !!python/name:pymdownx.emoji.gemoji
+              emoji_generator: !!python/name:pymdownx.emoji.to_png
+              alt: short
+              options:
+                attributes:
+                  align: absmiddle
+                  height: 20px
+                  width: 20px
+              image_path: https://assets-cdn.github.com/images/icons/emoji/unicode/
+              non_standard_image_path: https://assets-cdn.github.com/images/icons/emoji/
+          - pymdownx.tasklist
+          - pymdownx.superfences
 ---
 test: This tests the meta extension
 title: This title will be overridden by YAML
@@ -181,6 +201,10 @@ Local image
 
 contact@revolunet.com
 
+@revolunet
+
+Issue #1
+
 https://github.com/revolunet/sublimetext-markdown-preview/
 
 This is a link https://github.com/revolunet/sublimetext-markdown-preview/.
@@ -208,6 +232,10 @@ Local image
 www.google.com
 
 contact@revolunet.com
+
+@revolunet
+
+Issue #1
 
 https://github.com/revolunet/sublimetext-markdown-preview/
 
