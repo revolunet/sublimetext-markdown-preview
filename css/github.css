@@ -721,3 +721,10 @@ pre {
   position: relative;
   border-color: #4078c0;
 }
+
+@media print {
+  body .markdown-body {
+    padding: 0;
+    border: none;
+  }
+}
