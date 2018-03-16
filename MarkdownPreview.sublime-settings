@@ -88,7 +88,7 @@
         List of enabled extensions of the selected markdown parser.
 
         You can get the full list of extensions at:
-            * The python markdown parser, the `markdown`: http://pythonhosted.org/Markdown/extensions/index.html
+            * The python markdown parser, the `markdown`: https://python-markdown.github.io/extensions
 
 
         default - use the default set of extensions, see table later.
