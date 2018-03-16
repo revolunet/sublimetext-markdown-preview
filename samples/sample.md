@@ -137,7 +137,7 @@ Markdown Preview comes with **Python-Markdown** preloaded.
 
 The [Python-Markdown Parser][] provides support for several extensions.
 
-[Python-Markdown Parser]: https://github.com/waylan/Python-Markdown
+[Python-Markdown Parser]: https://github.com/Python-Markdown/markdown
 
 #### Extra Extensions
 
@@ -149,13 +149,13 @@ The [Python-Markdown Parser][] provides support for several extensions.
 * `tables` -- [Tables][]
 * `smart_strong` -- [Smart Strong][]
 
-[Abbreviations]: http://pythonhosted.org/Markdown/extensions/abbreviations.html
-[Attribute Lists]: http://pythonhosted.org/Markdown/extensions/attr_list.html
-[Definition Lists]: http://pythonhosted.org/Markdown/extensions/definition_lists.html
-[Fenced Code Blocks]: http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html
-[Footnotes]: http://pythonhosted.org/Markdown/extensions/footnotes.html
-[Tables]: http://pythonhosted.org/Markdown/extensions/tables.html
-[Smart Strong]: http://pythonhosted.org/Markdown/extensions/smart_strong.html
+[Abbreviations]: https://python-markdown.github.io/extensions/abbreviations
+[Attribute Lists]: https://python-markdown.github.io/extensions/attr_list
+[Definition Lists]: https://python-markdown.github.io/extensions/definition_lists
+[Fenced Code Blocks]: https://python-markdown.github.io/extensions/fenced_code_blocks
+[Footnotes]: https://python-markdown.github.io/extensions/footnotes
+[Tables]: https://python-markdown.github.io/extensions/tables
+[Smart Strong]: https://python-markdown.github.io/extensions/smart_strong
 
 
 You can enable them all at once using the `extra` keyword.
@@ -179,26 +179,22 @@ There are also some extensions that are not included in Markdown Extra
 but come in the standard Python-Markdown library.
 
 * `code-hilite` -- [CodeHilite][]
-* `html-tidy` -- [HTML Tidy][]
 * `header-id` -- [HeaderId][]
 * `meta_data` -- [Meta-Data][]
 * `nl2br` -- [New Line to Break][]
-* `rss` -- [RSS][]
 * `sane_lists` -- [Sane Lists][]
 * `smarty` -- [Smarty][]
 * `toc` -- [Table of Contents][]
 * `wikilinks` -- [WikiLinks][]
 
-[CodeHilite]:  http://pythonhosted.org/Markdown/extensions/code_hilite.html
-[HTML Tidy]:  http://pythonhosted.org/Markdown/extensions/html_tidy.html
-[HeaderId]:  http://pythonhosted.org/Markdown/extensions/header_id.html
-[Meta-Data]:  http://pythonhosted.org/Markdown/extensions/meta_data.html
-[New Line to Break]:  http://pythonhosted.org/Markdown/extensions/nl2br.html
-[RSS]:  http://pythonhosted.org/Markdown/extensions/rss.html
-[Sane Lists]:  http://pythonhosted.org/Markdown/extensions/sane_lists.html
-[Table of Contents]:  http://pythonhosted.org/Markdown/extensions/toc.html
-[WikiLinks]:  http://pythonhosted.org/Markdown/extensions/wikilinks.html
-[Smarty]: https://pythonhosted.org/Markdown/extensions/smarty.html
+[CodeHilite]:  https://python-markdown.github.io/extensions/code_hilite
+[HeaderId]:  https://python-markdown.github.io/extensions/header_id
+[Meta-Data]:  https://python-markdown.github.io/extensions/meta_data
+[New Line to Break]:  https://python-markdown.github.io/extensions/nl2br
+[Sane Lists]:  https://python-markdown.github.io/extensions/sane_lists
+[Table of Contents]:  https://python-markdown.github.io/extensions/toc
+[WikiLinks]:  https://python-markdown.github.io/extensions/wikilinks
+[Smarty]: hhttps://python-markdown.github.io/extensions/smarty
 
 #### 3rd Party Extensions
 
@@ -294,5 +290,3 @@ This plugin and this sample file is proudly brought to you by the [revolunet tea
  [revolunet-logo]: http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg "revolunet logo"
  [gfm]: https://help.github.com/articles/github-flavored-markdown/
  [emoji]: http://www.emoji-cheat-sheet.com/
-
-

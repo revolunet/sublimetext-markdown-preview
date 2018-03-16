@@ -235,11 +235,11 @@ If you add the codehilite extension manually in the enabled extensions, you can 
     ]
     ```
 
-See [codehilte page](https://pythonhosted.org/Markdown/extensions/code_hilite.html) for more info.
+See [codehilte page](https://python-markdown.github.io/extensions/code_hilite) for more info.
 
 ### Meta Data Support
 
-When the `meta` extension is enabled (https://pythonhosted.org/Markdown/extensions/meta_data.html), the results will be written to the HTML head in the form `<meta name="key" content="value1,value2">`.  `title` is the one exception, and its content will be written to the title tag in the HTML head.
+When the `meta` extension is enabled (https://python-markdown.github.io/extensions/meta_data), the results will be written to the HTML head in the form `<meta name="key" content="value1,value2">`.  `title` is the one exception, and its content will be written to the title tag in the HTML head.
 
 ### YAML Frontmatter Support
 
@@ -442,7 +442,7 @@ The code is available at github [project][home] under [MIT license][4].
  [7]: https://packagecontrol.io/packages/LiveReload
  [8]: https://github.com/revolunet/sublimetext-markdown-preview/issues/27#issuecomment-11772098
  [9]: https://github.com/revolunet/sublimetext-markdown-preview/issues/78#issuecomment-15644727
- [10]: https://github.com/waylan/Python-Markdown
+ [10]: https://github.com/Python-Markdown/markdown
  [11]: https://packagecontrol.io/installation
  [12]: https://github.com/revolunet/sublimetext-markdown-preview/archive/master.zip
  [13]: http://facelessuser.github.io/pymdown-extensions/usage_notes/
