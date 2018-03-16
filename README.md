@@ -108,6 +108,54 @@ To get live updates while editing a file after preview, you need to do the follo
 
 You don't need to enable `Simple Reload` on every file as it is done globally; it can be turned on or off as needed.  From now on, files should auto-reload when you open them in the browser unless you disable `Simple Reload`.
 
+### Preview Path Conversion
+
+In the generated previews, paths are converted so that images and other links work properly. By default, paths are converted to absolute paths, but you can use relative if desired as well.  Image paths can also be changed to inject embedded base 64 images (only for local images). Path handling is controlled by the following two settings:
+
+```js
+    /*
+        Sets how image paths are handled.
+        Setting is a string value: (absolute | relative | base64 | none)
+            absolute: converts relative local paths to absolute
+            relative: converts relative local paths to a path relative to the
+                        HTML output
+            base64: coverts the local file to base64 and embeds it in the HTML
+            none: does nothing
+    */
+    "image_path_conversion": "absolute",
+
+    /*
+        Sets how file paths are handled.
+        Setting is a string value: (absolute | relative | none)
+            absolute: converts relative local paths to absolute
+            relative: converts relative local paths to a path relative to the
+                        HTML output
+            none: does nothing
+    */
+    "file_path_conversions": "absolute",
+```
+
+### Preview Temp Location
+
+By default, previews are generated in the OSs default temp location, but you can specify your own custom temp location via the `path_tempfile` option:
+
+```js
+    /*
+        Sets a custom temporary folder for MarkdownPreview-generated HTML files. Useful if you're
+        using LiveReload and don't want to use the OS default. The directory will be created if it
+        doesn't exist. Relative paths are supported, and are checked against `os.path.isabs`, see
+        doc: http://docs.python.org/3/library/os.path.html#os.path.isabs
+
+        Examples: /tmp/custom_folder   (Linux/OSX - absolute path)
+                    C:/TEMP/MYNOTES
+                    C:\\TEMP\\MYNOTES    (Windows - absolute path, forward slash or escaped back slash)
+                    build                (All OS - relative path, current dir)
+                    ../build             (Linux/OSX - relative path, in parent dir)
+                    ..\\build            (Windows - relative path, in parent dir)
+    */
+    "path_tempfile": "/tmp/my_notes",
+```
+
 ### Enabling Other External Markdown Parsers
 
 External parser commands and arguments should first be mapped to a name.  Each binary value must be an array with the path to the binary being first, followed by flags and options as individual indexes in the array.
@@ -493,6 +541,33 @@ To render Tex style math in Markdown, you can use the default MathJax setup that
         Enable or not mathjax support.
     */
     "enable_mathjax": false,
+```
+
+### UML Support
+
+If you are using the extension [SuperFences extension](https://facelessuser.github.io/pymdown-extensions/extensions/superfences/), it has an option to create special, custom fences. By default, it specifies `flow` and `sequence` languages to generate special code blocks that JavaScript can be applied to later to create UML diagrams: see https://facelessuser.github.io/pymdown-extensions/extensions/superfences/#custom-fences. By enabling the Markdown Preview setting `enable_uml`, the necessary CSS and JavaScript code will be included to transform `sequence` and `flow` blocks using https://bramp.github.io/js-sequence-diagrams/ and https://flowchart.js.org/ respectively.
+
+```js
+    /*
+        Enable uml support scripts: flowchart.js and sequence-diagram.js.
+    */
+    "enable_uml": false,
+```
+
+### Simple HTML Output
+
+Some people may desire a stripped down output on occasions that does not include HTML headers, inline styles, and IDs. Markdown Preview has a mode that will strip out these things and omit using a template.  This mode can be enabled via the the `html_simple` option:
+
+```js
+    /*
+        Sets HTML output to a simple form:
+            - No head
+            - No body tags
+            - ids, classes, and style are stripped out
+            - Just bare minimum HTML tags and attributes
+            - extension modifications included
+    */
+    "html_simple": false,
 ```
 
 ## Support
