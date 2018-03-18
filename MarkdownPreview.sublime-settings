@@ -13,7 +13,7 @@
     /*
         Sets the parser used for building markdown to HTML.
 
-        NOTE: The parser setting is not for the preview commands now.
+        NOTE: The parser setting is not for the preview commands.
         The previews have separate commands for each parser markdown.
 
         Warning for github API: if you have a ST2 linux build, Python is not built with SSL so it may not work
@@ -110,7 +110,7 @@
         "pymdownx.tasklist",     // Task lists
         {
             "pymdownx.tilde": {  // Provide ~~delete~~
-                "superscript": false
+                "subscript": false
             }
         },
         {

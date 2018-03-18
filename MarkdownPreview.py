@@ -400,15 +400,13 @@ class Compiler(object):
 
     def postprocessor_simple(self, source):
         """Strip out ids and classes for a simplified HTML output."""
-        from pymdownx.plainhtml import PlainHtmlPostprocessor
+        from pymdownx.striphtml import StripHtmlPostprocessor
 
-        plainhtml = PlainHtmlPostprocessor()
-        plainhtml.config = {
-            'strip_comments': True,
-            'strip_attributes': 'id class style',
-            'strip_js_on_attributes': True
-        }
-        return plainhtml(source)
+        strip_comments = True,
+        strip_js_on_attributes = True
+        strip_attributes = ["id", "class", "style"]
+        striphtml = StripHtmlPostprocessor(strip_comments, strip_js_on_attributes, strip_attributes, None)
+        return striphtml.run(source)
 
     def preprocessor_criticmarkup(self, source, accept):
         """Stip out multi-markdown critic marks.  Accept changes by default."""
