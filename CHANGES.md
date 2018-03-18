@@ -1,5 +1,8 @@
 Changes in Markdown Preview
 ===========================
+## 2.0.0
+
+
 ## 1.4.3
 
 * Fix issue where Chrome prevents live reload.
