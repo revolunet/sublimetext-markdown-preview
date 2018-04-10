@@ -16,7 +16,14 @@
     # Settings overrides
     settings:
         pygments_style: github
-        enable_uml: true
+        js:
+          - https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js
+          - https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js
+          - https://cdnjs.cloudflare.com/ajax/libs/js-sequence-diagrams/1.0.6/sequence-diagram-min.js
+          - https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js
+          - res://Markdown Preview/js/uml.js
+          - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js
+          - res://Markdown Preview/js/math_config.js
         markdown_extensions:
           - markdown.extensions.footnotes
           - markdown.extensions.attr_list
@@ -29,6 +36,8 @@
           - markdown.extensions.admonition
           - markdown.extensions.codehilite:
               guess_lang: false
+          - pymdownx.arithmatex:
+              generic: true
           - pymdownx.extrarawhtml
           - pymdownx.progressbar
           - pymdownx.caret:
@@ -50,8 +59,8 @@
                   align: absmiddle
                   height: 20px
                   width: 20px
-              image_path: https://assets-cdn.github.com/images/icons/emoji/unicode/
-              non_standard_image_path: https://assets-cdn.github.com/images/icons/emoji/
+                image_path: https://assets-cdn.github.com/images/icons/emoji/unicode/
+                non_standard_image_path: https://assets-cdn.github.com/images/icons/emoji/
           - pymdownx.tasklist
           - pymdownx.superfences
 ---
@@ -59,6 +68,7 @@ test: This tests the meta extension
 title: This title will be overridden by YAML
 
 # Cheat Sheet and Test
+
 [TOC]
 
 ## Headers
@@ -84,6 +94,7 @@ title: This title will be overridden by YAML
 ### Duplicate Header
 
 ## Paragraphs
+
 ```
 This is a paragraph.
 I am still part of the paragraph.
@@ -187,6 +198,7 @@ __~~*strike italic 1 bold 2*~~__ and *~~__strike italic 1 bold 2__~~*
 
 
 ## Links
+
 Footnote, reference sources are provided in separate markdowns files specified in frontmatter.
 ```
 [Reference Link][1]
@@ -246,6 +258,7 @@ This is a link "https://github.com/revolunet/sublimetext-markdown-preview/".
 With this link (https://github.com/revolunet/sublimetext-markdown-preview/), it still works.
 
 ## Abbreviation
+
 Abbreviations source are found in a separate markdown file specified in frontmatter.
 ```
 The HTML specification 
@@ -290,6 +303,7 @@ Unordered List
 
 
 ## Ordered List
+
 ```
 Ordered List
 
@@ -319,6 +333,7 @@ Ordered List
 3. item 3
 
 ## Task List
+
 ```
 Task List
 
@@ -348,6 +363,7 @@ Task List
 - [ ] item 3
 
 ## Mixed Lists
+
 `Really Mixed Lists` should break with `sane_lists` on.
 
 ```
@@ -408,6 +424,7 @@ Really Mixed Lists
 
 
 ## Dictionary
+
 ```
 Dictionary
 :   item 1
@@ -425,6 +442,7 @@ Dictionary
     item 3
 
 ## Blocks
+
 ```
     This is a block.
     
@@ -438,6 +456,7 @@ Dictionary
 
 
 ## Block Quotes
+
 ```
 > This is a block quote
 >> How does it look?
@@ -448,6 +467,7 @@ Dictionary
 > I think it looks good.
 
 ## Fenced Block
+
 Assuming guessing is not enabled.
 
 `````
@@ -509,6 +529,7 @@ function doIt() {
 | Green         | ~~***Pears***~~ | Spinach      |
 
 ## Smart Strong
+
 ```
 Text with double__underscore__words.
 
@@ -524,6 +545,7 @@ __Strong__ still works.
 __this__works__too__
 
 ## Smarty
+
 ```
 "double quotes"
 
@@ -543,6 +565,7 @@ da--sh
 elipsis...
 
 ## Attribute List
+
 ```
 Normal Text
 
@@ -556,6 +579,7 @@ Modified Text
 {: style="font-weight:bold;" }
 
 ## Admonition
+
 ```
 !!! Attention "Success!"
     You can use inline ~~stuff~~ markup too!
@@ -625,6 +649,7 @@ Modified Text
     Default class style
 
 ## Github Emoji
+
 ```
 This is a test for emoji :smile:.  The emojis are images linked to github assets :octocat:.
 ```
@@ -652,6 +677,7 @@ This is a test for emoji :smile:.  The emojis are images linked to github assets
 :100::1234::a::ab::abc::abcd::accept::aquarius::aries::arrow_backward::arrow_double_down::arrow_double_up::arrow_down::arrow_down_small::arrow_forward::arrow_heading_down::arrow_heading_up::arrow_left::arrow_lower_left::arrow_lower_right::arrow_right::arrow_right_hook::arrow_up::arrow_up_down::arrow_up_small::arrow_upper_left::arrow_upper_right::arrows_clockwise::arrows_counterclockwise::b::baby_symbol::back::baggage_claim::ballot_box_with_check::bangbang::black_circle::black_large_square::black_medium_small_square::black_medium_square::black_small_square::black_square_button::cancer::capital_abcd::capricorn::chart::children_crossing::cinema::cl::clock1::clock10::clock1030::clock11::clock1130::clock12::clock1230::clock130::clock2::clock230::clock3::clock330::clock4::clock430::clock5::clock530::clock6::clock630::clock7::clock730::clock8::clock830::clock9::clock930::congratulations::cool::copyright::curly_loop::currency_exchange::customs::diamond_shape_with_a_dot_inside::do_not_litter::eight::eight_pointed_black_star::eight_spoked_asterisk::end::fast_forward::five::four::free::gemini::hash::heart_decoration::heavy_check_mark::heavy_division_sign::heavy_dollar_sign::heavy_exclamation_mark::heavy_minus_sign::heavy_multiplication_x::heavy_plus_sign::id::ideograph_advantage::information_source::interrobang::keycap_ten::koko::large_blue_circle::large_blue_diamond::large_orange_diamond::left_luggage::left_right_arrow::leftwards_arrow_with_hook::leo::libra::link::m::mens::metro::mobile_phone_off::negative_squared_cross_mark::new::ng::nine::no_bicycles::no_entry::no_entry_sign::no_mobile_phones::no_pedestrians::no_smoking::non-potable_water::o::o2::ok::on::one::ophiuchus::parking::part_alternation_mark::passport_control::pisces::potable_water::put_litter_in_its_place::radio_button::recycle::red_circle::registered::repeat::repeat_one::restroom::rewind::sa::sagittarius::scorpius::secret::seven::shipit::signal_strength::six::six_pointed_star::small_blue_diamond::small_orange_diamond::small_red_triangle::small_red_triangle_down::soon::sos::symbols::taurus::three::tm::top::trident::twisted_rightwards_arrows::two::u5272::u5408::u55b6::u6307::u6708::u6709::u6e80::u7121::u7533::u7981::u7a7a::underage::up::vibration_mode::virgo::vs::wavy_dash::wc::wheelchair::white_check_mark::white_circle::white_flower::white_large_square::white_medium_small_square::white_medium_square::white_small_square::white_square_button::womens::x::zero:
 
 ## Insert
+
 ```
 ^^insert^^
 
@@ -698,7 +724,8 @@ __^^_insert italic bold_^^__  _^^__insert italic bold 2__^^_
 
 __^^*insert italic bold*^^__  *^^__insert italic bold 2__^^*
 
-# Progress
+## Progress
+
 Progress bars are block elements and it is recommened to put a newline before and after.  But they will be recognized inline, but they will be on their own line.
 
 Normally you would just globally set your additional classes: `progressbar(add_classes=candystripe-animate)`, but here we will demonstrate that it works with the `attr_list` extension.  It will take inline style.
@@ -734,7 +761,8 @@ To turn off level classes (which are used to decide special colors for certain p
 |Inline              |Before[= 50% "I'm a block!"]After              |
 |Gloss and Animated  |[= 50% "Gloss"]{: .candystripe-animate .gloss} |
 
-## Neseted Fences:
+## Neseted Fences
+
 ````
     ```
     This will still be parsed
@@ -800,6 +828,7 @@ as a fenced code block.
         > ```
 
 ## UML Flow Charts
+
 ````
 ```flow
 st=>start: Start:>http://www.google.com[blank]
@@ -831,6 +860,7 @@ cond(no)->sub1(right)->op1
 ```
 
 ## UML Sequence Diagrams
+
 ````
 ```sequence
 Title: Here is a title
@@ -848,3 +878,18 @@ B-->C: Dashed line
 C->>D: Open arrow
 D-->>A: Dashed open arrow
 ```
+
+## Math
+
+$p(x|y) = \frac{p(y|x)p(x)}{p(y)}$, \(p(x|y) = \frac{p(y|x)p(x)}{p(y)}\).
+
+$$
+E(\mathbf{v}, \mathbf{h}) = -\sum_{i,j}w_{ij}v_i h_j - \sum_i b_i v_i - \sum_j c_j h_j
+$$
+
+\[3 < 4\]
+
+\begin{align}
+    p(v_i=1|\mathbf{h}) & = \sigma\left(\sum_j w_{ij}h_j + b_i\right) \\
+    p(h_j=1|\mathbf{v}) & = \sigma\left(\sum_i w_{ij}v_i + c_j\right)
+\end{align}

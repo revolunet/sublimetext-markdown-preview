@@ -42,16 +42,6 @@
     "build_action": "build",
 
     /*
-        Enable or not mathjax support.
-    */
-    "enable_mathjax": false,
-
-    /*
-        Enable uml support scripts: flowchart.js and sequence-diagram.js.
-    */
-    "enable_uml": false,
-
-    /*
         If Pygments is being used, you may want to inject one of the Pygment styles provided into the HTML.
         If so, enable this.
     */
@@ -200,13 +190,11 @@
         {{ HEAD }} - would be replaced by generated stylesheets, javascripts enabled above
         {{ BODY }} - would be replaced by HTML converted from markdown
 
-        By setting "skip_default_stylesheet" to true you can use the styles only in your HTML
-        template. In most cases you should turn this setting on to have a full-featured design.
+        Remove "default" from "css" setting to avoid injecting the default CSS if desired.
 
         Refer to 'customized-template-sample.html' as a show case.
     */
-    // "html_template": "/ABS_PATH_TO_A_HTML_FILE",
-    // "skip_default_stylesheet": true,
+    "html_template": "",
 
 
     /*
@@ -216,7 +204,7 @@
         into the script tag; others will be set as the `src` attribute. The order of files in the
         array is the order in which they are embedded.
     */
-    // "js": ["http://example.com/script.js", "/path/to/script.js"],
+    "js": [],
 
     /*
         Enable auto-reloaded on save. Will not work if GitHub parser is used without oauth key specified.
@@ -241,7 +229,7 @@
                     ../build             (Linux/OSX - relative path, in parent dir)
                     ..\\build            (Windows - relative path, in parent dir)
     */
-    // "path_tempfile": "/tmp/my_notes",
+    "path_tempfile": "",
 
     /*
         Sets HTML output to a simple form:
@@ -293,6 +281,6 @@
     /* do we show the panel when building with CMD+B */
     "show_panel_on_build": true,
 
-    /* do we include the CSS when outputting HTML into a new sublime view ? */
-    "embed_css_for_sublime_output": true
+    /* do we include the CSS when outputting HTML? */
+    "include_head": ["build", "browser", "sublime", "clipboard", "save"]
 }

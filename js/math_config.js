@@ -1,13 +1,11 @@
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script>
 MathJax.Hub.Config({
   config: ["MMLorHTML.js"],
   extensions: ["tex2jax.js"],
-  jax: ["input/TeX"],
+  jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
   tex2jax: {
     inlineMath: [ ['$','$'], ["\\(","\\)"] ],
     displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-    processEscapes: false
+    processEscapes: true
   },
   TeX: {
     extensions: ["AMSmath.js", "AMSsymbols.js"],
@@ -21,6 +19,7 @@ MathJax.Hub.Config({
       fonts: "STIXGeneral,'Arial Unicode MS'"
     }
   },
-  showProcessingMessages: false
+  displayAlign: "left",
+  showProcessingMessages: false,
+  messageStyle: 'none'
 });
-</script>

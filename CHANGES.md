@@ -32,9 +32,13 @@ Please read documentation as there have been big changes in this version which m
 
 * Hopefully better documentation.
 
-* Make flake8 compatible. I'd put it up on travis for continuous integration, but I don't have that kind of control.
+* Make flake8 compatible.
 
 * Fix outdated links.
+
+* Remove MatjJax and UML option in favor of a more generalized solution via the pre-existing `css` option.
+
+* Remove `embed_css_for_sublime_output` option in favor of more generalized `include_head` option.
 
 ## 1.4.3
 

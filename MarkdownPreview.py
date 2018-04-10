@@ -225,7 +225,13 @@ class Compiler(object):
 
         css_text = []
         for css_name in css_list:
-            if self.isurl(css_name):
+            if css_name.startswith('res://'):
+                internal_file = os.path.join(sublime.packages_path(), os.path.normpath(css_name[6:]))
+                if os.path.exists(internal_file):
+                    css_text.append("<style>%s</style>" % load_utf8(internal_file))
+                else:
+                    css_text.append("<style>%s</style>" % sublime.load_resource('Packages/' + css_name[6:]))
+            elif self.isurl(css_name):
                 # link to remote URL
                 css_text.append("<link href='%s' rel='stylesheet' type='text/css'>" % css_name)
             elif os.path.isfile(os.path.expanduser(css_name)):
@@ -268,24 +274,18 @@ class Compiler(object):
             # Only load scripts if we have a list.
             if isinstance(js_files, list):
                 for js_file in js_files:
-                    if os.path.isabs(js_file):
+                    if js_file.startswith('res://'):
+                        internal_file = os.path.join(sublime.packages_path(), os.path.normpath(js_file[6:]))
+                        if os.path.exists(internal_file):
+                            scripts += "<script>%s</script>" % load_utf8(internal_file)
+                        else:
+                            scripts += "<script>%s</script>" % sublime.load_resource('Packages/' + js_file[6:])
+                    elif os.path.isabs(js_file):
                         # Load the script inline to avoid cross-origin.
                         scripts += "<script>%s</script>" % load_utf8(js_file)
                     else:
                         scripts += "<script type='text/javascript' src='%s'></script>" % js_file
         return scripts
-
-    def get_mathjax(self):
-        """Return the MathJax script if enabled."""
-        if self.settings.get('enable_mathjax') is True:
-            return load_resource('partials/mathjax.html')
-        return ''
-
-    def get_uml(self):
-        """Return the UML scripts if enabled."""
-        if self.settings.get('enable_uml') is True:
-            return load_resource('partials/uml.html')
-        return ''
 
     def get_highlight(self):
         """Base highlight method."""
@@ -507,12 +507,9 @@ class Compiler(object):
         elif html_template and os.path.exists(html_template):
             head = ''
             head += self.get_meta()
-            if not self.settings.get('skip_default_stylesheet'):
-                head += self.get_stylesheet()
+            head += self.get_stylesheet()
             head += self.get_javascript()
             head += self.get_highlight()
-            head += self.get_mathjax()
-            head += self.get_uml()
             head += self.get_title()
 
             html = load_utf8(html_template)
@@ -525,8 +522,6 @@ class Compiler(object):
             html += self.get_stylesheet()
             html += self.get_javascript()
             html += self.get_highlight()
-            html += self.get_mathjax()
-            html += self.get_uml()
             html += self.get_title()
             html += '</head><body>'
             html += '<article class="markdown-body">'
@@ -912,14 +907,20 @@ class MarkdownPreviewCommand(sublime_plugin.TextCommand):
 
         html, body = compiler.run(self.view, preview=(target in ['disk', 'browser']))
 
+        temp_target = 'browser' if target == 'disk' else target
+        if temp_target in self.settings.get('include_head', ['build', 'browser', 'sublime', 'clipboard', 'save']):
+            content = html
+        else:
+            content = body
+
         if target in ['disk', 'browser']:
-            self.to_disk(html, self.target == 'browser')
+            self.to_disk(content, self.target == 'browser')
         elif target == 'sublime':
-            self.to_sublime(html if self.settings.get('embed_css_for_sublime_output', True) else body)
+            self.to_sublime(content)
         elif target == 'clipboard':
-            self.to_clipboard(html)
+            self.to_clipboard(content)
         elif target == 'save':
-            self.save(compiler, html)
+            self.save(compiler, content)
 
     def to_disk(self, html, open_in_browser):
         """Save to disk and open in browser if desired."""
@@ -1061,12 +1062,17 @@ class MarkdownBuildCommand(sublime_plugin.WindowCommand):
 
         html, body = compiler.run(view, True, preview=False)
 
+        if 'build' in self.settings.get('include_head', ['build', 'browser', 'sublime', 'clipboard', 'save']):
+            content = html
+        else:
+            content = body
+
         htmlfile = compiler.settings.get('builtin').get('destination', None)
 
         if htmlfile is None:
             htmlfile = os.path.splitext(mdfile)[0] + '.html'
         self.puts("        ->" + htmlfile)
-        save_utf8(htmlfile, html)
+        save_utf8(htmlfile, content)
 
         elapsed = time.time() - start_time
         if body == _CANNOT_CONVERT:
