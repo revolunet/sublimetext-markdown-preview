@@ -82,7 +82,12 @@
         "pymdownx.extrarawhtml",
 
         // More default Python Markdown extensions
-        "markdown.extensions.toc",
+        {
+            "markdown.extensions.toc":
+            {
+                "permalink": "\ue157"
+            }
+        },
         "markdown.extensions.meta",
         "markdown.extensions.sane_lists",
         "markdown.extensions.smarty",

@@ -30,7 +30,8 @@
           - markdown.extensions.def_list
           - markdown.extensions.tables
           - markdown.extensions.abbr
-          - markdown.extensions.toc
+          - markdown.extensions.toc:
+              permalink: "\ue157"
           - markdown.extensions.smarty
           - markdown.extensions.meta
           - markdown.extensions.admonition

@@ -610,6 +610,12 @@ Some people may desire a stripped down output on occasions that does not include
 - Any bugs about Markdown Preview please feel free to report [here][issue].
 - And you are welcome to fork and submit pull requests.
 
+## Attribution
+
+Markdown Preview contains a stripped down version of font awesome that is included in the default non-GitHub CSS.  It contains only the icons we currently use.
+
+https://fontawesome.com/license
+
 ## License
 
 The code is available at github [project][home] under [MIT license][4].
