@@ -19,6 +19,11 @@ You can use the builtin [Python Markdown][pymd] parser (offline) or use the [Git
 - Embed images as base64.
 - Strip out MultiMarkdown CriticMarkup.
 
+## Documentation
+
+Current Documentation: https://github.com/revolunet/sublimetext-markdown-preview/blob/st2/README.md
+Future 2.0 Documentation: https://revolunet.github.io/sublimetext-markdown-preview/
+
 ## Support
 
 - Any bugs about Markdown Preview please feel free to report [here][issue].
