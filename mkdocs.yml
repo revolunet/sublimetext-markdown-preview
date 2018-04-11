@@ -1,0 +1,89 @@
+site_name: Markdown Preview Documentation
+site_url: https://revolunet.github.io/sublimetext-markdown-preview
+repo_url: https://github.com/revolunet/sublimetext-markdown-preview
+edit_uri: tree/master/docs/src/markdown
+site_description: Markdown preview and build plugin for Sublime Text 3
+copyright: |
+  <br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
+
+docs_dir: docs/src/markdown
+theme:
+  name: material
+  custom_dir: docs/theme
+  palette:
+    primary: blue
+    accent: blue
+  logo:
+    icon: description
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+pages:
+  - Markdown Preview: index.md
+  - Installation: install.md
+  - Usage: usage.md
+  - Extras: extras.md
+  - Changes: changes.md
+  - License: license.md
+
+markdown_extensions:
+  - markdown.extensions.toc:
+      slugify: !!python/name:pymdownx.slugs.uslugify
+      permalink: "\ue157"
+  - markdown.extensions.admonition:
+  - markdown.extensions.smarty:
+      smart_quotes: false
+  - pymdownx.betterem:
+  - markdown.extensions.attr_list:
+  - markdown.extensions.def_list:
+  - markdown.extensions.tables:
+  - markdown.extensions.abbr:
+  - markdown.extensions.footnotes:
+  - pymdownx.extrarawhtml:
+  - pymdownx.superfences:
+  - pymdownx.highlight:
+      css_class: codehilite
+      extend_pygments_lang:
+        - name: php-inline
+          lang: php
+          options:
+            startinline: true
+        - name: pycon3
+          lang: pycon
+          options:
+            python3: true
+  - pymdownx.inlinehilite:
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      social_url_shorthand: true
+      user: revolunet
+      repo: sublimetext-markdown-preview
+  - pymdownx.tilde:
+  - pymdownx.caret:
+  - pymdownx.smartsymbols:
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_png
+  - pymdownx.escapeall:
+      hardbreak: True
+      nbsp: True
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.arithmatex:
+  - pymdownx.mark:
+  - pymdownx.striphtml:
+  - pymdownx.snippets:
+      base_path: docs/src/markdown/_snippets
+  - pymdownx.keys:
+      separator: "\uff0b"
+  - pymdownx.details:
+
+extra:
+  social:
+    - type: github
+      link: https://github.com/revolunet
+extra_css:
+  - extra-d04c85ed4a.css
+extra_javascript:
+  - extra-d8800ea088.js
