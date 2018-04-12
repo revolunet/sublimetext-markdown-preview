@@ -1,8 +1,11 @@
-# Markdown Preview
+# Overview
 
 Preview and build your markdown files quickly in your web browser.
 
 You can use the builtin [Python Markdown][pymd] parser (offline) or use the [GitHub Markdown API][gfm-api] (online) for the conversion.
+
+!!! note
+    If you choose the GitHub API for conversion (set `parser` to `github` in your settings), your code will be sent through HTTPS to GitHub for live conversion. You'll have [Github Flavored Markdown][gfm-help], syntax highlighting and EMOJI support for free :heart: :gift:. If you make more than 60 calls a day, be sure to set your GitHub API key in the settings :smile:.
 
 ## Features
 
@@ -14,15 +17,10 @@ You can use the builtin [Python Markdown][pymd] parser (offline) or use the [Git
 - Configurable CSS and JavaScript assets with overriding if needed.
 - YAML support thanks to [@tommi][tommi].
 - Clipboard selection and copy to clipboard thanks to [@hexatrope][hexatrope].
-- MathJax support : `\(\frac{\pi}{2}\)` thanks to [@bps10][bps10].
+- MathJax support : $\frac{\pi}{2}$ thanks to [@bps10][bps10].
 - HTML template customization thanks to [@hozaka][hozaka].
 - Embed images as base64.
 - Strip out MultiMarkdown CriticMarkup.
-
-## Documentation
-
-Current Documentation: https://github.com/revolunet/sublimetext-markdown-preview/blob/st2/README.md
-Future 2.0 Documentation: https://revolunet.github.io/sublimetext-markdown-preview/
 
 ## Support
 
@@ -39,14 +37,5 @@ https://fontawesome.com/license
 
 The code is available at [GitHub][home] under the [MIT license][license].
 
-[bps10]: https://github.com/bps10
-[gfm-api]: https://developer.github.com/v3/markdown/
-[hexatrope]: https://github.com/hexatrope
-[home]: https://github.com/revolunet/sublimetext-markdown-preview
-[hozaka]: https://github.com/hozaka
-[issue]: https://github.com/revolunet/sublimetext-markdown-preview/issues
-[license]: http://revolunet.mit-license.org
-[live-reload]: https://packagecontrol.io/packages/LiveReload
-[pymd]: https://github.com/Python-Markdown/markdown
-[pymdownx-docs]: http://facelessuser.github.io/pymdown-extensions/usage_notes/
-[tommi]: https://github.com/tommi
+--8<-- "refs.md"
+--8<-- "mathjax.md"

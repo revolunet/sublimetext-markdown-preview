@@ -1,20 +1,30 @@
+"""Markdown Preview settings handler."""
 from __future__ import unicode_literals
 import sublime
 import os
 import sys
 import re
+import json
+import importlib
 
 BUILTIN_KEYS = ('basepath', 'references', 'destination')
 
-ST3 = int(sublime.version()) >= 3000
-if ST3:
-    unicode_str = str
-else:
-    unicode_str = unicode
+
+def extended_decode(d):
+    """Decode python functions in JSON."""
+    if '!!python/name' in d:
+        parts = d["!!python/name"].split('.')
+        function = parts[-1]
+        module = '.'.join(parts[:-1])
+        return getattr(importlib.import_module(module), function)
+    return d
 
 
 class Settings(object):
+    """Settings handler."""
+
     def __init__(self, settings_file, file_name):
+        """Initialize."""
         self.file_name = file_name
         self._sub_settings = sublime.load_settings(settings_file)
         self._overrides = {
@@ -25,22 +35,46 @@ class Settings(object):
             "meta": {}
         }
 
+    def parse_md_ext(self):
+        """Parse Markdown extensions."""
+        extensions = self._sub_settings.get('markdown_extensions', {})
+        return json.loads(json.dumps(extensions), object_hook=extended_decode)
+
     def get(self, key, default=None):
+        """
+        Get method for the settings object.
+
+        First check if there is an override.
+        """
         if key in self._overrides:
             return self._overrides[key]
         else:
-            return self._sub_settings.get(key, default)
+            if key == 'markdown_extensions':
+                return self.parse_md_ext()
+            else:
+                return self._sub_settings.get(key, default)
 
     def set(self, key, value):
+        """
+        Set method for the settings object.
+
+        Setting will add to overrides.
+        """
         self._overrides[key] = value
 
     def has(self, key):
+        """
+        Check if key is present.
+
+        Check in overrides first.
+        """
         found = key in self._overrides
         if not found:
             found = self._sub_settings.has(key)
         return found
 
     def is_abs(self, pth):
+        """Check if path is an absolute path."""
         absolute = False
         if pth is not None:
             if sys.platform.startswith('win'):
@@ -54,6 +88,7 @@ class Settings(object):
     def resolve_meta_path(self, target):
         """
         Resolve the path returned in the meta data.
+
         1. See if path is defined as absolute and if so see
            if it exists
         2. If relative, use the file's current directory
@@ -79,7 +114,7 @@ class Settings(object):
         return target
 
     def get_base_path(self, basepath):
-        """ Get the base path to use when resolving basepath paths if possible """
+        """Get the base path to use when resolving basepath paths if possible."""
         if basepath is not None:
             basepath = os.path.expanduser(basepath)
 
@@ -101,10 +136,12 @@ class Settings(object):
         return basepath
 
     def add_meta(self, meta):
+        """Add meta data."""
         meta = dict(list(meta.items()) + list(self._overrides.get("meta", {}).items()))
         self._overrides["meta"] = meta
 
     def apply_frontmatter(self, frontmatter):
+        """Apply the provided frontmatter to override."""
         # Handle basepath first
 
         if "basepath" in frontmatter:
@@ -143,7 +180,7 @@ class Settings(object):
                             self._overrides["builtin"][key] = file_name
             else:
                 if isinstance(value, list):
-                    value = [unicode_str(v) for v in value]
+                    value = [str(v) for v in value]
                 else:
-                    value = unicode_str(value)
-                self._overrides["meta"][unicode_str(key)] = value
+                    value = str(value)
+                self._overrides["meta"][str(key)] = value

@@ -13,7 +13,7 @@
     /*
         Sets the parser used for building markdown to HTML.
 
-        NOTE: The parser setting is not for the preview commands now.
+        NOTE: The parser setting is not for the preview commands.
         The previews have separate commands for each parser markdown.
 
         Warning for github API: if you have a ST2 linux build, Python is not built with SSL so it may not work
@@ -22,7 +22,7 @@
         markdown - Use the built-in python-markdown parser
         github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see https://help.github.com/articles/github-flavored-markdown/
     */
-    "parser": "default",
+    "parser": "markdown",
 
     /*
         By default, Markdown Preview builds the HTML in the source directory.
@@ -42,66 +42,89 @@
     "build_action": "build",
 
     /*
-        Enable or not mathjax support.
+        If Pygments is being used, you may want to inject one of the Pygment styles provided into the HTML.
+        If so, enable this.
     */
-    "enable_mathjax": false,
+    "pygments_inject_css": true,
 
     /*
-        Enable uml support scripts: flowchart.js and sequence-diagram.js.
+        Name of the Pygments style to inject. Available styles are the styles provided by pygments
+        plus "github" and "github2014".
     */
-    "enable_uml": false,
+    "pygments_style": "github",
 
     /*
-        Enable highlighting. This enables codehilite extension if not already enabled.
+        This is the class to prepend to the pygments CSS styles. Make sure it matches whatever class(es)
+        you've specified in the extension that controls Pygments highlighting.  CodeHilite's default is
+        "codehilite".
     */
-    "enable_highlight": false,
+    "pygments_css_class": "codehilite",
 
     /*
-        Pygments support for syntax highlighting.  Controls whether codehilite extension
-        will use Pygments.  If disabled, code blocks will be formatted for javascript
-        highighters such as highlight.js.
+        Markdown extension configuration.
 
-        If you manually set codehilite as an included extension in "enabled_extensions",
-        your settings will override this one.  To configure using pygments manually:
-            "enabled_extensions": [
-                "codehilite(use_pygments=False)" // <-Turn off pygments usage
-            ]
+        To specify a function in this JSON configuration, create an object with the key "!!python/name"
+        and set it to the import path to the function "module.submodule.etc.function".
     */
-    "enable_pygments": true,
+    "markdown_extensions": [
+        // Python Markdown Extra with SuperFences.
+        // You can't include "extra" and "superfences"
+        // as "fenced_code" can not be included with "superfences",
+        // so we include the pieces separately.
+        "markdown.extensions.smart_strong",
+        "markdown.extensions.footnotes",
+        "markdown.extensions.attr_list",
+        "markdown.extensions.def_list",
+        "markdown.extensions.tables",
+        "markdown.extensions.abbr",
+        // Extra's Markdown parsing in raw HTML cannot be
+        // included by itself, but "pymdownx" exposes it so we can.
+        "pymdownx.extrarawhtml",
 
-    /*
-        Sets whether highlight JS will auto-guess raw block's syntax.
-        Alternative is to to only highlight blocks where a language has
-        been defined.
+        // More default Python Markdown extensions
+        {
+            "markdown.extensions.toc":
+            {
+                "permalink": "\ue157"
+            }
+        },
+        "markdown.extensions.meta",
+        "markdown.extensions.sane_lists",
+        "markdown.extensions.smarty",
+        "markdown.extensions.wikilinks",
+        "markdown.extensions.admonition",
 
-        Default is True (guess).
-
-        If you manually set codehilite as an included extension in "enabled_extensions",
-        your settings will override this one.  To configure language guessing manually:
-            "enabled_extensions": [
-                "codehilite(guess_lang=False)" // <-Turn off language guessing
-            ]
-    */
-    "guess_language": true,
-
-    /*
-        List of enabled extensions of the selected markdown parser.
-
-        You can get the full list of extensions at:
-            * The python markdown parser, the `markdown`: https://python-markdown.github.io/extensions
-
-
-        default - use the default set of extensions, see table later.
-        [ "default", "def_list", ... ] - a list of extensions. Use "default" to include the default extensions.
-
-            Parser     | "default" Values
-        ------------|---------------------------
-            default    | ["extra", "github", "toc", "meta", "sane_lists", "smarty", "wikilinks"]
-            markdown   | ["extra", "github", "toc", "meta", "sane_lists", "smarty", "wikilinks"]
-            github     | extension's values are not used.
-
-    */
-    "enabled_extensions": "default",
+        // PyMdown extensions that help give a GitHub-ish feel
+        "pymdownx.superfences",  // Nested fences and UML support
+        {
+            "pymdownx.magiclink": {   // Auto linkify URLs and email addresses
+                "repo_url_shortener": true,
+                "repo_url_shorthand": true
+            }
+        },
+        "pymdownx.tasklist",     // Task lists
+        {
+            "pymdownx.tilde": {  // Provide ~~delete~~
+                "subscript": false
+            }
+        },
+        {
+            "pymdownx.emoji": {  // Provide GitHub's emojis
+                "emoji_index": {"!!python/name": "pymdownx.emoji.gemoji"},
+                "emoji_generator": {"!!python/name": "pymdownx.emoji.to_png"},
+                "alt": "short",
+                "options": {
+                    "attributes": {
+                        "align": "absmiddle",
+                        "height": "20px",
+                        "width": "20px"
+                    },
+                   "image_path": "https://assets-cdn.github.com/images/icons/emoji/unicode/",
+                   "non_standard_image_path": "https://assets-cdn.github.com/images/icons/emoji/"
+                }
+            }
+        }
+    ],
 
     /*
         Enabled parsers for the parser "select parser" command
@@ -172,13 +195,11 @@
         {{ HEAD }} - would be replaced by generated stylesheets, javascripts enabled above
         {{ BODY }} - would be replaced by HTML converted from markdown
 
-        By setting "skip_default_stylesheet" to true you can use the styles only in your HTML
-        template. In most cases you should turn this setting on to have a full-featured design.
+        Remove "default" from "css" setting to avoid injecting the default CSS if desired.
 
         Refer to 'customized-template-sample.html' as a show case.
     */
-    // "html_template": "/ABS_PATH_TO_A_HTML_FILE",
-    // "skip_default_stylesheet": true,
+    "html_template": "",
 
 
     /*
@@ -188,12 +209,12 @@
         into the script tag; others will be set as the `src` attribute. The order of files in the
         array is the order in which they are embedded.
     */
-    // "js": ["http://example.com/script.js", "/path/to/script.js"],
+    "js": [],
 
     /*
-        Enable or not whether parsed files will be auto-reloaded on save
+        Enable auto-reloaded on save. Will not work if GitHub parser is used without oauth key specified.
     */
-    "enable_autoreload": false,
+    "enable_autoreload": true,
 
     /*
         Sets the supported filetypes for auto-reload on save
@@ -213,7 +234,7 @@
                     ../build             (Linux/OSX - relative path, in parent dir)
                     ..\\build            (Windows - relative path, in parent dir)
     */
-    // "path_tempfile": "/tmp/my_notes",
+    "path_tempfile": "",
 
     /*
         Sets HTML output to a simple form:
@@ -262,9 +283,9 @@
     */
     "strip_yaml_front_matter": false,
 
-    /* do we show the panel when build with CMD+B */
+    /* do we show the panel when building with CMD+B */
     "show_panel_on_build": true,
 
-    /* do we include the CSS when outputting HTML into a new sublime view ? */
-    "embed_css_for_sublime_output": true
+    /* do we include the CSS when outputting HTML? */
+    "include_head": ["build", "browser", "sublime", "clipboard", "save"]
 }
