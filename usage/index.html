@@ -1,0 +1,1262 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="Markdown preview and build plugin for Sublime Text 3">
+      
+      
+        <link rel="canonical" href="https://revolunet.github.io/sublimetext-markdown-preview/usage/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-0.17.3, mkdocs-material-2.7.2">
+    
+    
+      
+        <title>Usage - Markdown Preview Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.8d40d89b.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.6079476c.css">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
+    
+    
+      <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+      
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+      <link rel="stylesheet" href="../extra-d04c85ed4a.css">
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <a href="#usage" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://revolunet.github.io/sublimetext-markdown-preview" title="Markdown Preview Documentation" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">description</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            
+              <span class="md-header-nav__topic">
+                Markdown Preview Documentation
+              </span>
+              <span class="md-header-nav__topic">
+                Usage
+              </span>
+            
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          
+            <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+            
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/revolunet/sublimetext-markdown-preview/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <span class="md-nav__button md-logo">
+      
+        <i class="md-icon">description</i>
+      
+    </span>
+    Markdown Preview Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/revolunet/sublimetext-markdown-preview/" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Markdown Preview" class="md-nav__link">
+      Markdown Preview
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../install/" title="Installation" class="md-nav__link">
+      Installation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Usage
+      </label>
+    
+    <a href="./" title="Usage" class="md-nav__link md-nav__link--active">
+      Usage
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#to-preview" title="To preview" class="md-nav__link">
+    To preview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-templates" title="Custom Templates" class="md-nav__link">
+    Custom Templates
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#livereload" title="LiveReload" class="md-nav__link">
+    LiveReload
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-path-conversion" title="Preview Path Conversion" class="md-nav__link">
+    Preview Path Conversion
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-temp-location" title="Preview Temp Location" class="md-nav__link">
+    Preview Temp Location
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enabling-other-external-markdown-parsers" title="Enabling Other External Markdown Parsers" class="md-nav__link">
+    Enabling Other External Markdown Parsers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-python-markdown-extensions" title="Configuring Python Markdown Extensions" class="md-nav__link">
+    Configuring Python Markdown Extensions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#to-build" title="To build" class="md-nav__link">
+    To build
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-pygments" title="Configuring Pygments" class="md-nav__link">
+    Configuring Pygments
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#meta-data-support" title="Meta Data Support" class="md-nav__link">
+    Meta Data Support
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-frontmatter-support" title="YAML Frontmatter Support" class="md-nav__link">
+    YAML Frontmatter Support
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#special-yaml-key-names" title="Special YAML Key Names" class="md-nav__link">
+    Special YAML Key Names
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsing-github-flavored-markdown" title="Parsing Github Flavored Markdown" class="md-nav__link">
+    Parsing Github Flavored Markdown
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#online" title="Online" class="md-nav__link">
+    Online
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#offline" title="Offline" class="md-nav__link">
+    Offline
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#including-css" title="Including CSS" class="md-nav__link">
+    Including CSS
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#override-css-by-file-type" title="Override CSS by File Type" class="md-nav__link">
+    Override CSS by File Type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#including-html-head" title="Including HTML HEAD" class="md-nav__link">
+    Including HTML HEAD
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#including-javascript" title="Including JavaScript" class="md-nav__link">
+    Including JavaScript
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#criticmarkup" title="CriticMarkup" class="md-nav__link">
+    CriticMarkup
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-html-output" title="Simple HTML Output" class="md-nav__link">
+    Simple HTML Output
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../extras/" title="Extras" class="md-nav__link">
+      Extras
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../changes/" title="Changes" class="md-nav__link">
+      Changes
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../license/" title="License" class="md-nav__link">
+      License
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#to-preview" title="To preview" class="md-nav__link">
+    To preview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-templates" title="Custom Templates" class="md-nav__link">
+    Custom Templates
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#livereload" title="LiveReload" class="md-nav__link">
+    LiveReload
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-path-conversion" title="Preview Path Conversion" class="md-nav__link">
+    Preview Path Conversion
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-temp-location" title="Preview Temp Location" class="md-nav__link">
+    Preview Temp Location
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enabling-other-external-markdown-parsers" title="Enabling Other External Markdown Parsers" class="md-nav__link">
+    Enabling Other External Markdown Parsers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-python-markdown-extensions" title="Configuring Python Markdown Extensions" class="md-nav__link">
+    Configuring Python Markdown Extensions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#to-build" title="To build" class="md-nav__link">
+    To build
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-pygments" title="Configuring Pygments" class="md-nav__link">
+    Configuring Pygments
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#meta-data-support" title="Meta Data Support" class="md-nav__link">
+    Meta Data Support
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-frontmatter-support" title="YAML Frontmatter Support" class="md-nav__link">
+    YAML Frontmatter Support
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#special-yaml-key-names" title="Special YAML Key Names" class="md-nav__link">
+    Special YAML Key Names
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsing-github-flavored-markdown" title="Parsing Github Flavored Markdown" class="md-nav__link">
+    Parsing Github Flavored Markdown
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#online" title="Online" class="md-nav__link">
+    Online
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#offline" title="Offline" class="md-nav__link">
+    Offline
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#including-css" title="Including CSS" class="md-nav__link">
+    Including CSS
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#override-css-by-file-type" title="Override CSS by File Type" class="md-nav__link">
+    Override CSS by File Type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#including-html-head" title="Including HTML HEAD" class="md-nav__link">
+    Including HTML HEAD
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#including-javascript" title="Including JavaScript" class="md-nav__link">
+    Including JavaScript
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#criticmarkup" title="CriticMarkup" class="md-nav__link">
+    CriticMarkup
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-html-output" title="Simple HTML Output" class="md-nav__link">
+    Simple HTML Output
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/revolunet/sublimetext-markdown-preview/tree/master/docs/src/markdown/usage.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link"></a></h1>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>When referring to settings, we are referring to the settings found at <code>Preferences</code>-&gt;<code>Package Settings</code>-&gt;<code>Markdown Preview</code>.</p>
+<ul>
+<li><code>Settings - User</code> is where you change your settings for Markdown Preview.</li>
+<li><code>Settings - Default</code> is a good reference with detailed descriptions for each setting.</li>
+</ul>
+</div>
+<h2 id="to-preview">To preview<a class="headerlink" href="#to-preview" title="Permanent link"></a></h2>
+<ul>
+<li>Optionally select some of your markdown for conversion.</li>
+<li>
+<p>Use the shortcut <span class="keys"><kbd class="key-command">Cmd</kbd><span>＋</span><kbd class="key-shift">Shift</kbd><span>＋</span><kbd class="key-p">P</kbd></span> then select <code>Markdown Preview</code> to show the follow commands (you will be prompted to select which parser you prefer):</p>
+<ul>
+<li>Markdown Preview: Preview in Browser</li>
+<li>Markdown Preview: Export HTML in Sublime Text</li>
+<li>Markdown Preview: Copy to Clipboard</li>
+<li>Markdown Preview: Open Markdown Cheat sheet</li>
+</ul>
+<p><img alt="Usage Demo" src="../images/sublimetext-markdown-preview.gif" /></p>
+</li>
+<li>
+<p>Or bind some shortcut in your user key binding, go to <code>Preferences --&gt; Keybindings</code> then add to the User map:</p>
+<p>For a specific parser and target:</p>
+<div class="codehilite"><pre><span></span><span class="p">{</span> <span class="s2">&quot;keys&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;alt+m&quot;</span><span class="p">],</span> <span class="s2">&quot;command&quot;</span><span class="o">:</span> <span class="s2">&quot;markdown_preview&quot;</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;target&quot;</span><span class="o">:</span> <span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="s2">&quot;parser&quot;</span><span class="o">:</span><span class="s2">&quot;markdown&quot;</span><span class="p">}</span> <span class="p">},</span>
+</pre></div>
+
+<p>To bring up the quick panel to select enabled parsers for a given target:</p>
+<div class="codehilite"><pre><span></span><span class="p">{</span> <span class="s2">&quot;keys&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;alt+m&quot;</span><span class="p">],</span> <span class="s2">&quot;command&quot;</span><span class="o">:</span> <span class="s2">&quot;markdown_preview_select&quot;</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;target&quot;</span><span class="o">:</span> <span class="s2">&quot;browser&quot;</span><span class="p">}</span> <span class="p">},</span>
+</pre></div>
+
+</li>
+<li>
+<p>If you want to control which browser the preview is opened in, you can edit the <code>browser</code> option in the settings file:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Sets the default opener for HTML files</span>
+
+<span class="cm">        default - Use the system default HTML viewer</span>
+<span class="cm">        other - Set a full path to any executable. ex: /Applications/Google Chrome Canary.app or /Applications/Firefox.app</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;browser&quot;</span><span class="o">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+</pre></div>
+
+</li>
+</ul>
+<h2 id="custom-templates">Custom Templates<a class="headerlink" href="#custom-templates" title="Permanent link"></a></h2>
+<p>By default, Markdown Preview uses a simple template, but you can use your own custom template with the setting <code>html_template</code>. If you wish to not include the default stylesheets, just remove them from the <code>css</code> option.</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Specify a HTML template file to render your markdown within.</span>
+
+<span class="cm">        Available place holders in HTML template:</span>
+<span class="cm">        {{ HEAD }} - would be replaced by generated stylesheets, javascripts enabled above</span>
+<span class="cm">        {{ BODY }} - would be replaced by HTML converted from markdown</span>
+
+<span class="cm">        By setting &quot;skip_default_stylesheet&quot; to true you can use the styles only in your HTML</span>
+<span class="cm">        template. In most cases you should turn this setting on to have a full-featured design.</span>
+
+<span class="cm">        Refer to &#39;customized-template-sample.html&#39; as a show case.</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;html_template&quot;</span><span class="o">:</span> <span class="s2">&quot;/ABS_PATH_TO_A_HTML_FILE&quot;</span><span class="p">,</span>
+</pre></div>
+
+<h2 id="livereload">LiveReload<a class="headerlink" href="#livereload" title="Permanent link"></a></h2>
+<p>To get live updates while editing a file after preview, you need to do the following:</p>
+<ol>
+<li>Enable the <code>enable_autoreload</code> setting in <code>MarkdownPreview.sublime-settings</code>.
+    <div class="codehilite"><pre><span></span>     <span class="cm">/*</span>
+<span class="cm">        Enable auto-reloaded on save. Will not work if GitHub parser is used without oauth key specified.</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;enable_autoreload&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</pre></div></li>
+<li>Install [LiveReload][7] package from Package Control.</li>
+<li>Restart.</li>
+<li>Open the command palette and select the command <code>LiveReload: Enable/disable plug-ins</code>.</li>
+<li>Select <code>Simple Reload with delay (400ms)</code>.  It is possible you can get away with <code>Simple Reload</code>, but some experience an issue where they are one rev behind when using <code>Simple Reload</code>.</li>
+<li>Edit document and enjoy live reload.</li>
+</ol>
+<p>You don't need to enable <code>Simple Reload</code> on every file as it is done globally; it can be turned on or off as needed.  From now on, files should auto-reload when you open them in the browser unless you disable <code>Simple Reload</code>.</p>
+<h2 id="preview-path-conversion">Preview Path Conversion<a class="headerlink" href="#preview-path-conversion" title="Permanent link"></a></h2>
+<p>In the generated previews, paths are converted so that images and other links work properly. By default, paths are converted to absolute paths, but you can use relative if desired as well.  Image paths can also be changed to inject embedded base 64 images (only for local images). Path handling is controlled by the following two settings:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Sets how image paths are handled.</span>
+<span class="cm">        Setting is a string value: (absolute | relative | base64 | none)</span>
+<span class="cm">            absolute: converts relative local paths to absolute</span>
+<span class="cm">            relative: converts relative local paths to a path relative to the</span>
+<span class="cm">                        HTML output</span>
+<span class="cm">            base64: coverts the local file to base64 and embeds it in the HTML</span>
+<span class="cm">            none: does nothing</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;image_path_conversion&quot;</span><span class="o">:</span> <span class="s2">&quot;absolute&quot;</span><span class="p">,</span>
+
+    <span class="cm">/*</span>
+<span class="cm">        Sets how file paths are handled.</span>
+<span class="cm">        Setting is a string value: (absolute | relative | none)</span>
+<span class="cm">            absolute: converts relative local paths to absolute</span>
+<span class="cm">            relative: converts relative local paths to a path relative to the</span>
+<span class="cm">                        HTML output</span>
+<span class="cm">            none: does nothing</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;file_path_conversions&quot;</span><span class="o">:</span> <span class="s2">&quot;absolute&quot;</span><span class="p">,</span>
+</pre></div>
+
+<h2 id="preview-temp-location">Preview Temp Location<a class="headerlink" href="#preview-temp-location" title="Permanent link"></a></h2>
+<p>By default, previews are generated in the OSs default temp location, but you can specify your own custom temp location via the <code>path_tempfile</code> option:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Sets a custom temporary folder for MarkdownPreview-generated HTML files. Useful if you&#39;re</span>
+<span class="cm">        using LiveReload and don&#39;t want to use the OS default. The directory will be created if it</span>
+<span class="cm">        doesn&#39;t exist. Relative paths are supported, and are checked against `os.path.isabs`, see</span>
+<span class="cm">        doc: http://docs.python.org/3/library/os.path.html#os.path.isabs</span>
+
+<span class="cm">        Examples: /tmp/custom_folder   (Linux/OSX - absolute path)</span>
+<span class="cm">                    C:/TEMP/MYNOTES</span>
+<span class="cm">                    C:\\TEMP\\MYNOTES    (Windows - absolute path, forward slash or escaped back slash)</span>
+<span class="cm">                    build                (All OS - relative path, current dir)</span>
+<span class="cm">                    ../build             (Linux/OSX - relative path, in parent dir)</span>
+<span class="cm">                    ..\\build            (Windows - relative path, in parent dir)</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;path_tempfile&quot;</span><span class="o">:</span> <span class="s2">&quot;/tmp/my_notes&quot;</span><span class="p">,</span>
+</pre></div>
+
+<h2 id="enabling-other-external-markdown-parsers">Enabling Other External Markdown Parsers<a class="headerlink" href="#enabling-other-external-markdown-parsers" title="Permanent link"></a></h2>
+<p>External parser commands and arguments should first be mapped to a name.  Each binary value must be an array with the path to the binary being first, followed by flags and options as individual indexes in the array.</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;markdown_binary_map&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;multimarkdown&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;/usr/local/bin/multimarkdown&quot;</span><span class="p">,</span> <span class="s2">&quot;--some-option&quot;</span><span class="p">,</span> <span class="s2">&quot;some-value&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+</pre></div>
+
+<p>Then the name can be placed in <code>enabled_parsers</code> to enable use of the new parser.</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;enabled_parsers&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;github&quot;</span><span class="p">,</span> <span class="s2">&quot;multimarkdown&quot;</span><span class="p">],</span>
+</pre></div>
+
+<h2 id="configuring-python-markdown-extensions">Configuring Python Markdown Extensions<a class="headerlink" href="#configuring-python-markdown-extensions" title="Permanent link"></a></h2>
+<p>Python Markdown comes with a number of extensions and can also use a number of 3<sup>rd</sup> party extensions.  To configure Markdown Preview with extensions, use the <code>markdown_extensions</code> setting.</p>
+<p><code>markdown_extensions</code> is a setting that contains an array of extensions in the format of their import path. For instance, the Toc (Table of Contents) extension is found in the Markdown Package at <code>markdown.extensions.toc</code>.  This is according to Python Markdown <a href="https://pythonhosted.org/Markdown/extensions/toc.html#usage">documentation</a>.  All extensions must be specified this way.</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+        <span class="s2">&quot;markdown.extensions.toc&quot;</span>
+    <span class="p">]</span>
+</pre></div>
+
+<p>To configure an extension, make the entry a dictionary.  In this example, we want to turn on Toc's permalink feature:</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;markdown.extensions.toc&quot;</span><span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;permalink&quot;</span><span class="o">:</span> <span class="kc">true</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+</pre></div>
+
+<p>You can configure extension options with strings, booleans, integers, floats, etc.  But sometimes, an extension can take a function.  Functions are not part of the JSON spec. Luckily, support has been added with the following syntax:</p>
+<p>To specify a function, create an object whose key is named <code>!!python/name</code>, and whose value is the import path of the function.  This syntax was picked to be similar to PyYaml's syntax which is used for the Markdown frontmatter.</p>
+<p>So let's pretend we didn't like Toc's default slugify <code>markdown.extensions.headerid.slugify</code>, and instead wanted to use PyMdown Extensions' slugify <code>pymdownx.slugs.uslugify</code>.  We could specify the new slugify function with the following syntax:</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;markdown.extensions.toc&quot;</span><span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;slugify&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;!!python/name&quot;</span><span class="p">,</span> <span class="s2">&quot;pymdownx.slugs.uslugify&quot;</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+</pre></div>
+
+<p>Compare to the PyYaml format:</p>
+<div class="codehilite"><pre><span></span>markdown_extensions:
+  - markdown.extensions.toc:
+      slugify: !!python/name:pymdownx.slugs.uslugify
+</pre></div>
+
+<h2 id="to-build">To build<a class="headerlink" href="#to-build" title="Permanent link"></a></h2>
+<p>Just use <kbd>ctrl</kbd>+<kbd>B</kbd> (Windows/Linux) or <kbd>cmd</kbd>+<kbd>B</kbd> (Mac) to build current file.</p>
+<p>You can configure the build action by using the <code>build_action</code> setting.</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        By default, Markdown Preview builds the HTML in the source directory.</span>
+<span class="cm">        It expects the file to exist on disk.  It pops up the build output panel etc.</span>
+
+<span class="cm">        If you wish to override this behavior, you can change &quot;build_action&quot;</span>
+
+<span class="cm">        build - The default build behavior.</span>
+<span class="cm">        browser - Preview the file in your browser.</span>
+<span class="cm">        clipboard - Copy the HTML output to the clipboard.</span>
+<span class="cm">        sublime - Export the HTML to a Sublime tab.</span>
+<span class="cm">        save - Run the normal save command that outputs to the source directory.</span>
+<span class="cm">            It will also prompt for &quot;save as&quot; if the file does not exit on disk.</span>
+
+<span class="cm">        All the build options use the default parser defined above in &quot;parser&quot;</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;build_action&quot;</span><span class="o">:</span> <span class="s2">&quot;build&quot;</span><span class="p">,</span>
+</pre></div>
+
+<p>And the parser that is used when building is set in the <code>parser</code> setting:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Sets the parser used for building markdown to HTML.</span>
+
+<span class="cm">        NOTE: The parser setting is not for the preview commands now.</span>
+<span class="cm">        The previews have separate commands for each parser markdown.</span>
+
+<span class="cm">        Warning for github API: if you have a ST2 linux build, Python is not built with SSL so it may not work</span>
+
+<span class="cm">        default - The current default parser is python-markdown parser.</span>
+<span class="cm">        markdown - Use the built-in python-markdown parser</span>
+<span class="cm">        github - Use the github API to convert markdown, so you can use GitHub flavored Markdown, see https://help.github.com/articles/github-flavored-markdown/</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;parser&quot;</span><span class="o">:</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span>
+</pre></div>
+
+<p>When building, a panel will be opened showing build information. This can be disabled by setting <code>show_panel_on_build</code> to <code>false</code>:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/* do we show the panel when building with CMD+B */</span>
+    <span class="s2">&quot;show_panel_on_build&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</pre></div>
+
+<h2 id="configuring-pygments">Configuring Pygments<a class="headerlink" href="#configuring-pygments" title="Permanent link"></a></h2>
+<p>If you add the codehilite extension manually in the enabled extensions, you can override some of the default settings.</p>
+<ul>
+<li>
+<p>Turn language guessing <em>on</em> or <em>off</em> (<em>on</em> will highlight fenced blocks even if you don't specify a language):</p>
+<div class="codehilite"><pre><span></span><span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;codehilite&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;guess_lang&quot;</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+</li>
+<li>
+<p>Show line numbers:</p>
+<div class="codehilite"><pre><span></span><span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;codehilite&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;linenums&quot;</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+</li>
+<li>
+<p>Change the higlight theme:</p>
+<div class="codehilite"><pre><span></span><span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;codehilite&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;pygments_style&quot;</span><span class="o">:</span> <span class="s2">&quot;emacs&quot;</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+</li>
+<li>
+<p>Inline the CSS:</p>
+<div class="codehilite"><pre><span></span><span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;codehilite&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;noclasses&quot;</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+</li>
+<li>
+<p>Use multiple:
+    <div class="codehilite"><pre><span></span><span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;codehilite&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;linenums&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="s2">&quot;pygments_style&quot;</span><span class="o">:</span> <span class="s2">&quot;emacs&quot;</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div></p>
+</li>
+</ul>
+<p>The <code>codehiite</code> extension's <code>pygments_style</code> option is only useful if you are using <code>noclasses</code> which writes the styles directly to the HTML tags via the <code>style</code> attribute. Normally, we just inject CSS generated by Pygments which is the default behavior. Whether the CSS injection occurs, the Pygments' style that is used, and the CSS class that is used for code blocks can all be controlled with the following options:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        If Pygments is being used, you may want to inject one of the Pygment styles provided into the HTML.</span>
+<span class="cm">        If so, enable this.</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;pygments_inject_css&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+
+    <span class="cm">/*</span>
+<span class="cm">        Name of the Pygments style to inject. Available styles are the styles provided by pygments</span>
+<span class="cm">        plus &quot;github&quot; and &quot;github2014&quot;.</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;pygments_style&quot;</span><span class="o">:</span> <span class="s2">&quot;github&quot;</span><span class="p">,</span>
+
+    <span class="cm">/*</span>
+<span class="cm">        This is the class to prepend to the pygments CSS styles. Make sure it matches whatever class(es)</span>
+<span class="cm">        you&#39;ve specified in the extension that controls Pygments highlighting.  CodeHilite&#39;s default is</span>
+<span class="cm">        &quot;codehilite&quot;.</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;pygments_css_class&quot;</span><span class="o">:</span> <span class="s2">&quot;codehilite&quot;</span><span class="p">,</span>
+</pre></div>
+
+<p>See <a href="https://python-markdown.github.io/extensions/code_hilite">codehilte page</a> for more info.</p>
+<h2 id="meta-data-support">Meta Data Support<a class="headerlink" href="#meta-data-support" title="Permanent link"></a></h2>
+<p>When the <code>meta</code> extension is enabled (<a href="https://python-markdown.github.io/extensions/meta_data">https://python-markdown.github.io/extensions/meta_data</a>), the results will be written to the HTML head in the form <code>&lt;meta name=&quot;key&quot; content=&quot;value1,value2&quot;&gt;</code>.  <code>title</code> is the one exception, and its content will be written to the title tag in the HTML head.</p>
+<h2 id="yaml-frontmatter-support">YAML Frontmatter Support<a class="headerlink" href="#yaml-frontmatter-support" title="Permanent link"></a></h2>
+<p>YAML frontmatter can be stripped out and read when <code>strip_yaml_front_matter</code> is set to  <code>true</code> in the settings file.  In general the, the frontmatter is handled the same as <a href="#meta-data-support">meta data</a>, but if both exist in a file, the YAML keys will override the <code>meta</code> extension keys.  There are a few special key names that won't be handled as HTML meta data.</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Strips the YAML front matter header and converts title to a heading</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;strip_yaml_front_matter&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</pre></div>
+
+<h3 id="special-yaml-key-names">Special YAML Key Names<a class="headerlink" href="#special-yaml-key-names" title="Permanent link"></a></h3>
+<p>YAML frontmatter has a few special key names that are used that will not be handled as meta data:</p>
+<ul>
+<li><strong>basepath</strong>: An absolute path to configure the relative paths for images etc. (for when the markdown is supposed to reference images in a different location.)</li>
+<li><strong>references</strong>: Can take a file path or an array of file paths for separate markdown files containing references, footnotes, etc.  Can be an absolute path or relative path.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the <code>basepath</code> setting.</li>
+<li><strong>destination</strong>: This is an absolute file path or relative file path for when the markdown is saved to html via the build command or the <code>Save to HTML</code> command.  Relative paths first use the source file's directory, and if the file cannot be found, it will use the <code>basepath</code> setting.</li>
+<li><strong>settings</strong>: This is a dictionary where you can override settings that are in the settings file.</li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="nn">---</span>
+    <span class="c1"># Builtin values</span>
+    <span class="l l-Scalar l-Scalar-Plain">references</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">references.md</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">abbreviations.md</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">footnotes.md</span>
+
+    <span class="l l-Scalar l-Scalar-Plain">destination</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">destination.html</span>
+
+    <span class="c1"># Meta Data</span>
+    <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Test Page</span>
+    <span class="l l-Scalar l-Scalar-Plain">author</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">John Doe</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Jane Doe</span>
+
+    <span class="c1"># Settings overrides</span>
+    <span class="l l-Scalar l-Scalar-Plain">settings</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">enable_uml</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="l l-Scalar l-Scalar-Plain">markdown_extensions</span><span class="p p-Indicator">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.footnotes</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.attr_list</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.def_list</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.tables</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.abbr</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.toc</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.smarty</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.meta</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.wikilinks</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.admonition</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">markdown.extensions.codehilite</span><span class="p p-Indicator">:</span>
+              <span class="l l-Scalar l-Scalar-Plain">guess_lang</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+              <span class="l l-Scalar l-Scalar-Plain">pygments_style</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">github</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pymdownx.extrarawhtml</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pymdownx.progressbar</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pymdownx.github</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pymdownx.caret</span><span class="p p-Indicator">:</span>
+              <span class="l l-Scalar l-Scalar-Plain">superscript</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nn">---</span>
+</pre></div>
+
+<h2 id="parsing-github-flavored-markdown">Parsing Github Flavored Markdown<a class="headerlink" href="#parsing-github-flavored-markdown" title="Permanent link"></a></h2>
+<p>Github Flavored Mardown (GFM) is a very popular markdown.  Markdown Preview can actually handle them in a couple of ways: online and offline.</p>
+<h3 id="online">Online<a class="headerlink" href="#online" title="Permanent link"></a></h3>
+<p>Parsing GFM using the online method requires using the Github API as the parser.  It may also require setting <code>github_mode</code> to <code>gfm</code> to get things like tasklists to render properly.</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Default mode for the github Markdown parser : markdown (documents) or gfm (comments)</span>
+<span class="cm">        see http://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;github_mode&quot;</span><span class="o">:</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span>
+</pre></div>
+
+<p>Using the GitHub API without an oauth key is limited to so many calls.  After the limit is reached, the GitHub API will deny further calls until after a set limit of time. To avoid this issue, you can set your API key in the settings as follows:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Uses an OAuth token when parsing markdown with GitHub API. To create one for Markdown Preview, see https://help.github.com/articles/creating-an-oauth-token-for-command-line-use.</span>
+<span class="cm">        Warn: this secret *must not be shared* with anyone and at least you should create it with minimal scopes for security reasons.</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;github_oauth_token&quot;</span><span class="o">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">,</span>
+</pre></div>
+
+<p>The GitHub API only inserts IDs for headers when <code>github_mode</code> is <code>markdown</code>, but it doesn't quite generate the way that GitHub does in your project's readmes on the site. This makes it so the GitHub CSS doesn't create the clickable anchors. So when <code>github_mode</code> is <code>markdown</code>, you can have Markdown Preview insert the ids properly so the CSS works with the following option:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Enables a post process to inject header ids to ensure hrefs to headers work</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;github_inject_header_ids&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</pre></div>
+
+<h3 id="offline">Offline<a class="headerlink" href="#offline" title="Permanent link"></a></h3>
+<p>By default almost all extensions are enabled to help with a GitHub-ish feel, but there are some tweaks needed to get the full experience.</p>
+<p>GFM does not auto guess language in fenced blocks, but Markdown Preview does this by default.  You can fix this in one of two ways:</p>
+<ol>
+<li>Disable auto language guessing in the settings file <code>&quot;guess_language&quot;: false,</code></li>
+<li>
+<p>Or if you are manually defining extensions:</p>
+<div class="codehilite"><pre><span></span><span class="s2">&quot;markdown_extensions&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;codehilite&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;guess_lang&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="s2">&quot;pygments_style&quot;</span><span class="o">:</span> <span class="s2">&quot;github&quot;</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+</li>
+</ol>
+<p>As mentioned earlier, a number of extensions are included by default. You can remove ones that are not part of GFM.</p>
+<h2 id="including-css">Including CSS<a class="headerlink" href="#including-css" title="Permanent link"></a></h2>
+<p>By default Markdown Preview includes a default CSS via the <code>css</code> setting.  It uses the special keyword <code>default</code> to represent the default CSS.</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;css&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">],</span>
+</pre></div>
+
+<p>You can include whatever CSS you want, and even remove the <code>default</code> if you like.  It can take URLs or file paths. If you want to add a resource that is contained within a Sublime Package (like the Markdown Preview package itself), you can use the special URL of <code>res://&lt;package_name&gt;/&lt;subfolders&gt;/file.css</code>. Using the <code>res://</code> format will allow Markdown Preview to resolve the resource when it is in a package that is zipped and unzipped.</p>
+<h3 id="override-css-by-file-type">Override CSS by File Type<a class="headerlink" href="#override-css-by-file-type" title="Permanent link"></a></h3>
+<p>You can also override the default CSS with special file specific CSS. This CSS does not replace the default, but will append CSS for a supported file type after the conventional CSS.</p>
+<p>So assuming the following configuration:</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;css&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">],</span>
+    <span class="c1">// File must be of one type below</span>
+    <span class="s2">&quot;markdown_filetypes&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;.md&quot;</span><span class="p">,</span> <span class="s2">&quot;.markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;.mdown&quot;</span><span class="p">],</span>
+</pre></div>
+
+<p>We could enable the following:</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;allow_css_overrides&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</pre></div>
+
+<p>Then if we have a file <code>filename.md</code> and a CSS in the same directory <code>filename.css</code>, that CSS will be applied to that file.</p>
+<h3 id="including-html-head">Including HTML HEAD<a class="headerlink" href="#including-html-head" title="Permanent link"></a></h3>
+<p>By default, the head is always included in the HTML output. This includes the CSS, JavaScript, etc. If for some reason you need to omit the HEAD, you can by modifying the <code>include_head</code> option.  Just remove the target that you wish to omit the head in. The option <code>build</code> specifically refers to when <code>build_action</code> is set to <code>build</code> in the settings.</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/* do we include the CSS when outputting HTML? */</span>
+    <span class="s2">&quot;include_head&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;build&quot;</span><span class="p">,</span> <span class="s2">&quot;browser&quot;</span><span class="p">,</span> <span class="s2">&quot;sublime&quot;</span><span class="p">,</span> <span class="s2">&quot;clipboard&quot;</span><span class="p">,</span> <span class="s2">&quot;save&quot;</span><span class="p">]</span>
+</pre></div>
+
+<h2 id="including-javascript">Including JavaScript<a class="headerlink" href="#including-javascript" title="Permanent link"></a></h2>
+<p>JavaScript files can be included via the <code>js</code> setting.  It is a list and can take file paths or URLs. If you want to add a resource that is contained within a Sublime Package (like the Markdown Preview package itself), you can use the special URL of <code>res://&lt;package_name&gt;/&lt;subfolders&gt;/file.js</code>. Using the <code>res://</code> format will allow Markdown Preview to resolve the resource when it is in a package that is zipped and unzipped.</p>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;js&quot;</span><span class="o">:</span> <span class="p">[],</span>
+</pre></div>
+
+<h2 id="criticmarkup">CriticMarkup<a class="headerlink" href="#criticmarkup" title="Permanent link"></a></h2>
+<p>Python Markdown can strip/apply out <a href="http://criticmarkup.com/">CriticMarkup</a> syntax if desired.  Simply enable the following option:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Sets how multimarkdown critic marks are handled.</span>
+<span class="cm">        Setting is a string value: (accept | reject | none)</span>
+<span class="cm">            accept: Accepts the proposed inserts and deletions (comments etc. are discarded)</span>
+<span class="cm">            reject: Rejects the proposed inserts and deletions (comments etc. are discarded)</span>
+<span class="cm">            none: does nothing</span>
+
+<span class="cm">        Critic marks only affects &quot;github&quot; and &quot;markdown&quot; (Python Markdown).</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;strip_critic_marks&quot;</span><span class="o">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+</pre></div>
+
+<h3 id="simple-html-output">Simple HTML Output<a class="headerlink" href="#simple-html-output" title="Permanent link"></a></h3>
+<p>Some people may desire a stripped down output on occasions that does not include HTML headers, inline styles, and IDs. Markdown Preview has a mode that will strip out these things and omit using a template.  This mode can be enabled via the the <code>html_simple</code> option:</p>
+<div class="codehilite"><pre><span></span>    <span class="cm">/*</span>
+<span class="cm">        Sets HTML output to a simple form:</span>
+<span class="cm">            - No head</span>
+<span class="cm">            - No body tags</span>
+<span class="cm">            - ids, classes, and style are stripped out</span>
+<span class="cm">            - Just bare minimum HTML tags and attributes</span>
+<span class="cm">            - extension modifications included</span>
+<span class="cm">    */</span>
+    <span class="s2">&quot;html_simple&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</pre></div>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../install/" title="Installation" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Installation
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../extras/" title="Extras" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Extras
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <br><span class="md-footer-custom-text">emoji provided free by </span><a href="http://www.emojione.com">EmojiOne</a>
+
+          </div>
+        
+        powered by
+        <a href="http://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+        
+  <div class="md-footer-social">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+      <a href="https://github.com/revolunet" class="md-footer-social__link fa fa-github"></a>
+    
+  </div>
+
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.b438e6c5.js"></script>
+      
+      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
+      
+        <script src="../extra-d8800ea088.js"></script>
+      
+    
+    
+      
+    
+  </body>
+</html>
