@@ -1,5 +1,7 @@
 # Markdown Preview
 
+**New Repository location: https://github.com/facelessuser/MarkdownPreview. Please direct all issues, pulls, and feature requests to the new repository**
+
 Preview and build your markdown files quickly in your web browser.
 
 You can use the builtin [Python Markdown][pymd] parser (offline) or use the [GitHub Markdown API][gfm-api] (online) for the conversion.
