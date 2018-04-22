@@ -4,7 +4,7 @@
 
 Preview and build your markdown files quickly in your web browser.
 
-:warning: This project is now maintained here : [facelessuser/MarkdownPreview](home)
+:warning: This project is now maintained here : [facelessuser/MarkdownPreview][home].
 
 ## Support
 
@@ -12,4 +12,4 @@ Preview and build your markdown files quickly in your web browser.
 
 
 [home]: https://github.com/facelessuser/MarkdownPreview
-[issue]: https://github.com/faceless/MarkdownPreview/issues
+[issue]: https://github.com/facelessuser/MarkdownPreview/issues
